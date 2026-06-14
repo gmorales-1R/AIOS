@@ -1,4 +1,4 @@
-# agents/curator
+# .this/agents/curator
 
 The curator maintains the integrity and coherence of the AIOS node tree. It is part of the sprout — it ships with the framework and is available in any tree that grows from it.
 
@@ -45,7 +45,7 @@ Always breadth-first. Process all nodes at depth N before descending to depth N+
 
 ## Active paths
 
-`/agents/curator` (this node only — the curator loads the full tree itself during traversal)
+`/.this/agents/curator` (this node only — the curator loads the full tree itself during traversal)
 
 ## Expansion
 

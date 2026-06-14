@@ -16,6 +16,14 @@ Nodes may expand into a `.this/` directory for additional facets loaded on deman
 
 When a node only needs `this.md`, no `.this/` directory is required.
 
+## Root extras
+
+Load these from `/.this/` as part of every activation:
+
+| File | When to load |
+|------|-------------|
+| `etiquette.md` | Always — behavioral patterns learned from past interactions |
+
 ## Activation Skill: `load-context`
 
 When an agent is invoked, one or more **active paths** are provided (e.g. `/projects/calendar`, `/agents/planner`).
@@ -23,10 +31,11 @@ When an agent is invoked, one or more **active paths** are provided (e.g. `/proj
 Execute this skill before any other action:
 
 1. This file is already loaded (root context is always first).
-2. For each active path, walk from root to leaf and load `this.md` at each level in order.
+2. Load all required root extras listed above.
+3. For each active path, walk from root to leaf and load `this.md` at each level in order.
    - `/projects/calendar` → load `/projects/this.md`, then `/projects/calendar/this.md`
-3. At each node, check whether that `this.md` references `.this/` extras. Load only those listed as required; defer optional ones unless the task needs them.
-4. Context is now assembled. Proceed with the task.
+4. At each node, check whether that `this.md` references `.this/` extras. Load only those listed as required; defer optional ones unless the task needs them.
+5. Context is now assembled. Proceed with the task.
 
 If no active paths are provided, operate from root context only.
 
@@ -41,3 +50,13 @@ If no active paths are provided, operate from root context only.
 ## Tree index
 
 `/index.md` — flat map of all nodes, maintained by the curator agent. Read it for a quick overview of what exists in the tree.
+
+## Top-level nodes
+
+| Path | Purpose |
+|------|---------|
+| `agents/` | User-defined agent definitions |
+| `templates/` | Node type templates used by the steward (part of the sprout) |
+| `personal/` | Personal tools and knowledge namespace |
+
+Sprout-internal agents (curator, steward, archivist) live in `/.this/agents/` and are loaded as framework internals, not user nodes.

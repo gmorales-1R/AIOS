@@ -1,0 +1,3 @@
+# customer_interactions.log
+# Append-only. Managed by steward hook. Processed and trimmed by archivist.
+# Format: [ISO 8601 timestamp] [agent] interaction summary
