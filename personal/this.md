@@ -25,5 +25,6 @@ Agents operating here have the owner as their sole focus. When in doubt:
 | Node | Purpose |
 |------|---------|
 | `calendar/` | Time and scheduling |
+| `ToDo/` | Task and action management |
 
 More nodes will be added as the namespace grows (health, finance, goals, knowledge, etc.).
