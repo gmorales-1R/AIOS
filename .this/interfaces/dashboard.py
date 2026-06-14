@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+"""Generates dashboard.html from the AIOS tree. Run to refresh."""
+
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT  = Path(__file__).parent / "dashboard.html"
+
+html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIOS</title>
+  <style>
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }}
+    .card {{
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 48px 64px;
+      text-align: center;
+      max-width: 480px;
+    }}
+    h1 {{ font-size: 2.4rem; letter-spacing: 0.12em; color: #fff; }}
+    p  {{ margin-top: 16px; color: #888; font-size: 0.95rem; line-height: 1.6; }}
+    .root {{ margin-top: 24px; font-size: 0.8rem; color: #444; font-family: monospace; }}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>AIOS</h1>
+    <p>AI Operating System — your tree is growing.</p>
+    <div class="root">{ROOT}</div>
+  </div>
+</body>
+</html>
+"""
+
+OUT.write_text(html)
+print(f"Written → {OUT}")
