@@ -1,6 +1,6 @@
-# architect — catalog
+# steward — catalog
 
-Maps needs to templates. Consulted during step 2 of the architect workflow.
+Maps needs to templates. Consulted during step 2 of the steward workflow.
 
 ## Available templates
 

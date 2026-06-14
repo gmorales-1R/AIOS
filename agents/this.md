@@ -21,8 +21,9 @@ agents/
 
 | Agent | Role |
 |-------|------|
-| `architect/` | Guides node creation and modification, from need to scaffolded tree |
+| `archivist/` | Processes interaction logs into structured experience and behavioral patterns |
 | `curator/` | Maintains tree integrity, references, index, and convention compliance |
+| `steward/` | Guides node creation and modification, from need to scaffolded tree |
 
 ## Conventions for agent nodes
 
