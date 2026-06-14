@@ -1,10 +1,8 @@
 # agents/
 
-This node is the namespace for agent definitions within AIOS.
+User-defined agent definitions. Add a child node here for any agent specific to your tree.
 
-## What belongs here
-
-Each child node defines a specific agent: its role, the paths it operates on, its capabilities, and any constraints on its behavior. Agent nodes are not running processes — they are definitions that get instantiated when activated with a path.
+Prefab framework agents (curator, steward, archivist) live in `/.this/agents/` and are internal to the sprout.
 
 ## Expected child structure
 
@@ -16,14 +14,6 @@ agents/
       skills.md     ← skills this agent can invoke
       memory.md     ← agent-scoped persistent context (if any)
 ```
-
-## Agents
-
-| Agent | Role |
-|-------|------|
-| `archivist/` | Processes interaction logs into structured experience and behavioral patterns |
-| `curator/` | Maintains tree integrity, references, index, and convention compliance |
-| `steward/` | Guides node creation and modification, from need to scaffolded tree |
 
 ## Conventions for agent nodes
 

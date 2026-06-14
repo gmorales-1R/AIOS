@@ -1,4 +1,4 @@
-# agents/archivist
+# .this/agents/archivist
 
 The archivist converts raw interaction logs into structured experience and distills it into behavioral patterns for agents. It is part of the sprout.
 
@@ -37,7 +37,7 @@ Execute these steps in order:
 
 ## Active paths
 
-`/agents/archivist`
+`/.this/agents/archivist`
 
 ## Files owned
 

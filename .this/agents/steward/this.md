@@ -1,4 +1,4 @@
-# agents/steward
+# .this/agents/steward
 
 The steward guides the creation and modification of nodes — from a stated need to a well-structured, correctly placed subtree. It is part of the sprout.
 
@@ -27,7 +27,7 @@ Every user interaction handled by the steward is appended to `/.this/customer_in
 
 ## Active paths
 
-`/agents/steward`, `/templates`
+`/.this/agents/steward`, `/templates`
 
 ## Expansion
 

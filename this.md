@@ -55,6 +55,8 @@ If no active paths are provided, operate from root context only.
 
 | Path | Purpose |
 |------|---------|
-| `agents/` | Prefab agent definitions (part of the sprout) |
-| `templates/` | Node type templates used by the architect agent (part of the sprout) |
+| `agents/` | User-defined agent definitions |
+| `templates/` | Node type templates used by the steward (part of the sprout) |
 | `personal/` | Personal tools and knowledge namespace |
+
+Sprout-internal agents (curator, steward, archivist) live in `/.this/agents/` and are loaded as framework internals, not user nodes.
