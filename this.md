@@ -36,3 +36,8 @@ If no active paths are provided, operate from root context only.
 - Deeper detail lives in `.this/`. Reference it from `this.md` when relevant.
 - A node does not need to declare every possible child — only those with meaningful constraints or context.
 - Prefer depth over breadth: a well-defined narrow node is better than a vague broad one.
+- When adding or removing a child node, update the parent's `this.md` table in the same operation.
+
+## Tree index
+
+`/index.md` — flat map of all nodes, maintained by the curator agent. Read it for a quick overview of what exists in the tree.

@@ -17,6 +17,12 @@ agents/
       memory.md     ← agent-scoped persistent context (if any)
 ```
 
+## Agents
+
+| Agent | Role |
+|-------|------|
+| `curator/` | Maintains tree integrity, references, index, and convention compliance |
+
 ## Conventions for agent nodes
 
 - `this.md` must declare the agent's **role** (one sentence) and its **default active paths**.
