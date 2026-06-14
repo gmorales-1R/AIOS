@@ -21,6 +21,7 @@ agents/
 
 | Agent | Role |
 |-------|------|
+| `architect/` | Guides node creation and modification, from need to scaffolded tree |
 | `curator/` | Maintains tree integrity, references, index, and convention compliance |
 
 ## Conventions for agent nodes

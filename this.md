@@ -41,3 +41,11 @@ If no active paths are provided, operate from root context only.
 ## Tree index
 
 `/index.md` — flat map of all nodes, maintained by the curator agent. Read it for a quick overview of what exists in the tree.
+
+## Top-level nodes
+
+| Path | Purpose |
+|------|---------|
+| `agents/` | Prefab agent definitions (part of the sprout) |
+| `templates/` | Node type templates used by the architect agent (part of the sprout) |
+| `personal/` | Personal tools and knowledge namespace |
