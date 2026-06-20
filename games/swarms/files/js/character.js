@@ -44,10 +44,10 @@ export class Character {
     }
   }
 
-  setDestination(tiles, targetTile) {
+  setDestination(tiles, targetTile, isBlocked = () => false) {
     const { tile: start } = nearestTile(tiles, this.x, this.y);
     if (start === targetTile) return;
-    const waypoints  = findPath(tiles, start, targetTile);
+    const waypoints  = findPath(tiles, start, targetTile, isBlocked);
     this.targetTile  = targetTile;
     if (waypoints === null) {
       this.path        = [];

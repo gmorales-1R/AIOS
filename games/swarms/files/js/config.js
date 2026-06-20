@@ -45,4 +45,6 @@ export const COLORS = {
   hudHealth:     '#e84040',
   hudHunger:     '#e8a040',
   hudBg:         '#1a1a22',
+  waterFill:     '#0d1f2d',
+  waterBorder:   '#1a4060',
 };

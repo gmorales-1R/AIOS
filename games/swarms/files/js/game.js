@@ -118,11 +118,13 @@ resize();
 // Centre the background camera on the start screen.
 camera.deserialize({ ...boardCenter(), z: 1 });
 
+const isBlocked = (tile) => !!tile.water;
+
 setupInput(canvas, camera, {
   onTap(wx, wy) {
     if (gameState !== 'playing') return;
     const { tile } = nearestTile(tiles, wx, wy);
-    if (tile) character.setDestination(tiles, tile);
+    if (tile) character.setDestination(tiles, tile, isBlocked);
   },
 });
 

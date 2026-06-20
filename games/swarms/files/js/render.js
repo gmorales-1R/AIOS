@@ -22,7 +22,7 @@ export function render(ctx, camera, tiles, character) {
         c.y < -margin || c.y > viewH + margin) continue;
 
     const isTarget = t === character.targetTile;
-    let borderColor = COLORS.tileBorder;
+    let borderColor = t.water ? COLORS.waterBorder : COLORS.tileBorder;
     let lineWidth   = Math.max(1, 0.04 * ppu);
     if (isTarget) {
       borderColor = character.targetState === 'unreachable'
@@ -37,13 +37,15 @@ export function render(ctx, camera, tiles, character) {
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.closePath();
-    ctx.fillStyle   = t.tree ? COLORS.treeFill : COLORS.tileFill;
+    ctx.fillStyle   = t.water ? COLORS.waterFill
+                    : t.tree  ? COLORS.treeFill
+                    : COLORS.tileFill;
     ctx.fill();
     ctx.lineWidth   = lineWidth;
     ctx.strokeStyle = borderColor;
     ctx.stroke();
 
-    if (t.apples > 0) {
+    if (t.apples > 0 && !t.water) {
       const positions = APPLE_POS[t.apples - 1];
       for (const [ox, oy] of positions) {
         ctx.beginPath();
