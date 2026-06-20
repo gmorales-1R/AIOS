@@ -1,19 +1,34 @@
-import { SIDES, nearestTile } from './hex.js';
+import { nearestTile } from './hex.js';
+import { findPath } from './pathfind.js';
 import { MOVE_SPEED } from './config.js';
 
 export class Character {
   constructor(x, y) {
     this.x = x; this.y = y;
-    this.path = [];   // queue of {x, y} waypoints
+    this.path = [];
+    this.targetTile  = null;
+    this.targetState = null;   // 'active' | 'unreachable' | null
   }
 
   get moving() { return this.path.length > 0; }
 
   setDestination(tiles, targetTile) {
-    this.path = buildPath(tiles, this, targetTile);
+    const { tile: start } = nearestTile(tiles, this.x, this.y);
+    if (start === targetTile) return;   // already there
+
+    const waypoints = findPath(tiles, start, targetTile);
+    this.targetTile  = targetTile;
+    if (waypoints === null) {
+      this.path        = [];
+      this.targetState = 'unreachable';
+    } else {
+      this.path        = waypoints;
+      this.targetState = 'active';
+    }
   }
 
   update(dt) {
+    const wasMoving = this.moving;
     let budget = MOVE_SPEED * dt;
     while (budget > 0 && this.path.length > 0) {
       const wp = this.path[0];
@@ -29,37 +44,10 @@ export class Character {
         budget = 0;
       }
     }
-  }
-}
-
-// Greedy hop toward the target tile. At each tile, pick the edge whose outward
-// normal best aligns with the (tile -> target) vector, then enqueue that edge's
-// midpoint followed by the neighbour tile's center. Repeat until we arrive.
-function buildPath(tiles, char, target) {
-  const start = nearestTile(tiles, char.x, char.y).tile;
-  if (!start || !target) return [];
-
-  const path = [];
-  let cur = start;
-  let guard = 0;
-  while (cur !== target && guard++ < 1000) {
-    const vx = target.x - cur.x, vy = target.y - cur.y;
-
-    let best = -Infinity, side = null;
-    for (const s of SIDES) {
-      const dot = s.normal[0] * vx + s.normal[1] * vy;
-      if (dot > best) { best = dot; side = s; }
+    // Clear target highlight on natural arrival.
+    if (wasMoving && !this.moving) {
+      this.targetTile  = null;
+      this.targetState = null;
     }
-
-    const mid = { x: cur.x + side.mid[0], y: cur.y + side.mid[1] };
-    const nx = cur.x + side.neighbor[0];
-    const ny = cur.y + side.neighbor[1];
-    const near = nearestTile(tiles, nx, ny);
-    if (!near.tile || near.dist > 0.1) break;   // would leave the board
-
-    path.push(mid);
-    path.push({ x: near.tile.x, y: near.tile.y });
-    cur = near.tile;
   }
-  return path;
 }

@@ -24,6 +24,8 @@ export const COLORS = {
   page: '#0a0a0f',
   tileFill: '#000000',
   tileBorder: '#33ff6a',
+  targetActive: '#ffe600',
+  targetBad: '#ff3333',
   character: '#2f6bff',
   characterEdge: '#bcd4ff',
 };

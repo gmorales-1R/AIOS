@@ -3,7 +3,7 @@
 Emits a modular front-end:
   files/game.html
   files/css/style.css
-  files/js/{config,hex,camera,character,input,render,game}.js
+  files/js/{config,hex,camera,pathfind,character,input,render,game}.js
 
 Run from anywhere:  python games/swarms/code/generate_game.py
 """
@@ -81,6 +81,8 @@ export const COLORS = {
   page: '#0a0a0f',
   tileFill: '#000000',
   tileBorder: '#33ff6a',
+  targetActive: '#ffe600',
+  targetBad: '#ff3333',
   character: '#2f6bff',
   characterEdge: '#bcd4ff',
 };
@@ -230,25 +232,126 @@ export class Camera {
 """
 
 # --------------------------------------------------------------------------- #
-# JS: character.js  — state + "side then center" pathing
+# JS: pathfind.js  — DFS with limited backtracking, obstacle-aware
+# --------------------------------------------------------------------------- #
+PATHFIND_JS = """\
+import { SIDES, nearestTile } from './hex.js';
+
+// Greedy DFS with limited backtracking.
+//
+// At each tile, sides are ranked by dot-product alignment with the
+// current-tile → target direction. We try up to MAX_TRIES sides before
+// backtracking. When the direction lands near-equally between two edges
+// (vertex case), both forward edges are covered in the first two tries.
+//
+// Returns an array of {x,y} waypoints (side-midpoint then tile-center,
+// alternating) or null if the target is unreachable within GUARD steps.
+const MAX_TRIES = 3;
+const GUARD    = 600;
+
+export function findPath(tiles, start, target, isBlocked = () => false) {
+  if (start === target) return [];
+
+  const tilePath = [start];
+  const inPath   = new Set([start]);
+  const triedAt  = new Map();
+
+  const tried = (tile) => {
+    if (!triedAt.has(tile)) triedAt.set(tile, new Set());
+    return triedAt.get(tile);
+  };
+
+  for (let g = 0; g < GUARD; g++) {
+    const cur = tilePath[tilePath.length - 1];
+    const t   = tried(cur);
+
+    const dir = { x: target.x - cur.x, y: target.y - cur.y };
+    const ranked = SIDES
+      .map((s, i) => ({ i, dot: s.normal[0] * dir.x + s.normal[1] * dir.y }))
+      .sort((a, b) => b.dot - a.dot);
+
+    let advanced = false;
+    for (const { i } of ranked) {
+      if (t.has(i))        continue;
+      if (t.size >= MAX_TRIES) break;   // budget exhausted for this tile
+      t.add(i);
+
+      const s = SIDES[i];
+      const { tile: nb, dist } = nearestTile(
+        tiles, cur.x + s.neighbor[0], cur.y + s.neighbor[1]
+      );
+      if (!nb || dist > 0.1 || isBlocked(nb) || inPath.has(nb)) continue;
+
+      tilePath.push(nb);
+      inPath.add(nb);
+      advanced = true;
+      break;
+    }
+
+    if (tilePath[tilePath.length - 1] === target) break;
+
+    if (!advanced) {
+      inPath.delete(tilePath.pop());
+      if (tilePath.length === 0) return null;
+    }
+  }
+
+  if (tilePath[tilePath.length - 1] !== target) return null;
+  return tilesToWaypoints(tilePath);
+}
+
+function tilesToWaypoints(tilePath) {
+  const wps = [];
+  for (let i = 0; i < tilePath.length - 1; i++) {
+    const a = tilePath[i], b = tilePath[i + 1];
+    const dx = b.x - a.x, dy = b.y - a.y;
+    let best = SIDES[0], bestDot = -Infinity;
+    for (const s of SIDES) {
+      const dot = s.normal[0] * dx + s.normal[1] * dy;
+      if (dot > bestDot) { bestDot = dot; best = s; }
+    }
+    wps.push({ x: a.x + best.mid[0], y: a.y + best.mid[1] });
+    wps.push({ x: b.x, y: b.y });
+  }
+  return wps;
+}
+"""
+
+# --------------------------------------------------------------------------- #
+# JS: character.js  — state + pathfinding + target highlight state
 # --------------------------------------------------------------------------- #
 CHARACTER_JS = """\
-import { SIDES, nearestTile } from './hex.js';
+import { nearestTile } from './hex.js';
+import { findPath } from './pathfind.js';
 import { MOVE_SPEED } from './config.js';
 
 export class Character {
   constructor(x, y) {
     this.x = x; this.y = y;
-    this.path = [];   // queue of {x, y} waypoints
+    this.path = [];
+    this.targetTile  = null;
+    this.targetState = null;   // 'active' | 'unreachable' | null
   }
 
   get moving() { return this.path.length > 0; }
 
   setDestination(tiles, targetTile) {
-    this.path = buildPath(tiles, this, targetTile);
+    const { tile: start } = nearestTile(tiles, this.x, this.y);
+    if (start === targetTile) return;   // already there
+
+    const waypoints = findPath(tiles, start, targetTile);
+    this.targetTile  = targetTile;
+    if (waypoints === null) {
+      this.path        = [];
+      this.targetState = 'unreachable';
+    } else {
+      this.path        = waypoints;
+      this.targetState = 'active';
+    }
   }
 
   update(dt) {
+    const wasMoving = this.moving;
     let budget = MOVE_SPEED * dt;
     while (budget > 0 && this.path.length > 0) {
       const wp = this.path[0];
@@ -264,39 +367,12 @@ export class Character {
         budget = 0;
       }
     }
-  }
-}
-
-// Greedy hop toward the target tile. At each tile, pick the edge whose outward
-// normal best aligns with the (tile -> target) vector, then enqueue that edge's
-// midpoint followed by the neighbour tile's center. Repeat until we arrive.
-function buildPath(tiles, char, target) {
-  const start = nearestTile(tiles, char.x, char.y).tile;
-  if (!start || !target) return [];
-
-  const path = [];
-  let cur = start;
-  let guard = 0;
-  while (cur !== target && guard++ < 1000) {
-    const vx = target.x - cur.x, vy = target.y - cur.y;
-
-    let best = -Infinity, side = null;
-    for (const s of SIDES) {
-      const dot = s.normal[0] * vx + s.normal[1] * vy;
-      if (dot > best) { best = dot; side = s; }
+    // Clear target highlight on natural arrival.
+    if (wasMoving && !this.moving) {
+      this.targetTile  = null;
+      this.targetState = null;
     }
-
-    const mid = { x: cur.x + side.mid[0], y: cur.y + side.mid[1] };
-    const nx = cur.x + side.neighbor[0];
-    const ny = cur.y + side.neighbor[1];
-    const near = nearestTile(tiles, nx, ny);
-    if (!near.tile || near.dist > 0.1) break;   // would leave the board
-
-    path.push(mid);
-    path.push({ x: near.tile.x, y: near.tile.y });
-    cur = near.tile;
   }
-  return path;
 }
 """
 
@@ -398,15 +474,21 @@ export function render(ctx, camera, tiles, character) {
   ctx.fillStyle = COLORS.page;
   ctx.fillRect(0, 0, viewW, viewH);
 
-  ctx.lineWidth = Math.max(1, 0.04 * ppu);
-  ctx.strokeStyle = COLORS.tileBorder;
-  ctx.fillStyle = COLORS.tileFill;
-
   const margin = ppu * 2;
   for (const t of tiles) {
     const c = camera.worldToScreen(t.x, t.y);
     if (c.x < -margin || c.x > viewW + margin ||
-        c.y < -margin || c.y > viewH + margin) continue;   // cull offscreen
+        c.y < -margin || c.y > viewH + margin) continue;
+
+    const isTarget = t === character.targetTile;
+    let borderColor = COLORS.tileBorder;
+    let lineWidth   = Math.max(1, 0.04 * ppu);
+    if (isTarget) {
+      borderColor = character.targetState === 'unreachable'
+        ? COLORS.targetBad
+        : COLORS.targetActive;
+      lineWidth = Math.max(1.5, 0.08 * ppu);
+    }
 
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -415,7 +497,10 @@ export function render(ctx, camera, tiles, character) {
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.closePath();
+    ctx.fillStyle = COLORS.tileFill;
     ctx.fill();
+    ctx.lineWidth   = lineWidth;
+    ctx.strokeStyle = borderColor;
     ctx.stroke();
   }
 
@@ -425,7 +510,7 @@ export function render(ctx, camera, tiles, character) {
   ctx.arc(cc.x, cc.y, CHAR_RADIUS * ppu, 0, Math.PI * 2);
   ctx.fillStyle = COLORS.character;
   ctx.fill();
-  ctx.lineWidth = Math.max(1, 0.05 * ppu);
+  ctx.lineWidth   = Math.max(1, 0.05 * ppu);
   ctx.strokeStyle = COLORS.characterEdge;
   ctx.stroke();
 }
@@ -497,6 +582,7 @@ JS_FILES = {
     "config.js": CONFIG_JS,
     "hex.js": HEX_JS,
     "camera.js": CAMERA_JS,
+    "pathfind.js": PATHFIND_JS,
     "character.js": CHARACTER_JS,
     "input.js": INPUT_JS,
     "render.js": RENDER_JS,
