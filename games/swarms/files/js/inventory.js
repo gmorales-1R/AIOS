@@ -7,16 +7,14 @@ export function createInventory() {
   return { slots: Array(5).fill(null) };
 }
 
-// First slot index that can accept an apple, or -1 if full.
+// Returns the index of the single apple stack, or the first empty slot for a new one.
+// Returns -1 if the existing stack is full (no second stack is ever created).
 function appleSlotIdx(inv) {
-  for (let i = 0; i < inv.slots.length; i++) {
-    const s = inv.slots[i];
-    if (s && s.type === 'apple' && s.count < APPLE_STACK_MAX) return i;
+  const existing = inv.slots.findIndex(s => s && s.type === 'apple');
+  if (existing !== -1) {
+    return inv.slots[existing].count < APPLE_STACK_MAX ? existing : -1;
   }
-  for (let i = 0; i < inv.slots.length; i++) {
-    if (!inv.slots[i]) return i;
-  }
-  return -1;
+  return inv.slots.findIndex(s => !s);
 }
 
 export function canPickupApple(inv) { return appleSlotIdx(inv) !== -1; }

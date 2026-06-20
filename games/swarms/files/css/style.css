@@ -118,18 +118,17 @@ html, body {
 .hud-btn:hover { background: rgba(51,255,106,0.1); }
 .hud-btn.hidden { display: none; }
 
-/* ---- action bar ---- */
+/* ---- inventory bar (bottom, slots only) ---- */
 #action-bar {
   position: fixed;
-  bottom: 0; left: 0; right: 0;
+  bottom: 0; left: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
+  padding: 8px 10px;
   background: rgba(0, 0, 0, 0.82);
   border-top: 1px solid #33ff6a22;
+  border-right: 1px solid #33ff6a22;
   z-index: 10;
-  gap: 8px;
 }
 #action-bar.hidden { display: none; }
 
@@ -140,14 +139,14 @@ html, body {
 
 .inv-slot {
   position: relative;
-  width:  clamp(36px, 10vw, 52px);
-  height: clamp(36px, 10vw, 52px);
+  width:  clamp(36px, 10vw, 48px);
+  height: clamp(36px, 10vw, 48px);
   border: 1px solid #33ff6a33;
   background: rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
   cursor: default;
 }
-.inv-slot.filled  { border-color: #33ff6a88; cursor: pointer; }
+.inv-slot.filled   { border-color: #33ff6a88; cursor: pointer; }
 .inv-slot.equipped { border-color: #ffe600; box-shadow: 0 0 7px #ffe60055; cursor: pointer; }
 
 .slot-num {
@@ -186,18 +185,28 @@ html, body {
   z-index: 2;
 }
 
-#action-btns {
+/* ---- action column (right side, vertical) ---- */
+#action-column {
+  position: fixed;
+  right: 0; bottom: 0;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 5px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.82);
+  border-top: 1px solid #33ff6a22;
+  border-left: 1px solid #33ff6a22;
+  z-index: 11;
 }
+#action-column.hidden { display: none; }
 
 .action-btn {
-  width:  clamp(40px, 11vw, 56px);
-  height: clamp(36px, 10vw, 52px);
+  width:  clamp(36px, 10vw, 48px);
+  height: clamp(36px, 10vw, 48px);
   font-family: monospace;
-  font-size: clamp(0.65rem, 2vw, 0.85rem);
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
   font-weight: bold;
-  letter-spacing: 0.05em;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid #33ff6a;
   color: #33ff6a;
@@ -215,10 +224,11 @@ html, body {
   cursor: default;
 }
 
-/* ---- save toast (above action bar) ---- */
+/* ---- save toast (top-center, clear of all UI) ---- */
 .toast {
   position: fixed;
-  bottom: 90px; right: 18px;
+  top: 52px; left: 50%;
+  transform: translateX(-50%);
   font-family: monospace;
   font-size: 0.8rem;
   color: #33ff6a;
@@ -227,6 +237,7 @@ html, body {
   padding: 0.35em 1em;
   z-index: 30;
   transition: opacity 0.5s;
+  white-space: nowrap;
 }
 .toast.hidden  { display: none; }
 .toast.fading  { opacity: 0; }

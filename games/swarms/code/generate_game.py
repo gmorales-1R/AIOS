@@ -66,7 +66,7 @@ HTML = """\
   <!-- In-game hamburger toggle (hidden on start screen) -->
   <button id="btn-menu-toggle" class="hud-btn hidden">&#9776;</button>
 
-  <!-- Action bar (hidden until game starts) -->
+  <!-- Inventory bar (hidden until game starts) -->
   <div id="action-bar" class="hidden">
     <div id="inv-slots">
       <div class="inv-slot" data-slot="0"><span class="slot-num">1</span></div>
@@ -75,12 +75,14 @@ HTML = """\
       <div class="inv-slot" data-slot="3"><span class="slot-num">4</span></div>
       <div class="inv-slot" data-slot="4"><span class="slot-num">5</span></div>
     </div>
-    <div id="action-btns">
-      <button class="action-btn" id="act-melee"    disabled>ATK</button>
-      <button class="action-btn" id="act-defend"   disabled>DEF</button>
-      <button class="action-btn" id="act-range"    disabled>RNG</button>
-      <button class="action-btn" id="act-interact" disabled>USE</button>
-    </div>
+  </div>
+
+  <!-- Action column — right side vertical strip (hidden until game starts) -->
+  <div id="action-column" class="hidden">
+    <button class="action-btn" id="act-melee"    disabled>M</button>
+    <button class="action-btn" id="act-defend"   disabled>D</button>
+    <button class="action-btn" id="act-range"    disabled>R</button>
+    <button class="action-btn" id="act-interact" disabled>U</button>
   </div>
 
   <script type="module" src="js/game.js"></script>
@@ -212,18 +214,17 @@ html, body {
 .hud-btn:hover { background: rgba(51,255,106,0.1); }
 .hud-btn.hidden { display: none; }
 
-/* ---- action bar ---- */
+/* ---- inventory bar (bottom, slots only) ---- */
 #action-bar {
   position: fixed;
-  bottom: 0; left: 0; right: 0;
+  bottom: 0; left: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
+  padding: 8px 10px;
   background: rgba(0, 0, 0, 0.82);
   border-top: 1px solid #33ff6a22;
+  border-right: 1px solid #33ff6a22;
   z-index: 10;
-  gap: 8px;
 }
 #action-bar.hidden { display: none; }
 
@@ -234,14 +235,14 @@ html, body {
 
 .inv-slot {
   position: relative;
-  width:  clamp(36px, 10vw, 52px);
-  height: clamp(36px, 10vw, 52px);
+  width:  clamp(36px, 10vw, 48px);
+  height: clamp(36px, 10vw, 48px);
   border: 1px solid #33ff6a33;
   background: rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
   cursor: default;
 }
-.inv-slot.filled  { border-color: #33ff6a88; cursor: pointer; }
+.inv-slot.filled   { border-color: #33ff6a88; cursor: pointer; }
 .inv-slot.equipped { border-color: #ffe600; box-shadow: 0 0 7px #ffe60055; cursor: pointer; }
 
 .slot-num {
@@ -280,18 +281,28 @@ html, body {
   z-index: 2;
 }
 
-#action-btns {
+/* ---- action column (right side, vertical) ---- */
+#action-column {
+  position: fixed;
+  right: 0; bottom: 0;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 5px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.82);
+  border-top: 1px solid #33ff6a22;
+  border-left: 1px solid #33ff6a22;
+  z-index: 11;
 }
+#action-column.hidden { display: none; }
 
 .action-btn {
-  width:  clamp(40px, 11vw, 56px);
-  height: clamp(36px, 10vw, 52px);
+  width:  clamp(36px, 10vw, 48px);
+  height: clamp(36px, 10vw, 48px);
   font-family: monospace;
-  font-size: clamp(0.65rem, 2vw, 0.85rem);
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
   font-weight: bold;
-  letter-spacing: 0.05em;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid #33ff6a;
   color: #33ff6a;
@@ -309,10 +320,11 @@ html, body {
   cursor: default;
 }
 
-/* ---- save toast (above action bar) ---- */
+/* ---- save toast (top-center, clear of all UI) ---- */
 .toast {
   position: fixed;
-  bottom: 90px; right: 18px;
+  top: 52px; left: 50%;
+  transform: translateX(-50%);
   font-family: monospace;
   font-size: 0.8rem;
   color: #33ff6a;
@@ -321,6 +333,7 @@ html, body {
   padding: 0.35em 1em;
   z-index: 30;
   transition: opacity 0.5s;
+  white-space: nowrap;
 }
 .toast.hidden  { display: none; }
 .toast.fading  { opacity: 0; }
@@ -625,16 +638,14 @@ export function createInventory() {
   return { slots: Array(5).fill(null) };
 }
 
-// First slot index that can accept an apple, or -1 if full.
+// Returns the index of the single apple stack, or the first empty slot for a new one.
+// Returns -1 if the existing stack is full (no second stack is ever created).
 function appleSlotIdx(inv) {
-  for (let i = 0; i < inv.slots.length; i++) {
-    const s = inv.slots[i];
-    if (s && s.type === 'apple' && s.count < APPLE_STACK_MAX) return i;
+  const existing = inv.slots.findIndex(s => s && s.type === 'apple');
+  if (existing !== -1) {
+    return inv.slots[existing].count < APPLE_STACK_MAX ? existing : -1;
   }
-  for (let i = 0; i < inv.slots.length; i++) {
-    if (!inv.slots[i]) return i;
-  }
-  return -1;
+  return inv.slots.findIndex(s => !s);
 }
 
 export function canPickupApple(inv) { return appleSlotIdx(inv) !== -1; }
@@ -1048,8 +1059,14 @@ export class UI {
 
   hideConfirm() { this._hide(this._confirm); }
 
-  showActionBar() { this._show(document.getElementById('action-bar')); }
-  hideActionBar() { this._hide(document.getElementById('action-bar')); }
+  showActionBar() {
+    this._show(document.getElementById('action-bar'));
+    this._show(document.getElementById('action-column'));
+  }
+  hideActionBar() {
+    this._hide(document.getElementById('action-bar'));
+    this._hide(document.getElementById('action-column'));
+  }
 
   setActionEnabled(id, enabled) {
     const btn = document.getElementById('act-' + id);

@@ -71,8 +71,14 @@ export class UI {
 
   hideConfirm() { this._hide(this._confirm); }
 
-  showActionBar() { this._show(document.getElementById('action-bar')); }
-  hideActionBar() { this._hide(document.getElementById('action-bar')); }
+  showActionBar() {
+    this._show(document.getElementById('action-bar'));
+    this._show(document.getElementById('action-column'));
+  }
+  hideActionBar() {
+    this._hide(document.getElementById('action-bar'));
+    this._hide(document.getElementById('action-column'));
+  }
 
   setActionEnabled(id, enabled) {
     const btn = document.getElementById('act-' + id);
