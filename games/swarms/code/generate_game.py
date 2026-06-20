@@ -66,6 +66,23 @@ HTML = """\
   <!-- In-game hamburger toggle (hidden on start screen) -->
   <button id="btn-menu-toggle" class="hud-btn hidden">&#9776;</button>
 
+  <!-- Action bar (hidden until game starts) -->
+  <div id="action-bar" class="hidden">
+    <div id="inv-slots">
+      <div class="inv-slot" data-slot="0"><span class="slot-num">1</span></div>
+      <div class="inv-slot" data-slot="1"><span class="slot-num">2</span></div>
+      <div class="inv-slot" data-slot="2"><span class="slot-num">3</span></div>
+      <div class="inv-slot" data-slot="3"><span class="slot-num">4</span></div>
+      <div class="inv-slot" data-slot="4"><span class="slot-num">5</span></div>
+    </div>
+    <div id="action-btns">
+      <button class="action-btn" id="act-melee"    disabled>ATK</button>
+      <button class="action-btn" id="act-defend"   disabled>DEF</button>
+      <button class="action-btn" id="act-range"    disabled>RNG</button>
+      <button class="action-btn" id="act-interact" disabled>USE</button>
+    </div>
+  </div>
+
   <script type="module" src="js/game.js"></script>
 </body>
 </html>
@@ -194,6 +211,86 @@ html, body {
 }
 .hud-btn:hover { background: rgba(51,255,106,0.1); }
 .hud-btn.hidden { display: none; }
+
+/* ---- action bar ---- */
+#action-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.82);
+  border-top: 1px solid #33ff6a22;
+  z-index: 10;
+  gap: 8px;
+}
+#action-bar.hidden { display: none; }
+
+#inv-slots {
+  display: flex;
+  gap: 5px;
+}
+
+.inv-slot {
+  position: relative;
+  width:  clamp(36px, 10vw, 52px);
+  height: clamp(36px, 10vw, 52px);
+  border: 1px solid #33ff6a33;
+  background: rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+.inv-slot.filled { border-color: #33ff6a88; }
+
+.slot-num {
+  position: absolute;
+  top: 2px; left: 4px;
+  font-family: monospace;
+  font-size: 0.6rem;
+  color: #33ff6a33;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.inv-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #33ff6a;
+}
+
+#action-btns {
+  display: flex;
+  gap: 5px;
+}
+
+.action-btn {
+  width:  clamp(40px, 11vw, 56px);
+  height: clamp(36px, 10vw, 52px);
+  font-family: monospace;
+  font-size: clamp(0.65rem, 2vw, 0.85rem);
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #33ff6a;
+  color: #33ff6a;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  flex-shrink: 0;
+}
+.action-btn:hover:not(:disabled) {
+  background: rgba(51, 255, 106, 0.12);
+  color: #7fffaa;
+}
+.action-btn:disabled {
+  border-color: #33ff6a22;
+  color: #33ff6a22;
+  cursor: default;
+}
 
 /* ---- save toast ---- */
 .toast {
@@ -804,6 +901,29 @@ export class UI {
 
   hideConfirm() { this._hide(this._confirm); }
 
+  showActionBar() { this._show(document.getElementById('action-bar')); }
+  hideActionBar() { this._hide(document.getElementById('action-bar')); }
+
+  // Enable or disable an action button by short id ('melee'|'defend'|'range'|'interact').
+  setActionEnabled(id, enabled) {
+    const btn = document.getElementById('act-' + id);
+    if (btn) btn.disabled = !enabled;
+  }
+
+  // Set an inventory slot contents. item = null to clear, or { label } to fill.
+  setSlot(index, item) {
+    const slot = document.querySelector(`.inv-slot[data-slot="${index}"]`);
+    if (!slot) return;
+    slot.classList.toggle('filled', !!item);
+    let icon = slot.querySelector('.inv-icon');
+    if (item) {
+      if (!icon) { icon = document.createElement('span'); icon.className = 'inv-icon'; slot.appendChild(icon); }
+      icon.textContent = item.label ?? '';
+    } else if (icon) {
+      icon.remove();
+    }
+  }
+
   // Show a toast message that fades after 1.8 s.
   toast(msg) {
     clearTimeout(this._toastId);
@@ -1053,6 +1173,15 @@ function doSave(label = '\\u25CF SAVED') {
 }
 
 // ---- state transitions ----
+// Check current game state and enable/disable action buttons accordingly.
+// All stub-disabled for now; wire up when combat/interaction systems land.
+function updateActionBar() {
+  ui.setActionEnabled('melee',    false);
+  ui.setActionEnabled('defend',   false);
+  ui.setActionEnabled('range',    false);
+  ui.setActionEnabled('interact', false);
+}
+
 function startNew() {
   const s = tileCenter((COLS / 2) | 0, 0);
   character.reset(s.x, s.y);
@@ -1061,6 +1190,8 @@ function startNew() {
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
   gameState = 'playing';
   ui.hideStart();
+  ui.showActionBar();
+  updateActionBar();
 }
 
 function doContinue() {
@@ -1074,6 +1205,8 @@ function doContinue() {
   autoSaveAccum = 0;
   gameState = 'playing';
   ui.hideStart();
+  ui.showActionBar();
+  updateActionBar();
 }
 
 function togglePause() {
@@ -1090,16 +1223,16 @@ function togglePause() {
 
 function backToMenu() {
   const stale = lastSaveTime === 0 || (Date.now() - lastSaveTime) > 30_000;
-  if (stale) {
-    ui.showConfirm(() => {
-      gameState = 'menu';
-      ui.hidePause();
-      ui.showStart(hasSaves());
-    });
-  } else {
+  const toMenu = () => {
     gameState = 'menu';
     ui.hidePause();
+    ui.hideActionBar();
     ui.showStart(hasSaves());
+  };
+  if (stale) {
+    ui.showConfirm(toMenu);
+  } else {
+    toMenu();
   }
 }
 

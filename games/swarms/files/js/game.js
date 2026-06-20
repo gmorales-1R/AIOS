@@ -53,6 +53,15 @@ function doSave(label = '\u25CF SAVED') {
 }
 
 // ---- state transitions ----
+// Check current game state and enable/disable action buttons accordingly.
+// All stub-disabled for now; wire up when combat/interaction systems land.
+function updateActionBar() {
+  ui.setActionEnabled('melee',    false);
+  ui.setActionEnabled('defend',   false);
+  ui.setActionEnabled('range',    false);
+  ui.setActionEnabled('interact', false);
+}
+
 function startNew() {
   const s = tileCenter((COLS / 2) | 0, 0);
   character.reset(s.x, s.y);
@@ -61,6 +70,8 @@ function startNew() {
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
   gameState = 'playing';
   ui.hideStart();
+  ui.showActionBar();
+  updateActionBar();
 }
 
 function doContinue() {
@@ -74,6 +85,8 @@ function doContinue() {
   autoSaveAccum = 0;
   gameState = 'playing';
   ui.hideStart();
+  ui.showActionBar();
+  updateActionBar();
 }
 
 function togglePause() {
@@ -90,16 +103,16 @@ function togglePause() {
 
 function backToMenu() {
   const stale = lastSaveTime === 0 || (Date.now() - lastSaveTime) > 30_000;
-  if (stale) {
-    ui.showConfirm(() => {
-      gameState = 'menu';
-      ui.hidePause();
-      ui.showStart(hasSaves());
-    });
-  } else {
+  const toMenu = () => {
     gameState = 'menu';
     ui.hidePause();
+    ui.hideActionBar();
     ui.showStart(hasSaves());
+  };
+  if (stale) {
+    ui.showConfirm(toMenu);
+  } else {
+    toMenu();
   }
 }
 

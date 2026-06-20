@@ -48,6 +48,23 @@
   <!-- In-game hamburger toggle (hidden on start screen) -->
   <button id="btn-menu-toggle" class="hud-btn hidden">&#9776;</button>
 
+  <!-- Action bar (hidden until game starts) -->
+  <div id="action-bar" class="hidden">
+    <div id="inv-slots">
+      <div class="inv-slot" data-slot="0"><span class="slot-num">1</span></div>
+      <div class="inv-slot" data-slot="1"><span class="slot-num">2</span></div>
+      <div class="inv-slot" data-slot="2"><span class="slot-num">3</span></div>
+      <div class="inv-slot" data-slot="3"><span class="slot-num">4</span></div>
+      <div class="inv-slot" data-slot="4"><span class="slot-num">5</span></div>
+    </div>
+    <div id="action-btns">
+      <button class="action-btn" id="act-melee"    disabled>ATK</button>
+      <button class="action-btn" id="act-defend"   disabled>DEF</button>
+      <button class="action-btn" id="act-range"    disabled>RNG</button>
+      <button class="action-btn" id="act-interact" disabled>USE</button>
+    </div>
+  </div>
+
   <script type="module" src="js/game.js"></script>
 </body>
 </html>

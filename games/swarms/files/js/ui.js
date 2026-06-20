@@ -62,6 +62,29 @@ export class UI {
 
   hideConfirm() { this._hide(this._confirm); }
 
+  showActionBar() { this._show(document.getElementById('action-bar')); }
+  hideActionBar() { this._hide(document.getElementById('action-bar')); }
+
+  // Enable or disable an action button by short id ('melee'|'defend'|'range'|'interact').
+  setActionEnabled(id, enabled) {
+    const btn = document.getElementById('act-' + id);
+    if (btn) btn.disabled = !enabled;
+  }
+
+  // Set an inventory slot contents. item = null to clear, or { label } to fill.
+  setSlot(index, item) {
+    const slot = document.querySelector(`.inv-slot[data-slot="${index}"]`);
+    if (!slot) return;
+    slot.classList.toggle('filled', !!item);
+    let icon = slot.querySelector('.inv-icon');
+    if (item) {
+      if (!icon) { icon = document.createElement('span'); icon.className = 'inv-icon'; slot.appendChild(icon); }
+      icon.textContent = item.label ?? '';
+    } else if (icon) {
+      icon.remove();
+    }
+  }
+
   // Show a toast message that fades after 1.8 s.
   toast(msg) {
     clearTimeout(this._toastId);
