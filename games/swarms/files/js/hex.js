@@ -1,6 +1,5 @@
 import { SIDE, COL_SPACING, ROW_SPACING, COLS, ROWS } from './config.js';
 
-// Pointy-top hexagon: vertical edges on the left & right, points top & bottom.
 export const CORNERS = [];
 for (let i = 0; i < 6; i++) {
   const a = (-90 + 60 * i) * Math.PI / 180;
@@ -27,12 +26,11 @@ export function tileCenter(col, row) {
 
 export function generateGrid() {
   const tiles = [];
-  for (let row = 0; row < ROWS; row++) {
+  for (let row = 0; row < ROWS; row++)
     for (let col = 0; col < COLS; col++) {
       const c = tileCenter(col, row);
       tiles.push({ col, row, x: c.x, y: c.y });
     }
-  }
   return tiles;
 }
 

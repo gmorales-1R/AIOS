@@ -9,18 +9,32 @@ import {
 export class Character {
   constructor(x, y) {
     this.x = x; this.y = y;
-    this.path = [];
+    this.path        = [];
     this.targetTile  = null;
-    this.targetState = null;   // 'active' | 'unreachable' | null
-    this.health = HEALTH_MAX;
-    this.hunger = HUNGER_MAX;
-    // Set by game.js: called with the tile whenever the character enters it.
+    this.targetState = null;
+    this.health      = HEALTH_MAX;
+    this.hunger      = HUNGER_MAX;
     this.onTileEnter = null;
   }
 
   get moving() { return this.path.length > 0; }
 
-  // Called once per game tick (1 s).
+  reset(x, y) {
+    this.x = x; this.y = y;
+    this.path = []; this.targetTile = null; this.targetState = null;
+    this.health = HEALTH_MAX; this.hunger = HUNGER_MAX;
+  }
+
+  serialize() {
+    return { x: this.x, y: this.y, health: this.health, hunger: this.hunger };
+  }
+
+  deserialize(d) {
+    this.x = d.x; this.y = d.y;
+    this.health = d.health; this.hunger = d.hunger;
+    this.path = []; this.targetTile = null; this.targetState = null;
+  }
+
   onTick() {
     this.hunger = Math.max(0, this.hunger - TICK_HUNGER);
     if (this.hunger === 0) {
@@ -33,8 +47,7 @@ export class Character {
   setDestination(tiles, targetTile) {
     const { tile: start } = nearestTile(tiles, this.x, this.y);
     if (start === targetTile) return;
-
-    const waypoints = findPath(tiles, start, targetTile);
+    const waypoints  = findPath(tiles, start, targetTile);
     this.targetTile  = targetTile;
     if (waypoints === null) {
       this.path        = [];
@@ -56,7 +69,6 @@ export class Character {
         this.x = wp.x; this.y = wp.y;
         budget -= d;
         this.path.shift();
-        // tile-center waypoints carry a tile reference
         if (wp.tile) {
           this.hunger = Math.max(0, this.hunger - TILE_HUNGER_COST);
           if (this.onTileEnter) this.onTileEnter(wp.tile);

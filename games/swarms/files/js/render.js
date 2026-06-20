@@ -1,7 +1,6 @@
 import { CORNERS } from './hex.js';
 import { COLORS, CHAR_RADIUS } from './config.js';
 
-// Apple positions (world units, relative to tile center) indexed by count.
 const APPLE_POS = [
   [[0, 0]],
   [[-0.22, 0], [0.22, 0]],
@@ -31,7 +30,6 @@ export function render(ctx, camera, tiles, character) {
       lineWidth = Math.max(1.5, 0.08 * ppu);
     }
 
-    // Hex fill
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
       const px = c.x + CORNERS[i][0] * ppu;
@@ -45,7 +43,6 @@ export function render(ctx, camera, tiles, character) {
     ctx.strokeStyle = borderColor;
     ctx.stroke();
 
-    // Apples
     if (t.apples > 0) {
       const positions = APPLE_POS[t.apples - 1];
       for (const [ox, oy] of positions) {
@@ -60,7 +57,6 @@ export function render(ctx, camera, tiles, character) {
     }
   }
 
-  // Character
   const cc = camera.worldToScreen(character.x, character.y);
   ctx.beginPath();
   ctx.arc(cc.x, cc.y, CHAR_RADIUS * ppu, 0, Math.PI * 2);
@@ -74,15 +70,10 @@ export function render(ctx, camera, tiles, character) {
 }
 
 function renderHUD(ctx, char) {
-  const M  = 14;   // margin (px)
-  const BW = 100;  // bar width
-  const BH = 10;   // bar height
-  const G  =  7;   // gap between bars
-
-  ctx.font         = 'bold 11px monospace';
+  const M = 14, BW = 100, BH = 10, G = 7;
+  ctx.font = 'bold 11px monospace';
   ctx.textBaseline = 'middle';
 
-  // Health bar
   ctx.fillStyle = COLORS.hudBg;
   ctx.fillRect(M + 18, M, BW, BH);
   ctx.fillStyle = COLORS.hudHealth;
@@ -90,7 +81,6 @@ function renderHUD(ctx, char) {
   ctx.fillStyle = '#ff9090';
   ctx.fillText('\u2665', M + 2, M + BH / 2);
 
-  // Hunger bar
   const hy = M + BH + G;
   ctx.fillStyle = COLORS.hudBg;
   ctx.fillRect(M + 18, hy, BW, BH);

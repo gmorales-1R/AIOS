@@ -1,10 +1,7 @@
 export function setupInput(canvas, camera, { onTap }) {
   const pointers = new Map();
   let mode = 'none';
-  let last = null;
-  let downPos = null;
-  let moved = 0;
-  let pinchPrev = 0;
+  let last = null, downPos = null, moved = 0, pinchPrev = 0;
 
   const rel = (e) => {
     const r = canvas.getBoundingClientRect();
@@ -18,8 +15,7 @@ export function setupInput(canvas, camera, { onTap }) {
       mode = 'drag'; moved = 0;
       last = rel(e); downPos = rel(e);
     } else if (pointers.size === 2) {
-      mode = 'pinch';
-      pinchPrev = pinchDistance();
+      mode = 'pinch'; pinchPrev = pinchDist();
     }
   });
 
@@ -33,8 +29,7 @@ export function setupInput(canvas, camera, { onTap }) {
       camera.panByPixels(dx, dy);
       last = p;
     } else if (mode === 'pinch' && pointers.size === 2) {
-      const d = pinchDistance();
-      const c = pinchCenter();
+      const d = pinchDist(), c = pinchCenter();
       if (pinchPrev > 0) camera.zoomAt(c.x, c.y, d / pinchPrev);
       pinchPrev = d;
     }
@@ -49,21 +44,21 @@ export function setupInput(canvas, camera, { onTap }) {
     if (pointers.size === 0) {
       mode = 'none';
     } else if (pointers.size === 1) {
-      mode = 'drag';
-      last  = [...pointers.values()][0];
-      moved = 999;
+      mode = 'drag'; last = [...pointers.values()][0]; moved = 999;
     }
   };
   canvas.addEventListener('pointerup',     end);
   canvas.addEventListener('pointercancel', end);
-
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
-    const p = rel(e);
-    camera.zoomAt(p.x, p.y, Math.exp(-e.deltaY * 0.0015));
+    camera.zoomAt(
+      e.clientX - canvas.getBoundingClientRect().left,
+      e.clientY - canvas.getBoundingClientRect().top,
+      Math.exp(-e.deltaY * 0.0015)
+    );
   }, { passive: false });
 
-  function pinchDistance() {
+  function pinchDist() {
     const v = [...pointers.values()];
     return Math.hypot(v[0].x - v[1].x, v[0].y - v[1].y);
   }

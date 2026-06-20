@@ -65,7 +65,6 @@ function tilesToWaypoints(tilePath) {
       if (dot > bestDot) { bestDot = dot; best = s; }
     }
     wps.push({ x: a.x + best.mid[0], y: a.y + best.mid[1] });
-    // tag center waypoints with their tile so character.js can react on entry
     wps.push({ x: b.x, y: b.y, tile: b });
   }
   return wps;

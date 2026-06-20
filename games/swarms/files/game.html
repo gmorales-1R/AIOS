@@ -9,6 +9,45 @@
 </head>
 <body>
   <canvas id="game"></canvas>
+
+  <!-- Start screen -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SWARMS</h1>
+    <div class="menu">
+      <button class="menu-btn" id="btn-new-game">New Game</button>
+      <button class="menu-btn" id="btn-continue" disabled>Continue</button>
+      <button class="menu-btn" disabled>Options</button>
+      <button class="menu-btn" disabled>Tutorial</button>
+    </div>
+  </div>
+
+  <!-- Pause screen -->
+  <div id="pause-screen" class="screen hidden">
+    <div class="menu">
+      <p class="screen-label">PAUSED</p>
+      <button class="menu-btn" id="btn-resume">Resume</button>
+      <button class="menu-btn" id="btn-save">Save Game</button>
+      <button class="menu-btn" id="btn-back-menu">Back to Menu</button>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div id="confirm-screen" class="screen hidden">
+    <div class="dialog">
+      <p class="dialog-msg">Unsaved progress will be lost.<br>Return to main menu?</p>
+      <div class="dialog-btns">
+        <button class="menu-btn warn" id="btn-confirm-yes">Leave</button>
+        <button class="menu-btn"      id="btn-confirm-no">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save toast -->
+  <div id="save-toast" class="toast hidden"></div>
+
+  <!-- In-game hamburger toggle (hidden on start screen) -->
+  <button id="btn-menu-toggle" class="hud-btn hidden">&#9776;</button>
+
   <script type="module" src="js/game.js"></script>
 </body>
 </html>

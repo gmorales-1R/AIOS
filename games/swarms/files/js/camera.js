@@ -68,4 +68,15 @@ export class Camera {
       this.animating = false;
     }
   }
+
+  serialize() {
+    return { x: this.x, y: this.y, z: this.z };
+  }
+
+  deserialize(d) {
+    this.x = this.tx = d.x;
+    this.y = this.ty = d.y;
+    this.z = this.tz = d.z;
+    this.animating = false;
+  }
 }
