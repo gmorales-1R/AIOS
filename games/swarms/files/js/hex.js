@@ -1,23 +1,20 @@
 import { SIDE, COL_SPACING, ROW_SPACING, COLS, ROWS } from './config.js';
 
 // Pointy-top hexagon: vertical edges on the left & right, points top & bottom.
-// y-down world space, circumradius == SIDE.
 export const CORNERS = [];
 for (let i = 0; i < 6; i++) {
   const a = (-90 + 60 * i) * Math.PI / 180;
   CORNERS.push([SIDE * Math.cos(a), SIDE * Math.sin(a)]);
 }
 
-// One entry per edge: midpoint offset (from center), outward unit normal,
-// and the offset to the neighbouring tile's center across that edge.
 export const SIDES = CORNERS.map((c, i) => {
-  const n = CORNERS[(i + 1) % 6];
+  const n   = CORNERS[(i + 1) % 6];
   const mid = [(c[0] + n[0]) / 2, (c[1] + n[1]) / 2];
   const len = Math.hypot(mid[0], mid[1]) || 1;
   return {
     mid,
-    normal: [mid[0] / len, mid[1] / len],
-    neighbor: [mid[0] * 2, mid[1] * 2],
+    normal:   [mid[0] / len, mid[1] / len],
+    neighbor: [mid[0] * 2,   mid[1] * 2],
   };
 });
 

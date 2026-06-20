@@ -1,8 +1,6 @@
-// Unified pointer handling. Single pointer drags pan; a click/tap that barely
-// moves is treated as a tile selection; two pointers pinch-zoom; wheel zooms.
 export function setupInput(canvas, camera, { onTap }) {
   const pointers = new Map();
-  let mode = 'none';          // 'none' | 'drag' | 'pinch'
+  let mode = 'none';
   let last = null;
   let downPos = null;
   let moved = 0;
@@ -28,7 +26,6 @@ export function setupInput(canvas, camera, { onTap }) {
   canvas.addEventListener('pointermove', (e) => {
     if (!pointers.has(e.pointerId)) return;
     pointers.set(e.pointerId, rel(e));
-
     if (mode === 'drag' && pointers.size === 1) {
       const p = rel(e);
       const dx = p.x - last.x, dy = p.y - last.y;
@@ -52,13 +49,12 @@ export function setupInput(canvas, camera, { onTap }) {
     if (pointers.size === 0) {
       mode = 'none';
     } else if (pointers.size === 1) {
-      // a finger lingers after a pinch: keep dragging, never treat as a tap
       mode = 'drag';
-      last = [...pointers.values()][0];
+      last  = [...pointers.values()][0];
       moved = 999;
     }
   };
-  canvas.addEventListener('pointerup', end);
+  canvas.addEventListener('pointerup',     end);
   canvas.addEventListener('pointercancel', end);
 
   canvas.addEventListener('wheel', (e) => {

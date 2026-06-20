@@ -1,14 +1,5 @@
 import { SIDES, nearestTile } from './hex.js';
 
-// Greedy DFS with limited backtracking.
-//
-// At each tile, sides are ranked by dot-product alignment with the
-// current-tile → target direction. We try up to MAX_TRIES sides before
-// backtracking. When the direction lands near-equally between two edges
-// (vertex case), both forward edges are covered in the first two tries.
-//
-// Returns an array of {x,y} waypoints (side-midpoint then tile-center,
-// alternating) or null if the target is unreachable within GUARD steps.
 const MAX_TRIES = 3;
 const GUARD    = 600;
 
@@ -28,15 +19,15 @@ export function findPath(tiles, start, target, isBlocked = () => false) {
     const cur = tilePath[tilePath.length - 1];
     const t   = tried(cur);
 
-    const dir = { x: target.x - cur.x, y: target.y - cur.y };
+    const dir    = { x: target.x - cur.x, y: target.y - cur.y };
     const ranked = SIDES
       .map((s, i) => ({ i, dot: s.normal[0] * dir.x + s.normal[1] * dir.y }))
       .sort((a, b) => b.dot - a.dot);
 
     let advanced = false;
     for (const { i } of ranked) {
-      if (t.has(i))        continue;
-      if (t.size >= MAX_TRIES) break;   // budget exhausted for this tile
+      if (t.has(i))            continue;
+      if (t.size >= MAX_TRIES) break;
       t.add(i);
 
       const s = SIDES[i];
@@ -74,7 +65,8 @@ function tilesToWaypoints(tilePath) {
       if (dot > bestDot) { bestDot = dot; best = s; }
     }
     wps.push({ x: a.x + best.mid[0], y: a.y + best.mid[1] });
-    wps.push({ x: b.x, y: b.y });
+    // tag center waypoints with their tile so character.js can react on entry
+    wps.push({ x: b.x, y: b.y, tile: b });
   }
   return wps;
 }

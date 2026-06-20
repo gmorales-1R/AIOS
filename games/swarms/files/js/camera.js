@@ -1,8 +1,5 @@
 import { HEX_W, FIT_HEXES, ZOOM_MIN, ZOOM_MAX, FOLLOW_LERP } from './config.js';
 
-// Camera holds a world-space center (x, y) and a zoom factor (z).
-// Reusable focus: focusOn({x, y, z}) animates toward any point of interest;
-// update() lerps each frame. User pan/zoom cancels an active focus.
 export class Camera {
   constructor() {
     this.x = 0; this.y = 0; this.z = 1;
@@ -17,7 +14,7 @@ export class Camera {
     this.baseScale = Math.min(w, h) / (FIT_HEXES * HEX_W);
   }
 
-  get ppu() { return this.baseScale * this.z; }   // pixels per world unit
+  get ppu() { return this.baseScale * this.z; }
 
   worldToScreen(wx, wy) {
     return {
@@ -39,7 +36,6 @@ export class Camera {
     this.stopFollow();
   }
 
-  // Zoom while keeping the world point under (sx, sy) fixed on screen.
   zoomAt(sx, sy, factor) {
     const before = this.screenToWorld(sx, sy);
     this.z = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, this.z * factor));
@@ -48,7 +44,6 @@ export class Camera {
     this.stopFollow();
   }
 
-  // Smoothly move the camera toward a point of interest. Omit z to keep zoom.
   focusOn({ x, y, z } = {}) {
     if (x !== undefined) this.tx = x;
     if (y !== undefined) this.ty = y;
