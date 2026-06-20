@@ -1187,7 +1187,10 @@ export function setupInput(canvas, camera, { onTap }) {
 # --------------------------------------------------------------------------- #
 RENDER_JS = """\
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS, SIDE, ATK_ANIM_SECS } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS } from './config.js';
+
+const grassImg = new Image();
+grassImg.src = '../assets/tiles/grass.png';
 
 const APPLE_POS = [
   [[0, 0]],
@@ -1229,6 +1232,16 @@ export function render(ctx, camera, tiles, character) {
                     : t.tree  ? COLORS.treeFill
                     : COLORS.tileFill;
     ctx.fill();
+
+    // Grass texture on plain tiles — clip to hex, draw image, restore clip.
+    if (!t.water && !t.tree && grassImg.complete && grassImg.naturalWidth) {
+      ctx.save();
+      ctx.clip();
+      const s = HEX_H * ppu;
+      ctx.drawImage(grassImg, c.x - s / 2, c.y - s / 2, s, s);
+      ctx.restore();
+    }
+
     ctx.lineWidth   = lineWidth;
     ctx.strokeStyle = borderColor;
     ctx.stroke();
