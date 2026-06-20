@@ -1,8 +1,8 @@
-"""Generates game.html in games/swarms/files/."""
+"""Generates game.html and game.js in games/swarms/files/."""
 
 from pathlib import Path
 
-OUTPUT = Path(__file__).parent.parent / "files" / "game.html"
+FILES = Path(__file__).parent.parent / "files"
 
 html = """\
 <!DOCTYPE html>
@@ -26,11 +26,29 @@ html = """\
   </style>
 </head>
 <body>
-  <h1>Hello, World!</h1>
+  <h1 id="title">Hello, World!</h1>
+  <script src="game.js"></script>
 </body>
 </html>
 """
 
-OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-OUTPUT.write_text(html)
-print(f"Written: {OUTPUT}")
+js = """\
+(function () {
+  const el = document.getElementById("title");
+  let angle = 0;
+
+  function tick() {
+    angle = (angle + 1) % 360;
+    el.style.transform = `rotate(${angle}deg)`;
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+})();
+"""
+
+FILES.mkdir(parents=True, exist_ok=True)
+(FILES / "game.html").write_text(html)
+(FILES / "game.js").write_text(js)
+print(f"Written: {FILES / 'game.html'}")
+print(f"Written: {FILES / 'game.js'}")
