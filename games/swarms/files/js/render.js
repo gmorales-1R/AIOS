@@ -1,5 +1,5 @@
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, ATK_ANIM_SECS } from './config.js';
 
 const APPLE_POS = [
   [[0, 0]],
@@ -45,6 +45,7 @@ export function render(ctx, camera, tiles, character) {
     ctx.strokeStyle = borderColor;
     ctx.stroke();
 
+    // Apples on tree tiles
     if (t.apples > 0 && !t.water) {
       const positions = APPLE_POS[t.apples - 1];
       for (const [ox, oy] of positions) {
@@ -57,9 +58,43 @@ export function render(ctx, camera, tiles, character) {
         ctx.stroke();
       }
     }
+
+    // Sword on ground (two rectangles forming a cross)
+    if (t.hasSword) {
+      const hw = 0.09 * ppu;   // half arm width
+      const hl = 0.42 * ppu;   // half blade length
+      const gl = 0.30 * ppu;   // half guard length
+      ctx.fillStyle   = COLORS.sword;
+      ctx.strokeStyle = COLORS.swordEdge;
+      ctx.lineWidth   = Math.max(0.5, 0.018 * ppu);
+      // blade (vertical)
+      ctx.fillRect(c.x - hw, c.y - hl, hw * 2, hl * 2);
+      ctx.strokeRect(c.x - hw, c.y - hl, hw * 2, hl * 2);
+      // guard (horizontal, offset slightly upward)
+      ctx.fillRect(c.x - gl, c.y - hw * 1.2, gl * 2, hw * 2.4);
+      ctx.strokeRect(c.x - gl, c.y - hw * 1.2, gl * 2, hw * 2.4);
+    }
   }
 
+  // Attack animation ring (drawn behind character)
   const cc = camera.worldToScreen(character.x, character.y);
+  if (character.atkAnim) {
+    const prog  = character.atkAnim.t / ATK_ANIM_SECS;
+    const r     = (CHAR_RADIUS * 1.15 + SIDE * 1.3 * prog) * ppu;
+    const lw    = Math.max(1.5, (0.18 - 0.10 * prog) * ppu);
+    const alpha = (1 - prog) * 0.80;
+    const color = character.atkAnim.armed ? COLORS.atkRing : COLORS.atkRingAlt;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(cc.x, cc.y, r, 0, Math.PI * 2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = lw;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Character
   ctx.beginPath();
   ctx.arc(cc.x, cc.y, CHAR_RADIUS * ppu, 0, Math.PI * 2);
   ctx.fillStyle   = COLORS.character;

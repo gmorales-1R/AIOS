@@ -145,8 +145,10 @@ html, body {
   border: 1px solid #33ff6a33;
   background: rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
+  cursor: default;
 }
-.inv-slot.filled { border-color: #33ff6a88; }
+.inv-slot.filled  { border-color: #33ff6a88; cursor: pointer; }
+.inv-slot.equipped { border-color: #ffe600; box-shadow: 0 0 7px #ffe60055; cursor: pointer; }
 
 .slot-num {
   position: absolute;
@@ -156,17 +158,32 @@ html, body {
   color: #33ff6a33;
   line-height: 1;
   pointer-events: none;
+  z-index: 1;
 }
 
-.inv-icon {
+/* item icon wrapper inside each slot */
+.slot-icon {
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  inset: 5px;
+  pointer-events: none;
+}
+.slot-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* apple stack count badge */
+.slot-count {
+  position: absolute;
+  bottom: 2px; right: 3px;
   font-family: monospace;
-  font-size: 0.75rem;
-  color: #33ff6a;
+  font-size: clamp(0.55rem, 2vw, 0.7rem);
+  color: #fff;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 1px 3px #000;
+  z-index: 2;
 }
 
 #action-btns {
@@ -198,10 +215,10 @@ html, body {
   cursor: default;
 }
 
-/* ---- save toast ---- */
+/* ---- save toast (above action bar) ---- */
 .toast {
   position: fixed;
-  bottom: 20px; right: 18px;
+  bottom: 90px; right: 18px;
   font-family: monospace;
   font-size: 0.8rem;
   color: #33ff6a;

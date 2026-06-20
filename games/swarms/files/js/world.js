@@ -1,7 +1,5 @@
 import { TREE_DENSITY, APPLE_GROW_TICKS, APPLE_MAX, COLS, ROWS } from './config.js';
 
-// Generate irregular water blobs using sine-noise jitter.
-// Seeds are kept away from the board edges and from row 0 (character start).
 function generateWater(tiles) {
   const BLOBS = 3;
   const inner = tiles.filter(t =>
@@ -20,15 +18,25 @@ function generateWater(tiles) {
   }
 }
 
+function spawnSword(tiles) {
+  const cands = tiles.filter(t => !t.water && !t.tree);
+  if (!cands.length) return;
+  cands[Math.floor(Math.random() * cands.length)].hasSword = true;
+}
+
 export function initWorld(tiles) {
-  // Water first; trees never grow on water.
-  for (const t of tiles) { t.water = false; t.tree = false; t.apples = 0; t.ticksToApple = 0; }
+  for (const t of tiles) {
+    t.water = false; t.tree = false;
+    t.apples = 0; t.ticksToApple = 0;
+    t.hasSword = false;
+  }
   generateWater(tiles);
   for (const t of tiles) {
     if (t.water) continue;
     t.tree         = Math.random() < TREE_DENSITY;
     t.ticksToApple = t.tree ? Math.ceil(Math.random() * APPLE_GROW_TICKS) : 0;
   }
+  spawnSword(tiles);
 }
 
 export function tickWorld(tiles) {
@@ -42,29 +50,37 @@ export function tickWorld(tiles) {
   }
 }
 
-export function collectApples(tile) {
-  tile.apples       = 0;
-  tile.ticksToApple = APPLE_GROW_TICKS;
+// Remove one apple from the tile; reset grow timer when emptied.
+export function pickApple(tile) {
+  if (tile.apples <= 0) return false;
+  tile.apples--;
+  if (tile.apples === 0) tile.ticksToApple = APPLE_GROW_TICKS;
+  return true;
 }
 
-// Serialize tiles with non-default state (water or tree tiles).
 export function serializeTiles(tiles) {
   return tiles
-    .filter(t => t.water || t.tree)
+    .filter(t => t.water || t.tree || t.hasSword)
     .map(t => ({
       col: t.col, row: t.row,
       water: !!t.water, tree: !!t.tree,
       apples: t.apples || 0, ticksToApple: t.ticksToApple || 0,
+      hasSword: !!t.hasSword,
     }));
 }
 
 export function deserializeTiles(tiles, data) {
-  for (const t of tiles) { t.water = false; t.tree = false; t.apples = 0; t.ticksToApple = 0; }
+  for (const t of tiles) {
+    t.water = false; t.tree = false;
+    t.apples = 0; t.ticksToApple = 0;
+    t.hasSword = false;
+  }
   const tileMap = new Map(tiles.map(t => [t.col + ',' + t.row, t]));
   for (const d of data) {
     const t = tileMap.get(d.col + ',' + d.row);
     if (!t) continue;
     t.water = !!d.water; t.tree = !!d.tree;
     t.apples = d.apples || 0; t.ticksToApple = d.ticksToApple || 0;
+    t.hasSword = !!d.hasSword;
   }
 }

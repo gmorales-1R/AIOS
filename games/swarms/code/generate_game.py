@@ -3,7 +3,7 @@
 Emits a modular front-end:
   files/game.html
   files/css/style.css
-  files/js/{config,hex,camera,pathfind,world,character,save,ui,input,render,game}.js
+  files/js/{config,hex,camera,pathfind,inventory,world,character,save,ui,input,render,game}.js
 
 Run from anywhere:  python games/swarms/code/generate_game.py
 """
@@ -239,8 +239,10 @@ html, body {
   border: 1px solid #33ff6a33;
   background: rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
+  cursor: default;
 }
-.inv-slot.filled { border-color: #33ff6a88; }
+.inv-slot.filled  { border-color: #33ff6a88; cursor: pointer; }
+.inv-slot.equipped { border-color: #ffe600; box-shadow: 0 0 7px #ffe60055; cursor: pointer; }
 
 .slot-num {
   position: absolute;
@@ -250,17 +252,32 @@ html, body {
   color: #33ff6a33;
   line-height: 1;
   pointer-events: none;
+  z-index: 1;
 }
 
-.inv-icon {
+/* item icon wrapper inside each slot */
+.slot-icon {
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  inset: 5px;
+  pointer-events: none;
+}
+.slot-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* apple stack count badge */
+.slot-count {
+  position: absolute;
+  bottom: 2px; right: 3px;
   font-family: monospace;
-  font-size: 0.75rem;
-  color: #33ff6a;
+  font-size: clamp(0.55rem, 2vw, 0.7rem);
+  color: #fff;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 1px 3px #000;
+  z-index: 2;
 }
 
 #action-btns {
@@ -292,10 +309,10 @@ html, body {
   cursor: default;
 }
 
-/* ---- save toast ---- */
+/* ---- save toast (above action bar) ---- */
 .toast {
   position: fixed;
-  bottom: 20px; right: 18px;
+  bottom: 90px; right: 18px;
   font-family: monospace;
   font-size: 0.8rem;
   color: #33ff6a;
@@ -339,12 +356,17 @@ export const APPLE_GROW_TICKS  = 15;
 export const APPLE_MAX         = 3;
 export const APPLE_HUNGER_GAIN = 15;
 export const APPLE_HEALTH_GAIN = 5;
+export const APPLE_STACK_MAX   = 10;
 
-export const ZOOM_MIN         = 0.3;
-export const ZOOM_MAX         = 5;
-export const FIT_HEXES        = 6;
-export const FOLLOW_LERP      = 0.12;
-export const AUTO_SAVE_SECS   = 300;   // 5 minutes
+export const ATK_DMG_BASE  = 2;
+export const ATK_DMG_SWORD = 5;
+export const ATK_ANIM_SECS = 0.38;
+
+export const ZOOM_MIN       = 0.3;
+export const ZOOM_MAX       = 5;
+export const FIT_HEXES      = 6;
+export const FOLLOW_LERP    = 0.12;
+export const AUTO_SAVE_SECS = 300;
 
 export const COLORS = {
   page:          '#0a0a0f',
@@ -362,6 +384,10 @@ export const COLORS = {
   hudBg:         '#1a1a22',
   waterFill:     '#0d1f2d',
   waterBorder:   '#1a4060',
+  sword:         '#c8c8e8',
+  swordEdge:     '#ffffff',
+  atkRing:       '#ffe600',
+  atkRingAlt:    '#33ff6a',
 };
 """
 
@@ -587,13 +613,97 @@ function tilesToWaypoints(tilePath) {
 """
 
 # --------------------------------------------------------------------------- #
+# JS: inventory.js
+# --------------------------------------------------------------------------- #
+INVENTORY_JS = """\
+import {
+  APPLE_STACK_MAX, APPLE_HUNGER_GAIN, APPLE_HEALTH_GAIN,
+  HEALTH_MAX, HUNGER_MAX, ATK_DMG_BASE, ATK_DMG_SWORD,
+} from './config.js';
+
+export function createInventory() {
+  return { slots: Array(5).fill(null) };
+}
+
+// First slot index that can accept an apple, or -1 if full.
+function appleSlotIdx(inv) {
+  for (let i = 0; i < inv.slots.length; i++) {
+    const s = inv.slots[i];
+    if (s && s.type === 'apple' && s.count < APPLE_STACK_MAX) return i;
+  }
+  for (let i = 0; i < inv.slots.length; i++) {
+    if (!inv.slots[i]) return i;
+  }
+  return -1;
+}
+
+export function canPickupApple(inv) { return appleSlotIdx(inv) !== -1; }
+
+export function addApple(inv) {
+  const i = appleSlotIdx(inv);
+  if (i === -1) return false;
+  if (!inv.slots[i]) inv.slots[i] = { type: 'apple', count: 0 };
+  inv.slots[i].count++;
+  return true;
+}
+
+// Consume one apple from slot i; apply effects to character. Returns true on success.
+export function consumeApple(inv, i, char) {
+  const s = inv.slots[i];
+  if (!s || s.type !== 'apple' || s.count <= 0) return false;
+  char.hunger = Math.min(HUNGER_MAX, char.hunger + APPLE_HUNGER_GAIN);
+  char.health = Math.min(HEALTH_MAX, char.health + APPLE_HEALTH_GAIN);
+  s.count--;
+  if (s.count === 0) inv.slots[i] = null;
+  return true;
+}
+
+export function hasSword(inv) {
+  return inv.slots.some(s => s && s.type === 'sword');
+}
+
+export function addSword(inv) {
+  const i = inv.slots.findIndex(s => !s);
+  if (i === -1) return false;
+  inv.slots[i] = { type: 'sword', equipped: false };
+  return true;
+}
+
+// Toggle equip on the sword at slot i. Unequips all other weapons first.
+export function toggleEquip(inv, i) {
+  const s = inv.slots[i];
+  if (!s || s.type !== 'sword') return;
+  const equipping = !s.equipped;
+  for (const slot of inv.slots) {
+    if (slot && slot.type === 'sword') slot.equipped = false;
+  }
+  s.equipped = equipping;
+}
+
+export function getMeleeDmg(inv) {
+  return inv.slots.some(s => s && s.type === 'sword' && s.equipped)
+    ? ATK_DMG_SWORD : ATK_DMG_BASE;
+}
+
+export function serializeInventory(inv) {
+  return inv.slots.map(s => (s ? { ...s } : null));
+}
+
+export function deserializeInventory(data) {
+  const inv = createInventory();
+  for (let i = 0; i < data.length && i < inv.slots.length; i++) {
+    inv.slots[i] = data[i] ? { ...data[i] } : null;
+  }
+  return inv;
+}
+"""
+
+# --------------------------------------------------------------------------- #
 # JS: world.js
 # --------------------------------------------------------------------------- #
 WORLD_JS = """\
 import { TREE_DENSITY, APPLE_GROW_TICKS, APPLE_MAX, COLS, ROWS } from './config.js';
 
-// Generate irregular water blobs using sine-noise jitter.
-// Seeds are kept away from the board edges and from row 0 (character start).
 function generateWater(tiles) {
   const BLOBS = 3;
   const inner = tiles.filter(t =>
@@ -612,15 +722,25 @@ function generateWater(tiles) {
   }
 }
 
+function spawnSword(tiles) {
+  const cands = tiles.filter(t => !t.water && !t.tree);
+  if (!cands.length) return;
+  cands[Math.floor(Math.random() * cands.length)].hasSword = true;
+}
+
 export function initWorld(tiles) {
-  // Water first; trees never grow on water.
-  for (const t of tiles) { t.water = false; t.tree = false; t.apples = 0; t.ticksToApple = 0; }
+  for (const t of tiles) {
+    t.water = false; t.tree = false;
+    t.apples = 0; t.ticksToApple = 0;
+    t.hasSword = false;
+  }
   generateWater(tiles);
   for (const t of tiles) {
     if (t.water) continue;
     t.tree         = Math.random() < TREE_DENSITY;
     t.ticksToApple = t.tree ? Math.ceil(Math.random() * APPLE_GROW_TICKS) : 0;
   }
+  spawnSword(tiles);
 }
 
 export function tickWorld(tiles) {
@@ -634,30 +754,38 @@ export function tickWorld(tiles) {
   }
 }
 
-export function collectApples(tile) {
-  tile.apples       = 0;
-  tile.ticksToApple = APPLE_GROW_TICKS;
+// Remove one apple from the tile; reset grow timer when emptied.
+export function pickApple(tile) {
+  if (tile.apples <= 0) return false;
+  tile.apples--;
+  if (tile.apples === 0) tile.ticksToApple = APPLE_GROW_TICKS;
+  return true;
 }
 
-// Serialize tiles with non-default state (water or tree tiles).
 export function serializeTiles(tiles) {
   return tiles
-    .filter(t => t.water || t.tree)
+    .filter(t => t.water || t.tree || t.hasSword)
     .map(t => ({
       col: t.col, row: t.row,
       water: !!t.water, tree: !!t.tree,
       apples: t.apples || 0, ticksToApple: t.ticksToApple || 0,
+      hasSword: !!t.hasSword,
     }));
 }
 
 export function deserializeTiles(tiles, data) {
-  for (const t of tiles) { t.water = false; t.tree = false; t.apples = 0; t.ticksToApple = 0; }
+  for (const t of tiles) {
+    t.water = false; t.tree = false;
+    t.apples = 0; t.ticksToApple = 0;
+    t.hasSword = false;
+  }
   const tileMap = new Map(tiles.map(t => [t.col + ',' + t.row, t]));
   for (const d of data) {
     const t = tileMap.get(d.col + ',' + d.row);
     if (!t) continue;
     t.water = !!d.water; t.tree = !!d.tree;
     t.apples = d.apples || 0; t.ticksToApple = d.ticksToApple || 0;
+    t.hasSword = !!d.hasSword;
   }
 }
 """
@@ -672,6 +800,7 @@ import {
   MOVE_SPEED, TILE_HUNGER_COST,
   HEALTH_MAX, HUNGER_MAX,
   TICK_HUNGER, STARVE_DMG, HEAL_RATE, HEAL_THRESH,
+  ATK_ANIM_SECS,
 } from './config.js';
 
 export class Character {
@@ -683,6 +812,7 @@ export class Character {
     this.health      = HEALTH_MAX;
     this.hunger      = HUNGER_MAX;
     this.onTileEnter = null;
+    this.atkAnim     = null;   // { t, armed } while animating
   }
 
   get moving() { return this.path.length > 0; }
@@ -691,6 +821,11 @@ export class Character {
     this.x = x; this.y = y;
     this.path = []; this.targetTile = null; this.targetState = null;
     this.health = HEALTH_MAX; this.hunger = HUNGER_MAX;
+    this.atkAnim = null;
+  }
+
+  startAttack(armed = false) {
+    this.atkAnim = { t: 0, armed };
   }
 
   serialize() {
@@ -701,6 +836,7 @@ export class Character {
     this.x = d.x; this.y = d.y;
     this.health = d.health; this.hunger = d.hunger;
     this.path = []; this.targetTile = null; this.targetState = null;
+    this.atkAnim = null;
   }
 
   onTick() {
@@ -727,6 +863,12 @@ export class Character {
   }
 
   update(dt) {
+    // Advance attack animation.
+    if (this.atkAnim) {
+      this.atkAnim.t += dt;
+      if (this.atkAnim.t >= ATK_ANIM_SECS) this.atkAnim = null;
+    }
+
     const wasMoving = this.moving;
     let budget = MOVE_SPEED * dt;
     while (budget > 0 && this.path.length > 0) {
@@ -756,7 +898,7 @@ export class Character {
 """
 
 # --------------------------------------------------------------------------- #
-# JS: save.js  — serialization + localStorage/cookie/sessionStorage storage
+# JS: save.js
 # --------------------------------------------------------------------------- #
 SAVE_JS = """\
 const PREFIX    = 'sw_save_';
@@ -764,7 +906,6 @@ const IDX_KEY   = 'sw_idx';
 const MAX_SAVES = 3;
 const SAVE_VER  = 1;
 
-// Storage backend: localStorage → sessionStorage → cookies.
 function store(key, val) {
   try { localStorage.setItem(key, val); return; } catch {}
   try { sessionStorage.setItem(key, val); return; } catch {}
@@ -799,7 +940,6 @@ function loadIndex() {
 }
 function storeIndex(idx) { store(IDX_KEY, JSON.stringify(idx)); }
 
-// Save game state. Returns the savedAt timestamp.
 export function saveGame(state) {
   let idx = loadIndex();
   let key;
@@ -807,7 +947,6 @@ export function saveGame(state) {
   if (idx.length < MAX_SAVES) {
     key = PREFIX + Date.now();
   } else {
-    // Drop oldest save to make room.
     idx.sort((a, b) => a.savedAt - b.savedAt);
     key = idx[0].key;
     erase(key);
@@ -821,7 +960,6 @@ export function saveGame(state) {
   return savedAt;
 }
 
-// Load the most-recent save. Returns parsed object or null.
 export function loadLatestSave() {
   const idx = loadIndex();
   if (!idx.length) return null;
@@ -834,7 +972,7 @@ export function hasSaves() { return loadIndex().length > 0; }
 """
 
 # --------------------------------------------------------------------------- #
-# JS: ui.js  — DOM screen / toast controller
+# JS: ui.js
 # --------------------------------------------------------------------------- #
 UI_JS = """\
 export class UI {
@@ -847,16 +985,26 @@ export class UI {
     this._toastId = null;
   }
 
-  // Wire all button callbacks in one call.
-  bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle }) {
+  bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle, onAttack, onInteract }) {
     document.getElementById('btn-new-game').onclick  = onNewGame;
     document.getElementById('btn-continue').onclick  = onContinue;
     document.getElementById('btn-resume').onclick    = onResume;
     document.getElementById('btn-save').onclick      = onSave;
     document.getElementById('btn-back-menu').onclick = onBackMenu;
     this._toggle.onclick = onToggle;
+    if (onAttack)   document.getElementById('act-melee').onclick    = onAttack;
+    if (onInteract) document.getElementById('act-interact').onclick = onInteract;
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') onToggle();
+    });
+  }
+
+  // Wire click handlers for inventory slots.
+  bindInventory(onSlotClick) {
+    document.querySelectorAll('.inv-slot').forEach(slot => {
+      slot.addEventListener('click', () => {
+        onSlotClick(parseInt(slot.dataset.slot, 10));
+      });
     });
   }
 
@@ -883,7 +1031,6 @@ export class UI {
     this._hide(this._confirm);
   }
 
-  // Show the confirmation dialog. onYes fires if the user confirms.
   showConfirm(onYes) {
     this._show(this._confirm);
     document.getElementById('btn-confirm-yes').onclick = () => {
@@ -904,27 +1051,47 @@ export class UI {
   showActionBar() { this._show(document.getElementById('action-bar')); }
   hideActionBar() { this._hide(document.getElementById('action-bar')); }
 
-  // Enable or disable an action button by short id ('melee'|'defend'|'range'|'interact').
   setActionEnabled(id, enabled) {
     const btn = document.getElementById('act-' + id);
     if (btn) btn.disabled = !enabled;
   }
 
-  // Set an inventory slot contents. item = null to clear, or { label } to fill.
+  // Render an inventory slot. item: null | { type:'apple', count } | { type:'sword', equipped }
   setSlot(index, item) {
     const slot = document.querySelector(`.inv-slot[data-slot="${index}"]`);
     if (!slot) return;
-    slot.classList.toggle('filled', !!item);
-    let icon = slot.querySelector('.inv-icon');
-    if (item) {
-      if (!icon) { icon = document.createElement('span'); icon.className = 'inv-icon'; slot.appendChild(icon); }
-      icon.textContent = item.label ?? '';
-    } else if (icon) {
-      icon.remove();
+
+    slot.querySelector('.slot-icon')?.remove();
+    slot.querySelector('.slot-count')?.remove();
+    slot.classList.remove('filled', 'equipped');
+
+    if (!item) return;
+
+    slot.classList.add('filled');
+    const icon = document.createElement('div');
+    icon.className = 'slot-icon';
+
+    if (item.type === 'apple') {
+      icon.innerHTML =
+        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
+        '<circle r="0.82" fill="#e83a2a" stroke="#7a1a10" stroke-width="0.14"/>' +
+        '</svg>';
+      const cnt = document.createElement('span');
+      cnt.className = 'slot-count';
+      cnt.textContent = item.count;
+      slot.appendChild(cnt);
+    } else if (item.type === 'sword') {
+      icon.innerHTML =
+        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect x="-0.13" y="-0.9" width="0.26" height="1.8" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
+        '<rect x="-0.65" y="-0.14" width="1.3" height="0.28" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
+        '</svg>';
+      if (item.equipped) slot.classList.add('equipped');
     }
+
+    slot.appendChild(icon);
   }
 
-  // Show a toast message that fades after 1.8 s.
   toast(msg) {
     clearTimeout(this._toastId);
     this._toast.textContent = msg;
@@ -1020,7 +1187,7 @@ export function setupInput(canvas, camera, { onTap }) {
 # --------------------------------------------------------------------------- #
 RENDER_JS = """\
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, ATK_ANIM_SECS } from './config.js';
 
 const APPLE_POS = [
   [[0, 0]],
@@ -1066,6 +1233,7 @@ export function render(ctx, camera, tiles, character) {
     ctx.strokeStyle = borderColor;
     ctx.stroke();
 
+    // Apples on tree tiles
     if (t.apples > 0 && !t.water) {
       const positions = APPLE_POS[t.apples - 1];
       for (const [ox, oy] of positions) {
@@ -1078,9 +1246,43 @@ export function render(ctx, camera, tiles, character) {
         ctx.stroke();
       }
     }
+
+    // Sword on ground (two rectangles forming a cross)
+    if (t.hasSword) {
+      const hw = 0.09 * ppu;   // half arm width
+      const hl = 0.42 * ppu;   // half blade length
+      const gl = 0.30 * ppu;   // half guard length
+      ctx.fillStyle   = COLORS.sword;
+      ctx.strokeStyle = COLORS.swordEdge;
+      ctx.lineWidth   = Math.max(0.5, 0.018 * ppu);
+      // blade (vertical)
+      ctx.fillRect(c.x - hw, c.y - hl, hw * 2, hl * 2);
+      ctx.strokeRect(c.x - hw, c.y - hl, hw * 2, hl * 2);
+      // guard (horizontal, offset slightly upward)
+      ctx.fillRect(c.x - gl, c.y - hw * 1.2, gl * 2, hw * 2.4);
+      ctx.strokeRect(c.x - gl, c.y - hw * 1.2, gl * 2, hw * 2.4);
+    }
   }
 
+  // Attack animation ring (drawn behind character)
   const cc = camera.worldToScreen(character.x, character.y);
+  if (character.atkAnim) {
+    const prog  = character.atkAnim.t / ATK_ANIM_SECS;
+    const r     = (CHAR_RADIUS * 1.15 + SIDE * 1.3 * prog) * ppu;
+    const lw    = Math.max(1.5, (0.18 - 0.10 * prog) * ppu);
+    const alpha = (1 - prog) * 0.80;
+    const color = character.atkAnim.armed ? COLORS.atkRing : COLORS.atkRingAlt;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(cc.x, cc.y, r, 0, Math.PI * 2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = lw;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Character
   ctx.beginPath();
   ctx.arc(cc.x, cc.y, CHAR_RADIUS * ppu, 0, Math.PI * 2);
   ctx.fillStyle   = COLORS.character;
@@ -1124,17 +1326,18 @@ import { Character } from './character.js';
 import { setupInput } from './input.js';
 import { render } from './render.js';
 import {
-  initWorld, tickWorld, collectApples,
+  initWorld, tickWorld, pickApple,
   serializeTiles, deserializeTiles,
 } from './world.js';
+import {
+  createInventory, addApple, canPickupApple, consumeApple,
+  addSword, hasSword, toggleEquip, getMeleeDmg,
+  serializeInventory, deserializeInventory,
+} from './inventory.js';
 import { saveGame, loadLatestSave, hasSaves } from './save.js';
 import { UI } from './ui.js';
-import {
-  COLS, APPLE_HUNGER_GAIN, APPLE_HEALTH_GAIN, HEALTH_MAX, HUNGER_MAX,
-  AUTO_SAVE_SECS,
-} from './config.js';
+import { COLS, AUTO_SAVE_SECS } from './config.js';
 
-// ---- core objects (persist across game sessions) ----
 const canvas    = document.getElementById('game');
 const ctx       = canvas.getContext('2d');
 const camera    = new Camera();
@@ -1145,20 +1348,61 @@ const ui        = new UI();
 // Pre-populate tiles so there's a pretty background on the start screen.
 initWorld(tiles);
 
-// ---- game state ----
-let gameState     = 'menu';   // 'menu' | 'playing' | 'paused'
+let gameState     = 'menu';
 let tickAccum     = 0;
 let autoSaveAccum = 0;
-let lastSaveTime  = 0;        // ms timestamp of last save (0 = never)
+let lastSaveTime  = 0;
+let currentTile   = null;
+let inventory     = createInventory();
 
-// ---- apple collection (set once, reused across sessions) ----
+// Track which tile the character is standing on.
 character.onTileEnter = (tile) => {
-  if (!tile.apples) return;
-  const n = tile.apples;
-  collectApples(tile);
-  character.hunger = Math.min(HUNGER_MAX, character.hunger + n * APPLE_HUNGER_GAIN);
-  character.health = Math.min(HEALTH_MAX, character.health + n * APPLE_HEALTH_GAIN);
+  currentTile = tile;
+  updateActionBar();
 };
+
+// ---- inventory UI sync ----
+function updateInventoryUI() {
+  for (let i = 0; i < inventory.slots.length; i++) {
+    ui.setSlot(i, inventory.slots[i]);
+  }
+}
+
+// ---- action bar state ----
+function updateActionBar() {
+  ui.setActionEnabled('melee', gameState === 'playing');
+  ui.setActionEnabled('defend', false);
+  ui.setActionEnabled('range',  false);
+
+  const canUse = gameState === 'playing' && !!currentTile && (
+    (currentTile.hasSword && !hasSword(inventory)) ||
+    (currentTile.apples > 0 && canPickupApple(inventory))
+  );
+  ui.setActionEnabled('interact', !!canUse);
+}
+
+// ---- actions ----
+function doAttack() {
+  if (gameState !== 'playing') return;
+  const armed = inventory.slots.some(s => s && s.type === 'sword' && s.equipped);
+  character.startAttack(armed);
+  // dmg = getMeleeDmg(inventory)  — applied to enemies when combat lands
+}
+
+function doUse() {
+  if (gameState !== 'playing' || !currentTile) return;
+  if (currentTile.hasSword && !hasSword(inventory)) {
+    currentTile.hasSword = false;
+    addSword(inventory);
+    updateInventoryUI();
+    updateActionBar();
+  } else if (currentTile.apples > 0 && canPickupApple(inventory)) {
+    pickApple(currentTile);
+    addApple(inventory);
+    updateInventoryUI();
+    updateActionBar();
+  }
+}
 
 // ---- save/load helpers ----
 function doSave(label = '\\u25CF SAVED') {
@@ -1166,6 +1410,7 @@ function doSave(label = '\\u25CF SAVED') {
     character: character.serialize(),
     camera:    camera.serialize(),
     tiles:     serializeTiles(tiles),
+    inventory: serializeInventory(inventory),
     tickAccum,
   });
   lastSaveTime = savedAt;
@@ -1173,24 +1418,19 @@ function doSave(label = '\\u25CF SAVED') {
 }
 
 // ---- state transitions ----
-// Check current game state and enable/disable action buttons accordingly.
-// All stub-disabled for now; wire up when combat/interaction systems land.
-function updateActionBar() {
-  ui.setActionEnabled('melee',    false);
-  ui.setActionEnabled('defend',   false);
-  ui.setActionEnabled('range',    false);
-  ui.setActionEnabled('interact', false);
-}
-
 function startNew() {
+  inventory = createInventory();
   const s = tileCenter((COLS / 2) | 0, 0);
   character.reset(s.x, s.y);
   initWorld(tiles);
   camera.deserialize({ ...boardCenter(), z: 1 });
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
+  const { tile: startTile } = nearestTile(tiles, s.x, s.y);
+  currentTile = startTile;
   gameState = 'playing';
   ui.hideStart();
   ui.showActionBar();
+  updateInventoryUI();
   updateActionBar();
 }
 
@@ -1200,12 +1440,16 @@ function doContinue() {
   character.deserialize(save.character);
   camera.deserialize(save.camera);
   deserializeTiles(tiles, save.tiles);
+  inventory     = save.inventory ? deserializeInventory(save.inventory) : createInventory();
   tickAccum     = save.tickAccum || 0;
   lastSaveTime  = save.savedAt;
   autoSaveAccum = 0;
+  const { tile: startTile } = nearestTile(tiles, character.x, character.y);
+  currentTile = startTile;
   gameState = 'playing';
   ui.hideStart();
   ui.showActionBar();
+  updateInventoryUI();
   updateActionBar();
 }
 
@@ -1224,7 +1468,8 @@ function togglePause() {
 function backToMenu() {
   const stale = lastSaveTime === 0 || (Date.now() - lastSaveTime) > 30_000;
   const toMenu = () => {
-    gameState = 'menu';
+    gameState   = 'menu';
+    currentTile = null;
     ui.hidePause();
     ui.hideActionBar();
     ui.showStart(hasSaves());
@@ -1248,7 +1493,6 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-// Centre the background camera on the start screen.
 camera.deserialize({ ...boardCenter(), z: 1 });
 
 const isBlocked = (tile) => !!tile.water;
@@ -1268,7 +1512,22 @@ ui.bind({
   onSave:     () => doSave(),
   onBackMenu: backToMenu,
   onToggle:   togglePause,
+  onAttack:   doAttack,
+  onInteract: doUse,
 });
+
+ui.bindInventory((idx) => {
+  if (gameState !== 'playing') return;
+  const slot = inventory.slots[idx];
+  if (!slot) return;
+  if (slot.type === 'apple') {
+    if (consumeApple(inventory, idx, character)) updateInventoryUI();
+  } else if (slot.type === 'sword') {
+    toggleEquip(inventory, idx);
+    updateInventoryUI();
+  }
+});
+
 ui.showStart(hasSaves());
 
 // ---- main loop ----
@@ -1286,6 +1545,7 @@ function loop(now) {
       tickAccum -= 1.0;
       character.onTick();
       tickWorld(tiles);
+      updateActionBar();   // apples may have grown on currentTile
     }
 
     if (autoSaveAccum >= AUTO_SAVE_SECS) {
@@ -1312,6 +1572,7 @@ JS_FILES = {
     "hex.js":       HEX_JS,
     "camera.js":    CAMERA_JS,
     "pathfind.js":  PATHFIND_JS,
+    "inventory.js": INVENTORY_JS,
     "world.js":     WORLD_JS,
     "character.js": CHARACTER_JS,
     "save.js":      SAVE_JS,

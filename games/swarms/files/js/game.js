@@ -4,17 +4,18 @@ import { Character } from './character.js';
 import { setupInput } from './input.js';
 import { render } from './render.js';
 import {
-  initWorld, tickWorld, collectApples,
+  initWorld, tickWorld, pickApple,
   serializeTiles, deserializeTiles,
 } from './world.js';
+import {
+  createInventory, addApple, canPickupApple, consumeApple,
+  addSword, hasSword, toggleEquip, getMeleeDmg,
+  serializeInventory, deserializeInventory,
+} from './inventory.js';
 import { saveGame, loadLatestSave, hasSaves } from './save.js';
 import { UI } from './ui.js';
-import {
-  COLS, APPLE_HUNGER_GAIN, APPLE_HEALTH_GAIN, HEALTH_MAX, HUNGER_MAX,
-  AUTO_SAVE_SECS,
-} from './config.js';
+import { COLS, AUTO_SAVE_SECS } from './config.js';
 
-// ---- core objects (persist across game sessions) ----
 const canvas    = document.getElementById('game');
 const ctx       = canvas.getContext('2d');
 const camera    = new Camera();
@@ -25,20 +26,61 @@ const ui        = new UI();
 // Pre-populate tiles so there's a pretty background on the start screen.
 initWorld(tiles);
 
-// ---- game state ----
-let gameState     = 'menu';   // 'menu' | 'playing' | 'paused'
+let gameState     = 'menu';
 let tickAccum     = 0;
 let autoSaveAccum = 0;
-let lastSaveTime  = 0;        // ms timestamp of last save (0 = never)
+let lastSaveTime  = 0;
+let currentTile   = null;
+let inventory     = createInventory();
 
-// ---- apple collection (set once, reused across sessions) ----
+// Track which tile the character is standing on.
 character.onTileEnter = (tile) => {
-  if (!tile.apples) return;
-  const n = tile.apples;
-  collectApples(tile);
-  character.hunger = Math.min(HUNGER_MAX, character.hunger + n * APPLE_HUNGER_GAIN);
-  character.health = Math.min(HEALTH_MAX, character.health + n * APPLE_HEALTH_GAIN);
+  currentTile = tile;
+  updateActionBar();
 };
+
+// ---- inventory UI sync ----
+function updateInventoryUI() {
+  for (let i = 0; i < inventory.slots.length; i++) {
+    ui.setSlot(i, inventory.slots[i]);
+  }
+}
+
+// ---- action bar state ----
+function updateActionBar() {
+  ui.setActionEnabled('melee', gameState === 'playing');
+  ui.setActionEnabled('defend', false);
+  ui.setActionEnabled('range',  false);
+
+  const canUse = gameState === 'playing' && !!currentTile && (
+    (currentTile.hasSword && !hasSword(inventory)) ||
+    (currentTile.apples > 0 && canPickupApple(inventory))
+  );
+  ui.setActionEnabled('interact', !!canUse);
+}
+
+// ---- actions ----
+function doAttack() {
+  if (gameState !== 'playing') return;
+  const armed = inventory.slots.some(s => s && s.type === 'sword' && s.equipped);
+  character.startAttack(armed);
+  // dmg = getMeleeDmg(inventory)  — applied to enemies when combat lands
+}
+
+function doUse() {
+  if (gameState !== 'playing' || !currentTile) return;
+  if (currentTile.hasSword && !hasSword(inventory)) {
+    currentTile.hasSword = false;
+    addSword(inventory);
+    updateInventoryUI();
+    updateActionBar();
+  } else if (currentTile.apples > 0 && canPickupApple(inventory)) {
+    pickApple(currentTile);
+    addApple(inventory);
+    updateInventoryUI();
+    updateActionBar();
+  }
+}
 
 // ---- save/load helpers ----
 function doSave(label = '\u25CF SAVED') {
@@ -46,6 +88,7 @@ function doSave(label = '\u25CF SAVED') {
     character: character.serialize(),
     camera:    camera.serialize(),
     tiles:     serializeTiles(tiles),
+    inventory: serializeInventory(inventory),
     tickAccum,
   });
   lastSaveTime = savedAt;
@@ -53,24 +96,19 @@ function doSave(label = '\u25CF SAVED') {
 }
 
 // ---- state transitions ----
-// Check current game state and enable/disable action buttons accordingly.
-// All stub-disabled for now; wire up when combat/interaction systems land.
-function updateActionBar() {
-  ui.setActionEnabled('melee',    false);
-  ui.setActionEnabled('defend',   false);
-  ui.setActionEnabled('range',    false);
-  ui.setActionEnabled('interact', false);
-}
-
 function startNew() {
+  inventory = createInventory();
   const s = tileCenter((COLS / 2) | 0, 0);
   character.reset(s.x, s.y);
   initWorld(tiles);
   camera.deserialize({ ...boardCenter(), z: 1 });
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
+  const { tile: startTile } = nearestTile(tiles, s.x, s.y);
+  currentTile = startTile;
   gameState = 'playing';
   ui.hideStart();
   ui.showActionBar();
+  updateInventoryUI();
   updateActionBar();
 }
 
@@ -80,12 +118,16 @@ function doContinue() {
   character.deserialize(save.character);
   camera.deserialize(save.camera);
   deserializeTiles(tiles, save.tiles);
+  inventory     = save.inventory ? deserializeInventory(save.inventory) : createInventory();
   tickAccum     = save.tickAccum || 0;
   lastSaveTime  = save.savedAt;
   autoSaveAccum = 0;
+  const { tile: startTile } = nearestTile(tiles, character.x, character.y);
+  currentTile = startTile;
   gameState = 'playing';
   ui.hideStart();
   ui.showActionBar();
+  updateInventoryUI();
   updateActionBar();
 }
 
@@ -104,7 +146,8 @@ function togglePause() {
 function backToMenu() {
   const stale = lastSaveTime === 0 || (Date.now() - lastSaveTime) > 30_000;
   const toMenu = () => {
-    gameState = 'menu';
+    gameState   = 'menu';
+    currentTile = null;
     ui.hidePause();
     ui.hideActionBar();
     ui.showStart(hasSaves());
@@ -128,7 +171,6 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-// Centre the background camera on the start screen.
 camera.deserialize({ ...boardCenter(), z: 1 });
 
 const isBlocked = (tile) => !!tile.water;
@@ -148,7 +190,22 @@ ui.bind({
   onSave:     () => doSave(),
   onBackMenu: backToMenu,
   onToggle:   togglePause,
+  onAttack:   doAttack,
+  onInteract: doUse,
 });
+
+ui.bindInventory((idx) => {
+  if (gameState !== 'playing') return;
+  const slot = inventory.slots[idx];
+  if (!slot) return;
+  if (slot.type === 'apple') {
+    if (consumeApple(inventory, idx, character)) updateInventoryUI();
+  } else if (slot.type === 'sword') {
+    toggleEquip(inventory, idx);
+    updateInventoryUI();
+  }
+});
+
 ui.showStart(hasSaves());
 
 // ---- main loop ----
@@ -166,6 +223,7 @@ function loop(now) {
       tickAccum -= 1.0;
       character.onTick();
       tickWorld(tiles);
+      updateActionBar();   // apples may have grown on currentTile
     }
 
     if (autoSaveAccum >= AUTO_SAVE_SECS) {

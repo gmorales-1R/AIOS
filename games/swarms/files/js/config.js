@@ -24,12 +24,17 @@ export const APPLE_GROW_TICKS  = 15;
 export const APPLE_MAX         = 3;
 export const APPLE_HUNGER_GAIN = 15;
 export const APPLE_HEALTH_GAIN = 5;
+export const APPLE_STACK_MAX   = 10;
 
-export const ZOOM_MIN         = 0.3;
-export const ZOOM_MAX         = 5;
-export const FIT_HEXES        = 6;
-export const FOLLOW_LERP      = 0.12;
-export const AUTO_SAVE_SECS   = 300;   // 5 minutes
+export const ATK_DMG_BASE  = 2;
+export const ATK_DMG_SWORD = 5;
+export const ATK_ANIM_SECS = 0.38;
+
+export const ZOOM_MIN       = 0.3;
+export const ZOOM_MAX       = 5;
+export const FIT_HEXES      = 6;
+export const FOLLOW_LERP    = 0.12;
+export const AUTO_SAVE_SECS = 300;
 
 export const COLORS = {
   page:          '#0a0a0f',
@@ -47,4 +52,8 @@ export const COLORS = {
   hudBg:         '#1a1a22',
   waterFill:     '#0d1f2d',
   waterBorder:   '#1a4060',
+  sword:         '#c8c8e8',
+  swordEdge:     '#ffffff',
+  atkRing:       '#ffe600',
+  atkRingAlt:    '#33ff6a',
 };

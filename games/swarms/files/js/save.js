@@ -3,7 +3,6 @@ const IDX_KEY   = 'sw_idx';
 const MAX_SAVES = 3;
 const SAVE_VER  = 1;
 
-// Storage backend: localStorage → sessionStorage → cookies.
 function store(key, val) {
   try { localStorage.setItem(key, val); return; } catch {}
   try { sessionStorage.setItem(key, val); return; } catch {}
@@ -38,7 +37,6 @@ function loadIndex() {
 }
 function storeIndex(idx) { store(IDX_KEY, JSON.stringify(idx)); }
 
-// Save game state. Returns the savedAt timestamp.
 export function saveGame(state) {
   let idx = loadIndex();
   let key;
@@ -46,7 +44,6 @@ export function saveGame(state) {
   if (idx.length < MAX_SAVES) {
     key = PREFIX + Date.now();
   } else {
-    // Drop oldest save to make room.
     idx.sort((a, b) => a.savedAt - b.savedAt);
     key = idx[0].key;
     erase(key);
@@ -60,7 +57,6 @@ export function saveGame(state) {
   return savedAt;
 }
 
-// Load the most-recent save. Returns parsed object or null.
 export function loadLatestSave() {
   const idx = loadIndex();
   if (!idx.length) return null;

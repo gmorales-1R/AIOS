@@ -8,16 +8,26 @@ export class UI {
     this._toastId = null;
   }
 
-  // Wire all button callbacks in one call.
-  bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle }) {
+  bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle, onAttack, onInteract }) {
     document.getElementById('btn-new-game').onclick  = onNewGame;
     document.getElementById('btn-continue').onclick  = onContinue;
     document.getElementById('btn-resume').onclick    = onResume;
     document.getElementById('btn-save').onclick      = onSave;
     document.getElementById('btn-back-menu').onclick = onBackMenu;
     this._toggle.onclick = onToggle;
+    if (onAttack)   document.getElementById('act-melee').onclick    = onAttack;
+    if (onInteract) document.getElementById('act-interact').onclick = onInteract;
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') onToggle();
+    });
+  }
+
+  // Wire click handlers for inventory slots.
+  bindInventory(onSlotClick) {
+    document.querySelectorAll('.inv-slot').forEach(slot => {
+      slot.addEventListener('click', () => {
+        onSlotClick(parseInt(slot.dataset.slot, 10));
+      });
     });
   }
 
@@ -44,7 +54,6 @@ export class UI {
     this._hide(this._confirm);
   }
 
-  // Show the confirmation dialog. onYes fires if the user confirms.
   showConfirm(onYes) {
     this._show(this._confirm);
     document.getElementById('btn-confirm-yes').onclick = () => {
@@ -65,27 +74,47 @@ export class UI {
   showActionBar() { this._show(document.getElementById('action-bar')); }
   hideActionBar() { this._hide(document.getElementById('action-bar')); }
 
-  // Enable or disable an action button by short id ('melee'|'defend'|'range'|'interact').
   setActionEnabled(id, enabled) {
     const btn = document.getElementById('act-' + id);
     if (btn) btn.disabled = !enabled;
   }
 
-  // Set an inventory slot contents. item = null to clear, or { label } to fill.
+  // Render an inventory slot. item: null | { type:'apple', count } | { type:'sword', equipped }
   setSlot(index, item) {
     const slot = document.querySelector(`.inv-slot[data-slot="${index}"]`);
     if (!slot) return;
-    slot.classList.toggle('filled', !!item);
-    let icon = slot.querySelector('.inv-icon');
-    if (item) {
-      if (!icon) { icon = document.createElement('span'); icon.className = 'inv-icon'; slot.appendChild(icon); }
-      icon.textContent = item.label ?? '';
-    } else if (icon) {
-      icon.remove();
+
+    slot.querySelector('.slot-icon')?.remove();
+    slot.querySelector('.slot-count')?.remove();
+    slot.classList.remove('filled', 'equipped');
+
+    if (!item) return;
+
+    slot.classList.add('filled');
+    const icon = document.createElement('div');
+    icon.className = 'slot-icon';
+
+    if (item.type === 'apple') {
+      icon.innerHTML =
+        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
+        '<circle r="0.82" fill="#e83a2a" stroke="#7a1a10" stroke-width="0.14"/>' +
+        '</svg>';
+      const cnt = document.createElement('span');
+      cnt.className = 'slot-count';
+      cnt.textContent = item.count;
+      slot.appendChild(cnt);
+    } else if (item.type === 'sword') {
+      icon.innerHTML =
+        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect x="-0.13" y="-0.9" width="0.26" height="1.8" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
+        '<rect x="-0.65" y="-0.14" width="1.3" height="0.28" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
+        '</svg>';
+      if (item.equipped) slot.classList.add('equipped');
     }
+
+    slot.appendChild(icon);
   }
 
-  // Show a toast message that fades after 1.8 s.
   toast(msg) {
     clearTimeout(this._toastId);
     this._toast.textContent = msg;
