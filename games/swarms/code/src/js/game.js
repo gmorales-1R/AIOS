@@ -143,7 +143,7 @@ function startNew() {
   const spawnTile  = passable[Math.floor(Math.random() * passable.length)];
   character.reset(spawnTile.x, spawnTile.y);
   creatures = spawnCreatures(tiles, isBlocked);
-  camera.deserialize({ ...boardCenter(), z: 1 });
+  camera.deserialize({ x: spawnTile.x, y: spawnTile.y, z: 1 });
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
   currentTile = spawnTile;
   gameState = 'playing';
