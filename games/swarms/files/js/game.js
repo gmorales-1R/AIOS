@@ -218,14 +218,19 @@ camera.deserialize({ ...boardCenter(), z: 1 });
 
 const isBlocked = (tile) => !!tile.water;
 
-// Dead zone margins (CSS px) around the bottom and right UI bars.
-const DEAD_BOTTOM = 80;
-const DEAD_RIGHT  = 80;
+// Dead zones match the actual footprint of each UI bar.
+// Inventory bar: bottom-left (5 slots × 48px + gaps + padding ≈ 290×70px)
+// Action column: bottom-right (4 buttons × 48px + gaps + padding ≈ 70×230px)
+const DEAD_BAR_H = 70;
+const DEAD_BAR_W = 290;
+const DEAD_COL_W = 70;
+const DEAD_COL_H = 230;
 
 setupInput(canvas, camera, {
   onTap(wx, wy, sx, sy) {
     if (gameState !== 'playing') return;
-    if (sy > camera.viewH - DEAD_BOTTOM || sx > camera.viewW - DEAD_RIGHT) return;
+    if (sy > camera.viewH - DEAD_BAR_H && sx < DEAD_BAR_W) return;
+    if (sx > camera.viewW - DEAD_COL_W && sy > camera.viewH - DEAD_COL_H) return;
     const { tile, dist } = nearestTile(tiles, wx, wy);
     if (!tile || dist > SIDE) return;
     character.setDestination(tiles, tile, isBlocked);
