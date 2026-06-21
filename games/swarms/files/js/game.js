@@ -70,7 +70,7 @@ function doAttack() {
   if (gameState !== 'playing') return;
   const stats  = getMeleeStats(inventory);
   const armed  = stats.acc > 0;
-  character.startAttack(armed);
+  character.startAttack(armed, stats.range);
 
   const refDmg = stats.dmg * 1.5;   // opacity reference: 1.0 at this value
   for (const cr of creatures) {

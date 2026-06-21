@@ -5,6 +5,10 @@ const grassImg = new Image();
 grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
 let grassPattern = null;
 
+const grassImg2 = new Image();
+grassImg2.src = new URL('../assets/tiles/grass2.png', import.meta.url).href;
+let grassPattern2 = null;
+
 const APPLE_POS = [
   [[0, 0]],
   [[-0.22, 0], [0.22, 0]],
@@ -28,6 +32,9 @@ function drawHitRing(ctx, x, y, anim, ppu) {
 export function render(ctx, camera, tiles, character, creatures) {
   if (!grassPattern && grassImg.complete && grassImg.naturalWidth) {
     grassPattern = ctx.createPattern(grassImg, 'repeat');
+  }
+  if (!grassPattern2 && grassImg2.complete && grassImg2.naturalWidth) {
+    grassPattern2 = ctx.createPattern(grassImg2, 'repeat');
   }
 
   const { viewW, viewH } = camera;
@@ -58,11 +65,17 @@ export function render(ctx, camera, tiles, character, creatures) {
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.closePath();
-    if (!t.water && !t.tree && grassPattern) {
-      const s = HEX_H * ppu;
-      const sc = s / grassImg.width;
-      grassPattern.setTransform(new DOMMatrix([sc, 0, 0, sc, c.x - s / 2, c.y - s / 2]));
-      ctx.fillStyle = grassPattern;
+    if (!t.water && !t.tree) {
+      const pat = t.grassVar ? grassPattern2 : grassPattern;
+      const img = t.grassVar ? grassImg2 : grassImg;
+      if (pat) {
+        const s = HEX_H * ppu;
+        const sc = s / img.width;
+        pat.setTransform(new DOMMatrix([sc, 0, 0, sc, c.x - s / 2, c.y - s / 2]));
+        ctx.fillStyle = pat;
+      } else {
+        ctx.fillStyle = COLORS.tileFill;
+      }
     } else {
       ctx.fillStyle = t.water ? COLORS.waterFill
                     : t.tree  ? COLORS.treeFill
@@ -127,7 +140,7 @@ export function render(ctx, camera, tiles, character, creatures) {
   const cc = camera.worldToScreen(character.x, character.y);
   if (character.atkAnim) {
     const prog  = character.atkAnim.t / ATK_ANIM_SECS;
-    const r     = (CHAR_RADIUS * 1.15 + SIDE * 1.3 * prog) * ppu;
+    const r     = (CHAR_RADIUS * 0.4 + character.atkAnim.range * prog) * ppu;
     const lw    = Math.max(1.5, (0.18 - 0.10 * prog) * ppu);
     const alpha = (1 - prog) * 0.80;
     const color = character.atkAnim.armed ? COLORS.atkRing : COLORS.atkRingAlt;

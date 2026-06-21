@@ -29,8 +29,8 @@ export class Character {
     this.atkAnim = null; this.hitAnim = null;
   }
 
-  startAttack(armed = false) {
-    this.atkAnim = { t: 0, armed };
+  startAttack(armed = false, range = 1.5) {
+    this.atkAnim = { t: 0, armed, range };
   }
 
   // dmg: final calculated damage; refDmg: baseDmg*1.5 scale reference for opacity.

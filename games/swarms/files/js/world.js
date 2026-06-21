@@ -29,6 +29,7 @@ export function initWorld(tiles) {
     t.water = false; t.tree = false;
     t.apples = 0; t.ticksToApple = 0;
     t.hasSword = false;
+    t.grassVar = Math.random() < 0.3;
   }
   generateWater(tiles);
   for (const t of tiles) {
