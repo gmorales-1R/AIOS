@@ -2,7 +2,7 @@ import { CORNERS } from './hex.js';
 import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS, HIT_ANIM_SECS } from './config.js';
 
 const grassImg = new Image();
-grassImg.src = '../assets/tiles/grass.png';
+grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
 
 const APPLE_POS = [
   [[0, 0]],
