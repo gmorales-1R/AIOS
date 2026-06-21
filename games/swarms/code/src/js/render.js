@@ -41,6 +41,11 @@ function drawHitRing(ctx, x, y, anim, ppu) {
 }
 
 export function render(ctx, camera, tiles, character, creatures) {
+  // Defensive: reset any state that might have leaked from a previous render
+  // or from a browser compositing artifact.
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+
   if (!grassPattern && grassImg.complete && grassImg.naturalWidth) {
     grassPattern = ctx.createPattern(grassImg, 'repeat');
   }
@@ -55,6 +60,13 @@ export function render(ctx, camera, tiles, character, creatures) {
   const ppu    = camera.ppu;
   const margin = ppu * 2;
 
+  // Clear using physical pixel coordinates (bypasses DPR transform) to guarantee
+  // the entire canvas is wiped, then fill with the background colour.
+  const cvs = ctx.canvas;
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  ctx.restore();
   ctx.fillStyle = COLORS.page;
   ctx.fillRect(0, 0, viewW, viewH);
 
