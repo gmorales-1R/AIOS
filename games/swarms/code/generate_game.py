@@ -11,6 +11,7 @@ games/swarms/files/ (same output paths as before).
 Run from anywhere:  python games/swarms/code/generate_game.py
 """
 
+import subprocess
 from pathlib import Path
 from datetime import datetime
 try:
@@ -24,7 +25,16 @@ HERE  = Path(__file__).parent
 SRC   = HERE / "src"
 FILES = HERE.parent / "files"
 
-BUILD_TIME = datetime.now(_tz).strftime("%d/%m/%Y %H:%M:%S")
+try:
+    _commits = subprocess.check_output(
+        ["git", "rev-list", "--count", "HEAD"],
+        cwd=HERE, stderr=subprocess.DEVNULL
+    ).decode().strip()
+    _version = f"v{_commits}"
+except Exception:
+    _version = "v?"
+
+BUILD_TIME = f"{_version} {datetime.now(_tz).strftime('%d/%m/%Y %H:%M')}"
 
 COPIES = [
     (SRC / "game.html",          FILES / "game.html"),
