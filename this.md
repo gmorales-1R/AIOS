@@ -36,6 +36,7 @@ If no active paths are provided, operate from root context only.
 | Path | Purpose |
 |------|---------|
 | `agents/` | User-defined agent definitions |
+| `games/` | Interactive game projects |
 | `templates/` | Node type templates used by the steward |
 | `personal/` | Personal tools and knowledge namespace |
 
