@@ -273,9 +273,12 @@ export function render(ctx, camera, tiles, character, creatures) {
     }
   }
 
-  // Character
+  // Character — bob up/down while moving.
+  const charY = cc.y + (character.moving
+    ? Math.sin(performance.now() / 1000 * 12) * 0.08 * ppu
+    : 0);
   ctx.beginPath();
-  ctx.arc(cc.x, cc.y, CHAR_RADIUS * ppu, 0, Math.PI * 2);
+  ctx.arc(cc.x, charY, CHAR_RADIUS * ppu, 0, Math.PI * 2);
   ctx.fillStyle   = COLORS.character;
   ctx.fill();
   ctx.lineWidth   = Math.max(1, 0.05 * ppu);
@@ -288,13 +291,13 @@ export function render(ctx, camera, tiles, character, creatures) {
     ctx.strokeStyle = COLORS.shieldRing;
     ctx.lineWidth   = Math.max(1.5, 0.07 * ppu);
     ctx.beginPath();
-    ctx.arc(cc.x, cc.y, (CHAR_RADIUS + 0.1) * ppu, 0, Math.PI * 2);
+    ctx.arc(cc.x, charY, (CHAR_RADIUS + 0.1) * ppu, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }
 
   // Character damage flash (drawn on top of circle)
-  if (character.hitAnim) drawHitRing(ctx, cc.x, cc.y, character.hitAnim, ppu);
+  if (character.hitAnim) drawHitRing(ctx, cc.x, charY, character.hitAnim, ppu);
 
   renderHUD(ctx, character);
 }
