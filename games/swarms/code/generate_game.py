@@ -1330,6 +1330,7 @@ import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS, HIT_ANIM_SECS } from '
 
 const grassImg = new Image();
 grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
+let grassPattern = null;
 
 const APPLE_POS = [
   [[0, 0]],
@@ -1352,6 +1353,10 @@ function drawHitRing(ctx, x, y, anim, ppu) {
 }
 
 export function render(ctx, camera, tiles, character, creatures) {
+  if (!grassPattern && grassImg.complete && grassImg.naturalWidth) {
+    grassPattern = ctx.createPattern(grassImg, 'repeat');
+  }
+
   const { viewW, viewH } = camera;
   const ppu    = camera.ppu;
   const margin = ppu * 2;
@@ -1380,19 +1385,17 @@ export function render(ctx, camera, tiles, character, creatures) {
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.closePath();
-    ctx.fillStyle   = t.water ? COLORS.waterFill
+    if (!t.water && !t.tree && grassPattern) {
+      const s = HEX_H * ppu;
+      const sc = s / grassImg.width;
+      grassPattern.setTransform(new DOMMatrix([sc, 0, 0, sc, c.x - s / 2, c.y - s / 2]));
+      ctx.fillStyle = grassPattern;
+    } else {
+      ctx.fillStyle = t.water ? COLORS.waterFill
                     : t.tree  ? COLORS.treeFill
                     : COLORS.tileFill;
-    ctx.fill();
-
-    // Grass texture on plain tiles — clip to hex, draw image, restore clip.
-    if (!t.water && !t.tree && grassImg.complete && grassImg.naturalWidth) {
-      ctx.save();
-      ctx.clip();
-      const s = HEX_H * ppu;
-      ctx.drawImage(grassImg, c.x - s / 2, c.y - s / 2, s, s);
-      ctx.restore();
     }
+    ctx.fill();
 
     ctx.lineWidth   = lineWidth;
     ctx.strokeStyle = borderColor;
