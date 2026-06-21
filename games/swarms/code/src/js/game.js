@@ -151,6 +151,7 @@ function startNew() {
   ui.hideDead();
   ui.showActionBar();
   updateInventoryUI();
+  for (let i = 0; i < inventory.slots.length; i++) ui.updateSlotTimer(i, null);
   updateActionBar();
 }
 
@@ -266,6 +267,10 @@ ui.bindInventory((idx) => {
   } else if (slot.type === 'sword') {
     toggleEquip(inventory, idx);
     updateInventoryUI();
+  } else if (slot.type === 'shield') {
+    toggleEquip(inventory, idx);
+    updateInventoryUI();
+    updateActionBar();
   }
 });
 
