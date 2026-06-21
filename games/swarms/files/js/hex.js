@@ -43,6 +43,12 @@ export function nearestTile(tiles, x, y) {
   return { tile: best, dist: Math.sqrt(bestD) };
 }
 
+// Returns true if side sideIndex of tile is walled (impassable).
+// Stub: always false until wall placement is implemented.
+export function hasWall(_tile, _sideIndex) {
+  return false;
+}
+
 export function boardCenter() {
   const maxX = (COLS - 1) * COL_SPACING + (COL_SPACING / 2);
   const maxY = (ROWS - 1) * ROW_SPACING;

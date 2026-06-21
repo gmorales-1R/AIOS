@@ -1,4 +1,4 @@
-import { SIDES, nearestTile } from './hex.js';
+import { SIDES, nearestTile, hasWall } from './hex.js';
 
 const MAX_TRIES = 3;
 const GUARD    = 600;
@@ -34,7 +34,7 @@ export function findPath(tiles, start, target, isBlocked = () => false) {
       const { tile: nb, dist } = nearestTile(
         tiles, cur.x + s.neighbor[0], cur.y + s.neighbor[1]
       );
-      if (!nb || dist > 0.1 || isBlocked(nb) || inPath.has(nb)) continue;
+      if (!nb || dist > 0.1 || isBlocked(nb) || hasWall(cur, i) || inPath.has(nb)) continue;
 
       tilePath.push(nb);
       inPath.add(nb);
