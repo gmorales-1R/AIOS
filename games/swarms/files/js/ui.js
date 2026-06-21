@@ -129,6 +129,57 @@ export class UI {
     slot.appendChild(icon);
   }
 
+  // Generic timed overlay: yellow arc for active state, blue for cooldown.
+  // state: { active: {remaining, total} | null, cooldown: {remaining, total} | null }
+  updateSlotTimer(index, state) {
+    const slot = document.querySelector(`.inv-slot[data-slot="${index}"]`);
+    if (!slot) return;
+    const C = 113.1; // 2π*18
+
+    let svg = slot.querySelector('.slot-timer');
+    if (!svg) {
+      svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'slot-timer');
+      svg.setAttribute('viewBox', '0 0 44 44');
+
+      const mk = (cls, color) => {
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('class', cls);
+        c.setAttribute('cx', '22'); c.setAttribute('cy', '22'); c.setAttribute('r', '18');
+        c.setAttribute('fill', 'none');
+        c.setAttribute('stroke', color);
+        c.setAttribute('stroke-width', '3');
+        c.setAttribute('stroke-dasharray', String(C));
+        c.setAttribute('stroke-dashoffset', String(C));
+        c.setAttribute('transform', 'rotate(-90 22 22)');
+        c.style.display = 'none';
+        return c;
+      };
+      svg.appendChild(mk('timer-active',   '#ffe600'));
+      svg.appendChild(mk('timer-cooldown', '#4488ff'));
+      slot.appendChild(svg);
+    }
+
+    const ac = svg.querySelector('.timer-active');
+    const cd = svg.querySelector('.timer-cooldown');
+
+    if (state?.active) {
+      const f = Math.max(0, Math.min(1, state.active.remaining / state.active.total));
+      ac.setAttribute('stroke-dashoffset', (C * (1 - f)).toFixed(1));
+      ac.style.display = '';
+    } else {
+      ac.style.display = 'none';
+    }
+
+    if (state?.cooldown) {
+      const f = Math.max(0, Math.min(1, state.cooldown.remaining / state.cooldown.total));
+      cd.setAttribute('stroke-dashoffset', (C * (1 - f)).toFixed(1));
+      cd.style.display = '';
+    } else {
+      cd.style.display = 'none';
+    }
+  }
+
   toast(msg) {
     clearTimeout(this._toastId);
     this._toast.textContent = msg;

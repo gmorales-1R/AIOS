@@ -176,6 +176,15 @@ html, body {
   display: block;
 }
 
+/* clock-style timer arc overlay */
+.slot-timer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
 /* apple stack count badge */
 .slot-count {
   position: absolute;

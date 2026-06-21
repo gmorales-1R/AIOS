@@ -72,7 +72,6 @@ export function render(ctx, camera, tiles, character, creatures) {
 
   for (const t of tiles) {
     const c = camera.worldToScreen(t.x, t.y);
-    c.x = Math.round(c.x); c.y = Math.round(c.y);
     if (c.x < -margin || c.x > viewW + margin ||
         c.y < -margin || c.y > viewH + margin) continue;
 
@@ -175,7 +174,6 @@ export function render(ctx, camera, tiles, character, creatures) {
   if (creatures) {
     for (const c of creatures) {
       const cc = camera.worldToScreen(c.x, c.y);
-      cc.x = Math.round(cc.x); cc.y = Math.round(cc.y);
       if (cc.x < -margin || cc.x > viewW + margin ||
           cc.y < -margin || cc.y > viewH + margin) continue;
       if (c.alive) {
@@ -202,7 +200,6 @@ export function render(ctx, camera, tiles, character, creatures) {
 
   // Attack animation ring (drawn behind character)
   const cc = camera.worldToScreen(character.x, character.y);
-  cc.x = Math.round(cc.x); cc.y = Math.round(cc.y);
   if (character.atkAnim) {
     const prog  = character.atkAnim.t / ATK_ANIM_SECS;
     const r     = (CHAR_RADIUS * 0.4 + character.atkAnim.range * prog) * ppu;

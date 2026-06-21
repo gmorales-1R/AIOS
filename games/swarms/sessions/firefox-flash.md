@@ -58,4 +58,4 @@ different paint order on certain frames, briefly showing the element behind the 
 ## Applied so far
 
 - **#1 + #2** — removed `will-change: transform` and `background` from `#game` → no change, reverted
-- **#3 (integer rounding)** — `Math.round()` on all `worldToScreen` results in render.js (pending test)
+- **Integer rounding** — `Math.round()` on all `worldToScreen` results in render.js → no change, reverted

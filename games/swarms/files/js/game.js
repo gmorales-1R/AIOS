@@ -18,7 +18,7 @@ import {
 import { saveGame, loadLatestSave, hasSaves } from './save.js';
 import { UI } from './ui.js';
 import {
-  COLS, AUTO_SAVE_SECS, SIDE,
+  COLS, AUTO_SAVE_SECS, SIDE, SHIELD_DURATION, SHIELD_COOLDOWN,
 } from './config.js';
 
 const canvas    = document.getElementById('game');
@@ -296,6 +296,17 @@ function loop(now) {
       if (!creatures[i].alive && !creatures[i].hitAnim) creatures.splice(i, 1);
     }
     if (character.moving) camera.focusOn({ x: character.x, y: character.y });
+  }
+
+  // Slot timer arcs (always run so paused state stays accurate).
+  const shieldIdx = inventory.slots.findIndex(s => s && s.type === 'shield');
+  if (shieldIdx !== -1) {
+    ui.updateSlotTimer(shieldIdx, {
+      active:   character.shieldActive
+        ? { remaining: character.shieldTimer,   total: SHIELD_DURATION } : null,
+      cooldown: !character.shieldActive && character.shieldCooldown > 0
+        ? { remaining: character.shieldCooldown, total: SHIELD_COOLDOWN } : null,
+    });
   }
 
   camera.update();
