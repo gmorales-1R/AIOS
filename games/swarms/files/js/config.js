@@ -26,9 +26,20 @@ export const APPLE_HUNGER_GAIN = 15;
 export const APPLE_HEALTH_GAIN = 5;
 export const APPLE_STACK_MAX   = 10;
 
-export const ATK_DMG_BASE  = 2;
-export const ATK_DMG_SWORD = 5;
-export const ATK_ANIM_SECS = 0.38;
+export const ATK_DMG_BASE    = 2;
+export const ATK_DMG_SWORD   = 5;
+export const ATK_ANIM_SECS   = 0.38;
+export const ATK_RANGE_FIST  = 1.5;
+export const ATK_RANGE_SWORD = 2.0;
+export const ATK_ACC_FIST    = 0;
+export const ATK_ACC_SWORD   = 0.10;
+export const HIT_ANIM_SECS   = 0.45;
+
+export const CHICKEN_HP          = 8;
+export const CHICKEN_EVADE       = 0.20;
+export const CHICKEN_SPAWN_COUNT = 5;
+export const CHICKEN_MOVE_CHANCE = 0.30;
+export const CHICKEN_EAT_CHANCE  = 0.50;
 
 export const ZOOM_MIN       = 0.3;
 export const ZOOM_MAX       = 5;
@@ -56,4 +67,7 @@ export const COLORS = {
   swordEdge:     '#ffffff',
   atkRing:       '#ffe600',
   atkRingAlt:    '#33ff6a',
+  hitRing:       '#ff4040',
+  chicken:       '#f0f0f0',
+  chickenEdge:   '#888888',
 };

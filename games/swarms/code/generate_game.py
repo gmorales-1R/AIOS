@@ -371,9 +371,20 @@ export const APPLE_HUNGER_GAIN = 15;
 export const APPLE_HEALTH_GAIN = 5;
 export const APPLE_STACK_MAX   = 10;
 
-export const ATK_DMG_BASE  = 2;
-export const ATK_DMG_SWORD = 5;
-export const ATK_ANIM_SECS = 0.38;
+export const ATK_DMG_BASE    = 2;
+export const ATK_DMG_SWORD   = 5;
+export const ATK_ANIM_SECS   = 0.38;
+export const ATK_RANGE_FIST  = 1.5;
+export const ATK_RANGE_SWORD = 2.0;
+export const ATK_ACC_FIST    = 0;
+export const ATK_ACC_SWORD   = 0.10;
+export const HIT_ANIM_SECS   = 0.45;
+
+export const CHICKEN_HP          = 8;
+export const CHICKEN_EVADE       = 0.20;
+export const CHICKEN_SPAWN_COUNT = 5;
+export const CHICKEN_MOVE_CHANCE = 0.30;
+export const CHICKEN_EAT_CHANCE  = 0.50;
 
 export const ZOOM_MIN       = 0.3;
 export const ZOOM_MAX       = 5;
@@ -401,6 +412,9 @@ export const COLORS = {
   swordEdge:     '#ffffff',
   atkRing:       '#ffe600',
   atkRingAlt:    '#33ff6a',
+  hitRing:       '#ff4040',
+  chicken:       '#f0f0f0',
+  chickenEdge:   '#888888',
 };
 """
 
@@ -631,7 +645,10 @@ function tilesToWaypoints(tilePath) {
 INVENTORY_JS = """\
 import {
   APPLE_STACK_MAX, APPLE_HUNGER_GAIN, APPLE_HEALTH_GAIN,
-  HEALTH_MAX, HUNGER_MAX, ATK_DMG_BASE, ATK_DMG_SWORD,
+  HEALTH_MAX, HUNGER_MAX,
+  ATK_DMG_BASE, ATK_DMG_SWORD,
+  ATK_RANGE_FIST, ATK_RANGE_SWORD,
+  ATK_ACC_FIST, ATK_ACC_SWORD,
 } from './config.js';
 
 export function createInventory() {
@@ -706,6 +723,100 @@ export function deserializeInventory(data) {
     inv.slots[i] = data[i] ? { ...data[i] } : null;
   }
   return inv;
+}
+
+// Returns { dmg, range, acc } for the currently equipped melee weapon.
+export function getMeleeStats(inv) {
+  const armed = inv.slots.some(s => s && s.type === 'sword' && s.equipped);
+  return armed
+    ? { dmg: ATK_DMG_SWORD, range: ATK_RANGE_SWORD, acc: ATK_ACC_SWORD }
+    : { dmg: ATK_DMG_BASE,  range: ATK_RANGE_FIST,  acc: ATK_ACC_FIST  };
+}
+"""
+
+# --------------------------------------------------------------------------- #
+# JS: creatures.js
+# --------------------------------------------------------------------------- #
+CREATURES_JS = """\
+import { SIDES, nearestTile } from './hex.js';
+import {
+  CHICKEN_HP, CHICKEN_EVADE, CHICKEN_MOVE_CHANCE, CHICKEN_EAT_CHANCE,
+  CHICKEN_SPAWN_COUNT, HIT_ANIM_SECS, APPLE_GROW_TICKS,
+} from './config.js';
+
+export class Chicken {
+  constructor(tile) {
+    this.tile = tile;
+    this.x = tile.x; this.y = tile.y;
+    this.health = CHICKEN_HP;
+    this.hitAnim = null;  // { t, opacity } while flash plays
+  }
+
+  get alive() { return this.health > 0; }
+
+  tick(tiles, isBlocked) {
+    // Random move to a neighbouring non-blocked tile.
+    if (Math.random() < CHICKEN_MOVE_CHANCE) {
+      const neighbors = [];
+      for (const s of SIDES) {
+        const { tile: nb, dist } = nearestTile(
+          tiles, this.tile.x + s.neighbor[0], this.tile.y + s.neighbor[1]
+        );
+        if (nb && dist < 0.1 && !isBlocked(nb)) neighbors.push(nb);
+      }
+      if (neighbors.length) {
+        this.tile = neighbors[Math.floor(Math.random() * neighbors.length)];
+        this.x = this.tile.x; this.y = this.tile.y;
+      }
+    }
+    // Eat one apple with 50% chance.
+    if (this.tile.apples > 0 && Math.random() < CHICKEN_EAT_CHANCE) {
+      this.tile.apples--;
+      if (this.tile.apples === 0) this.tile.ticksToApple = APPLE_GROW_TICKS;
+    }
+  }
+
+  // dmg: final calculated damage; refDmg: baseDmg*1.5 scale reference for opacity.
+  takeDamage(dmg, refDmg) {
+    this.health = Math.max(0, this.health - dmg);
+    this.hitAnim = { t: 0, opacity: Math.min(1, dmg / refDmg) };
+  }
+
+  update(dt) {
+    if (this.hitAnim) {
+      this.hitAnim.t += dt;
+      if (this.hitAnim.t >= HIT_ANIM_SECS) this.hitAnim = null;
+    }
+  }
+
+  serialize() {
+    return { col: this.tile.col, row: this.tile.row, health: this.health };
+  }
+}
+
+export function spawnChickens(tiles, isBlocked, count = CHICKEN_SPAWN_COUNT) {
+  const cands = tiles.filter(t => !isBlocked(t));
+  const used  = new Set();
+  const out   = [];
+  for (let i = 0; i < count; i++) {
+    const avail = cands.filter(t => !used.has(t));
+    if (!avail.length) break;
+    const tile = avail[Math.floor(Math.random() * avail.length)];
+    used.add(tile);
+    out.push(new Chicken(tile));
+  }
+  return out;
+}
+
+export function deserializeChickens(data, tiles) {
+  const map = new Map(tiles.map(t => [t.col + ',' + t.row, t]));
+  return data.map(d => {
+    const tile = map.get(d.col + ',' + d.row);
+    if (!tile) return null;
+    const c = new Chicken(tile);
+    c.health = d.health;
+    return c;
+  }).filter(Boolean);
 }
 """
 
@@ -811,7 +922,7 @@ import {
   MOVE_SPEED, TILE_HUNGER_COST,
   HEALTH_MAX, HUNGER_MAX,
   TICK_HUNGER, STARVE_DMG, HEAL_RATE, HEAL_THRESH,
-  ATK_ANIM_SECS,
+  ATK_ANIM_SECS, HIT_ANIM_SECS,
 } from './config.js';
 
 export class Character {
@@ -824,6 +935,7 @@ export class Character {
     this.hunger      = HUNGER_MAX;
     this.onTileEnter = null;
     this.atkAnim     = null;   // { t, armed } while animating
+    this.hitAnim     = null;   // { t, opacity } while damage flash plays
   }
 
   get moving() { return this.path.length > 0; }
@@ -832,11 +944,17 @@ export class Character {
     this.x = x; this.y = y;
     this.path = []; this.targetTile = null; this.targetState = null;
     this.health = HEALTH_MAX; this.hunger = HUNGER_MAX;
-    this.atkAnim = null;
+    this.atkAnim = null; this.hitAnim = null;
   }
 
   startAttack(armed = false) {
     this.atkAnim = { t: 0, armed };
+  }
+
+  // dmg: final calculated damage; refDmg: baseDmg*1.5 scale reference for opacity.
+  takeDamage(dmg, refDmg) {
+    this.health = Math.max(0, this.health - dmg);
+    this.hitAnim = { t: 0, opacity: Math.min(1, dmg / refDmg) };
   }
 
   serialize() {
@@ -847,7 +965,7 @@ export class Character {
     this.x = d.x; this.y = d.y;
     this.health = d.health; this.hunger = d.hunger;
     this.path = []; this.targetTile = null; this.targetState = null;
-    this.atkAnim = null;
+    this.atkAnim = null; this.hitAnim = null;
   }
 
   onTick() {
@@ -874,10 +992,14 @@ export class Character {
   }
 
   update(dt) {
-    // Advance attack animation.
+    // Advance attack and hit animations.
     if (this.atkAnim) {
       this.atkAnim.t += dt;
       if (this.atkAnim.t >= ATK_ANIM_SECS) this.atkAnim = null;
+    }
+    if (this.hitAnim) {
+      this.hitAnim.t += dt;
+      if (this.hitAnim.t >= HIT_ANIM_SECS) this.hitAnim = null;
     }
 
     const wasMoving = this.moving;
@@ -1204,7 +1326,7 @@ export function setupInput(canvas, camera, { onTap }) {
 # --------------------------------------------------------------------------- #
 RENDER_JS = """\
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS, HIT_ANIM_SECS } from './config.js';
 
 const grassImg = new Image();
 grassImg.src = '../assets/tiles/grass.png';
@@ -1216,7 +1338,20 @@ const APPLE_POS = [
 ];
 const APPLE_R = CHAR_RADIUS / 3;
 
-export function render(ctx, camera, tiles, character) {
+// Shared expanding-ring hit flash (red). opacity is the peak alpha.
+function drawHitRing(ctx, x, y, anim, ppu) {
+  const progress = anim.t / HIT_ANIM_SECS;
+  ctx.save();
+  ctx.globalAlpha = anim.opacity * (1 - progress);
+  ctx.beginPath();
+  ctx.arc(x, y, (CHAR_RADIUS * 1.15 + SIDE * 1.3 * progress) * ppu, 0, Math.PI * 2);
+  ctx.strokeStyle = COLORS.hitRing;
+  ctx.lineWidth   = Math.max(1.5, (0.18 - 0.10 * progress) * ppu);
+  ctx.stroke();
+  ctx.restore();
+}
+
+export function render(ctx, camera, tiles, character, creatures) {
   const { viewW, viewH } = camera;
   const ppu    = camera.ppu;
   const margin = ppu * 2;
@@ -1294,6 +1429,24 @@ export function render(ctx, camera, tiles, character) {
     }
   }
 
+  // Creatures — draw before character so player is always on top.
+  if (creatures) {
+    for (const c of creatures) {
+      const cc = camera.worldToScreen(c.x, c.y);
+      if (cc.x < -margin || cc.x > viewW + margin ||
+          cc.y < -margin || cc.y > viewH + margin) continue;
+      if (c.alive) {
+        const hs = CHAR_RADIUS * 0.85 * ppu;
+        ctx.fillStyle   = COLORS.chicken;
+        ctx.fillRect(cc.x - hs, cc.y - hs, hs * 2, hs * 2);
+        ctx.strokeStyle = COLORS.chickenEdge;
+        ctx.lineWidth   = Math.max(0.5, 0.04 * ppu);
+        ctx.strokeRect(cc.x - hs, cc.y - hs, hs * 2, hs * 2);
+      }
+      if (c.hitAnim) drawHitRing(ctx, cc.x, cc.y, c.hitAnim, ppu);
+    }
+  }
+
   // Attack animation ring (drawn behind character)
   const cc = camera.worldToScreen(character.x, character.y);
   if (character.atkAnim) {
@@ -1320,6 +1473,9 @@ export function render(ctx, camera, tiles, character) {
   ctx.lineWidth   = Math.max(1, 0.05 * ppu);
   ctx.strokeStyle = COLORS.characterEdge;
   ctx.stroke();
+
+  // Character damage flash (drawn on top of circle)
+  if (character.hitAnim) drawHitRing(ctx, cc.x, cc.y, character.hitAnim, ppu);
 
   renderHUD(ctx, character);
 }
@@ -1361,12 +1517,17 @@ import {
 } from './world.js';
 import {
   createInventory, addApple, canPickupApple, consumeApple,
-  addSword, hasSword, toggleEquip, getMeleeDmg,
-  serializeInventory, deserializeInventory,
+  addSword, hasSword, toggleEquip,
+  getMeleeStats, serializeInventory, deserializeInventory,
 } from './inventory.js';
+import {
+  spawnChickens, deserializeChickens,
+} from './creatures.js';
 import { saveGame, loadLatestSave, hasSaves } from './save.js';
 import { UI } from './ui.js';
-import { COLS, AUTO_SAVE_SECS } from './config.js';
+import {
+  COLS, AUTO_SAVE_SECS, CHICKEN_EVADE, CHICKEN_SPAWN_COUNT,
+} from './config.js';
 
 const canvas    = document.getElementById('game');
 const ctx       = canvas.getContext('2d');
@@ -1384,6 +1545,7 @@ let autoSaveAccum = 0;
 let lastSaveTime  = 0;
 let currentTile   = null;
 let inventory     = createInventory();
+let creatures     = [];
 
 // Track which tile the character is standing on.
 character.onTileEnter = (tile) => {
@@ -1414,9 +1576,22 @@ function updateActionBar() {
 // ---- actions ----
 function doAttack() {
   if (gameState !== 'playing') return;
-  const armed = inventory.slots.some(s => s && s.type === 'sword' && s.equipped);
+  const stats  = getMeleeStats(inventory);
+  const armed  = stats.acc > 0;
   character.startAttack(armed);
-  // dmg = getMeleeDmg(inventory)  — applied to enemies when combat lands
+
+  const refDmg = stats.dmg * 1.5;   // opacity reference: 1.0 at this value
+  for (const cr of creatures) {
+    if (!cr.alive) continue;
+    const dist = Math.hypot(cr.x - character.x, cr.y - character.y);
+    if (dist > stats.range) continue;
+    // accuracy factor: uniform in [1-acc, 1+acc]; 0 variance for fists
+    const accFactor = stats.acc > 0
+      ? 1 + (Math.random() * 2 - 1) * stats.acc
+      : 1;
+    const finalDmg = Math.max(0, Math.floor(stats.dmg * accFactor * (1 - CHICKEN_EVADE)));
+    cr.takeDamage(finalDmg, refDmg);
+  }
 }
 
 function doUse() {
@@ -1441,6 +1616,7 @@ function doSave(label = '\\u25CF SAVED') {
     camera:    camera.serialize(),
     tiles:     serializeTiles(tiles),
     inventory: serializeInventory(inventory),
+    creatures: creatures.filter(c => c.alive).map(c => c.serialize()),
     tickAccum,
   });
   lastSaveTime = savedAt;
@@ -1453,6 +1629,7 @@ function startNew() {
   const s = tileCenter((COLS / 2) | 0, 0);
   character.reset(s.x, s.y);
   initWorld(tiles);
+  creatures = spawnChickens(tiles, isBlocked, CHICKEN_SPAWN_COUNT);
   camera.deserialize({ ...boardCenter(), z: 1 });
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
   const { tile: startTile } = nearestTile(tiles, s.x, s.y);
@@ -1471,6 +1648,8 @@ function doContinue() {
   camera.deserialize(save.camera);
   deserializeTiles(tiles, save.tiles);
   inventory     = save.inventory ? deserializeInventory(save.inventory) : createInventory();
+  creatures     = save.creatures ? deserializeChickens(save.creatures, tiles)
+                                 : spawnChickens(tiles, isBlocked, CHICKEN_SPAWN_COUNT);
   tickAccum     = save.tickAccum || 0;
   lastSaveTime  = save.savedAt;
   autoSaveAccum = 0;
@@ -1575,6 +1754,7 @@ function loop(now) {
       tickAccum -= 1.0;
       character.onTick();
       tickWorld(tiles);
+      for (const c of creatures) c.tick(tiles, isBlocked);
       updateActionBar();   // apples may have grown on currentTile
     }
 
@@ -1584,11 +1764,16 @@ function loop(now) {
     }
 
     character.update(dt);
+    for (const c of creatures) c.update(dt);
+    // Remove dead creatures once their hit flash finishes.
+    for (let i = creatures.length - 1; i >= 0; i--) {
+      if (!creatures[i].alive && !creatures[i].hitAnim) creatures.splice(i, 1);
+    }
     if (character.moving) camera.focusOn({ x: character.x, y: character.y });
   }
 
   camera.update();
-  render(ctx, camera, tiles, character);
+  render(ctx, camera, tiles, character, creatures);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -1603,6 +1788,7 @@ JS_FILES = {
     "camera.js":    CAMERA_JS,
     "pathfind.js":  PATHFIND_JS,
     "inventory.js": INVENTORY_JS,
+    "creatures.js": CREATURES_JS,
     "world.js":     WORLD_JS,
     "character.js": CHARACTER_JS,
     "save.js":      SAVE_JS,

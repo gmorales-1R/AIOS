@@ -1,5 +1,5 @@
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS, HIT_ANIM_SECS } from './config.js';
 
 const grassImg = new Image();
 grassImg.src = '../assets/tiles/grass.png';
@@ -11,7 +11,20 @@ const APPLE_POS = [
 ];
 const APPLE_R = CHAR_RADIUS / 3;
 
-export function render(ctx, camera, tiles, character) {
+// Shared expanding-ring hit flash (red). opacity is the peak alpha.
+function drawHitRing(ctx, x, y, anim, ppu) {
+  const progress = anim.t / HIT_ANIM_SECS;
+  ctx.save();
+  ctx.globalAlpha = anim.opacity * (1 - progress);
+  ctx.beginPath();
+  ctx.arc(x, y, (CHAR_RADIUS * 1.15 + SIDE * 1.3 * progress) * ppu, 0, Math.PI * 2);
+  ctx.strokeStyle = COLORS.hitRing;
+  ctx.lineWidth   = Math.max(1.5, (0.18 - 0.10 * progress) * ppu);
+  ctx.stroke();
+  ctx.restore();
+}
+
+export function render(ctx, camera, tiles, character, creatures) {
   const { viewW, viewH } = camera;
   const ppu    = camera.ppu;
   const margin = ppu * 2;
@@ -89,6 +102,24 @@ export function render(ctx, camera, tiles, character) {
     }
   }
 
+  // Creatures — draw before character so player is always on top.
+  if (creatures) {
+    for (const c of creatures) {
+      const cc = camera.worldToScreen(c.x, c.y);
+      if (cc.x < -margin || cc.x > viewW + margin ||
+          cc.y < -margin || cc.y > viewH + margin) continue;
+      if (c.alive) {
+        const hs = CHAR_RADIUS * 0.85 * ppu;
+        ctx.fillStyle   = COLORS.chicken;
+        ctx.fillRect(cc.x - hs, cc.y - hs, hs * 2, hs * 2);
+        ctx.strokeStyle = COLORS.chickenEdge;
+        ctx.lineWidth   = Math.max(0.5, 0.04 * ppu);
+        ctx.strokeRect(cc.x - hs, cc.y - hs, hs * 2, hs * 2);
+      }
+      if (c.hitAnim) drawHitRing(ctx, cc.x, cc.y, c.hitAnim, ppu);
+    }
+  }
+
   // Attack animation ring (drawn behind character)
   const cc = camera.worldToScreen(character.x, character.y);
   if (character.atkAnim) {
@@ -115,6 +146,9 @@ export function render(ctx, camera, tiles, character) {
   ctx.lineWidth   = Math.max(1, 0.05 * ppu);
   ctx.strokeStyle = COLORS.characterEdge;
   ctx.stroke();
+
+  // Character damage flash (drawn on top of circle)
+  if (character.hitAnim) drawHitRing(ctx, cc.x, cc.y, character.hitAnim, ppu);
 
   renderHUD(ctx, character);
 }

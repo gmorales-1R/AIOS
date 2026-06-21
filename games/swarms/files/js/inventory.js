@@ -1,6 +1,9 @@
 import {
   APPLE_STACK_MAX, APPLE_HUNGER_GAIN, APPLE_HEALTH_GAIN,
-  HEALTH_MAX, HUNGER_MAX, ATK_DMG_BASE, ATK_DMG_SWORD,
+  HEALTH_MAX, HUNGER_MAX,
+  ATK_DMG_BASE, ATK_DMG_SWORD,
+  ATK_RANGE_FIST, ATK_RANGE_SWORD,
+  ATK_ACC_FIST, ATK_ACC_SWORD,
 } from './config.js';
 
 export function createInventory() {
@@ -75,4 +78,12 @@ export function deserializeInventory(data) {
     inv.slots[i] = data[i] ? { ...data[i] } : null;
   }
   return inv;
+}
+
+// Returns { dmg, range, acc } for the currently equipped melee weapon.
+export function getMeleeStats(inv) {
+  const armed = inv.slots.some(s => s && s.type === 'sword' && s.equipped);
+  return armed
+    ? { dmg: ATK_DMG_SWORD, range: ATK_RANGE_SWORD, acc: ATK_ACC_SWORD }
+    : { dmg: ATK_DMG_BASE,  range: ATK_RANGE_FIST,  acc: ATK_ACC_FIST  };
 }
