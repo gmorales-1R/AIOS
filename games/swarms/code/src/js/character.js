@@ -4,7 +4,7 @@ import {
   MOVE_SPEED, TILE_HUNGER_COST,
   HEALTH_MAX, HUNGER_MAX,
   TICK_HUNGER, STARVE_DMG, HEAL_RATE, HEAL_THRESH,
-  ATK_ANIM_SECS, HIT_ANIM_SECS,
+  ATK_ANIM_SECS, ATK_ANIM_SECS_SWORD, HIT_ANIM_SECS,
   SHIELD_BLOCK_BASE, SHIELD_BLOCK_VAR, SHIELD_DURATION, SHIELD_COOLDOWN,
 } from './config.js';
 
@@ -37,7 +37,8 @@ export class Character {
   }
 
   startAttack(armed = false, range = 1.5) {
-    this.atkAnim = { t: 0, armed, range };
+    const duration = armed ? ATK_ANIM_SECS_SWORD : ATK_ANIM_SECS;
+    this.atkAnim = { t: 0, armed, range, duration };
   }
 
   // Returns false if shield is already active or on cooldown.
@@ -118,7 +119,7 @@ export class Character {
     // Advance attack and hit animations.
     if (this.atkAnim) {
       this.atkAnim.t += dt;
-      if (this.atkAnim.t >= ATK_ANIM_SECS) this.atkAnim = null;
+      if (this.atkAnim.t >= this.atkAnim.duration) this.atkAnim = null;
     }
     if (this.hitAnim) {
       this.hitAnim.t += dt;

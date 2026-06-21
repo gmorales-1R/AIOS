@@ -28,10 +28,11 @@ export const APPLE_HUNGER_GAIN = 15;
 export const APPLE_HEALTH_GAIN = 5;
 export const APPLE_STACK_MAX   = 10;
 
-export const ATK_DMG_BASE    = 2;
-export const ATK_DMG_SWORD   = 5;
-export const ATK_ANIM_SECS   = 0.38;
-export const ATK_RANGE_FIST  = 1.5;
+export const ATK_DMG_BASE       = 2;
+export const ATK_DMG_SWORD      = 5;
+export const ATK_ANIM_SECS      = 0.38;
+export const ATK_ANIM_SECS_SWORD = 0.25;
+export const ATK_RANGE_FIST     = 1.5;
 export const ATK_RANGE_SWORD = 2.0;
 export const ATK_ACC_FIST    = 0;
 export const ATK_ACC_SWORD   = 0.10;
