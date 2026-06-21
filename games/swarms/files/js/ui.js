@@ -10,7 +10,7 @@ export class UI {
   }
 
   bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle, onAttack, onDefend, onInteract,
-         onReloadSave, onDeadNewGame, onDeadMenu }) {
+         onRange, onReloadSave, onDeadNewGame, onDeadMenu }) {
     document.getElementById('btn-new-game').onclick  = onNewGame;
     document.getElementById('btn-continue').onclick  = onContinue;
     document.getElementById('btn-resume').onclick    = onResume;
@@ -20,6 +20,7 @@ export class UI {
     if (onAttack)      document.getElementById('act-melee').onclick        = onAttack;
     if (onDefend)      document.getElementById('act-defend').onclick       = onDefend;
     if (onInteract)    document.getElementById('act-interact').onclick     = onInteract;
+    if (onRange)       document.getElementById('act-range').onclick        = onRange;
     if (onReloadSave)  document.getElementById('btn-reload-save').onclick  = onReloadSave;
     if (onDeadNewGame) document.getElementById('btn-dead-new-game').onclick = onDeadNewGame;
     if (onDeadMenu)    document.getElementById('btn-dead-menu').onclick    = onDeadMenu;
@@ -99,7 +100,7 @@ export class UI {
     if (btn) btn.disabled = !enabled;
   }
 
-  // Render an inventory slot. item: null | { type:'apple', count } | { type:'sword', equipped }
+  // Render an inventory slot.
   setSlot(index, item) {
     const slot = document.querySelector(`.inv-slot[data-slot="${index}"]`);
     if (!slot) return;
@@ -136,6 +137,15 @@ export class UI {
         '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
         '<path d="M0,-0.88 L0.78,-0.45 L0.78,0.18 Q0.6,0.84 0,0.93 Q-0.6,0.84 -0.78,0.18 L-0.78,-0.45 Z"' +
         ' fill="#4488ff" stroke="#2255cc" stroke-width="0.08"/>' +
+        '</svg>';
+      if (item.equipped) slot.classList.add('equipped');
+    } else if (item.type === 'bow') {
+      icon.innerHTML =
+        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
+        '<path d="M-0.10,-0.82 Q0.62,0 -0.10,0.82" fill="none" stroke="#c8a060" stroke-width="0.16" stroke-linecap="round"/>' +
+        '<line x1="-0.10" y1="-0.82" x2="-0.10" y2="0.82" stroke="#e8d090" stroke-width="0.05"/>' +
+        '<line x1="-0.10" y1="0.10" x2="0.72" y2="0.10" stroke="#c8a060" stroke-width="0.09" stroke-linecap="round"/>' +
+        '<polygon points="0.72,0.10 0.54,0.00 0.54,0.20" fill="#ffe600"/>' +
         '</svg>';
       if (item.equipped) slot.classList.add('equipped');
     }

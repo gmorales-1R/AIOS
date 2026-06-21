@@ -1,4 +1,4 @@
-export function setupInput(canvas, camera, { onTap }) {
+export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowMove, onBowUp }) {
   const pointers = new Map();
   let mode = 'none';
   let last = null, downPos = null, moved = 0, pinchPrev = 0;
@@ -12,8 +12,14 @@ export function setupInput(canvas, camera, { onTap }) {
     canvas.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, rel(e));
     if (pointers.size === 1) {
-      mode = 'drag'; moved = 0;
-      last = rel(e); downPos = rel(e);
+      if (isBowMode && isBowMode()) {
+        mode = 'bow';
+        const p = rel(e);
+        if (onBowDown) onBowDown(p.x, p.y);
+      } else {
+        mode = 'drag'; moved = 0;
+        last = rel(e); downPos = rel(e);
+      }
     } else if (pointers.size === 2) {
       mode = 'pinch'; pinchPrev = pinchDist();
     }
@@ -22,7 +28,10 @@ export function setupInput(canvas, camera, { onTap }) {
   canvas.addEventListener('pointermove', (e) => {
     if (!pointers.has(e.pointerId)) return;
     pointers.set(e.pointerId, rel(e));
-    if (mode === 'drag' && pointers.size === 1) {
+    if (mode === 'bow' && pointers.size === 1) {
+      const p = rel(e);
+      if (onBowMove) onBowMove(p.x, p.y);
+    } else if (mode === 'drag' && pointers.size === 1) {
       const p = rel(e);
       const dx = p.x - last.x, dy = p.y - last.y;
       moved += Math.abs(dx) + Math.abs(dy);
@@ -36,14 +45,19 @@ export function setupInput(canvas, camera, { onTap }) {
   });
 
   const end = (e) => {
+    const p = rel(e);
     pointers.delete(e.pointerId);
-    if (mode === 'drag' && moved < 8 && downPos) {
+    if (mode === 'bow') {
+      if (onBowUp) onBowUp(p.x, p.y);
+      if (pointers.size === 0) mode = 'none';
+      else if (pointers.size === 1) { mode = 'drag'; last = [...pointers.values()][0]; moved = 999; }
+    } else if (mode === 'drag' && moved < 8 && downPos) {
       const w = camera.screenToWorld(downPos.x, downPos.y);
       onTap(w.x, w.y, downPos.x, downPos.y);
     }
-    if (pointers.size === 0) {
+    if (mode !== 'bow' && pointers.size === 0) {
       mode = 'none';
-    } else if (pointers.size === 1) {
+    } else if (mode !== 'bow' && pointers.size === 1) {
       mode = 'drag'; last = [...pointers.values()][0]; moved = 999;
     }
   };

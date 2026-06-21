@@ -30,11 +30,17 @@ function spawnShield(tiles) {
   cands[Math.floor(Math.random() * cands.length)].hasShield = true;
 }
 
+function spawnBow(tiles) {
+  const cands = tiles.filter(t => !t.water && !t.tree && !t.hasSword && !t.hasShield);
+  if (!cands.length) return;
+  cands[Math.floor(Math.random() * cands.length)].hasBow = true;
+}
+
 export function initWorld(tiles) {
   for (const t of tiles) {
     t.water = false; t.tree = false;
     t.apples = 0; t.ticksToApple = 0;
-    t.hasSword = false; t.hasShield = false;
+    t.hasSword = false; t.hasShield = false; t.hasBow = false;
     t.grassVar = Math.random() < 0.3;
   }
   generateWater(tiles);
@@ -49,6 +55,7 @@ export function initWorld(tiles) {
   }
   spawnSword(tiles);
   spawnShield(tiles);
+  spawnBow(tiles);
 }
 
 export function tickWorld(tiles) {
@@ -72,12 +79,12 @@ export function pickApple(tile) {
 
 export function serializeTiles(tiles) {
   return tiles
-    .filter(t => t.water || t.tree || t.hasSword || t.hasShield)
+    .filter(t => t.water || t.tree || t.hasSword || t.hasShield || t.hasBow)
     .map(t => ({
       col: t.col, row: t.row,
       water: !!t.water, tree: !!t.tree,
       apples: t.apples || 0, ticksToApple: t.ticksToApple || 0,
-      hasSword: !!t.hasSword, hasShield: !!t.hasShield,
+      hasSword: !!t.hasSword, hasShield: !!t.hasShield, hasBow: !!t.hasBow,
     }));
 }
 
@@ -85,7 +92,7 @@ export function deserializeTiles(tiles, data) {
   for (const t of tiles) {
     t.water = false; t.tree = false;
     t.apples = 0; t.ticksToApple = 0;
-    t.hasSword = false; t.hasShield = false;
+    t.hasSword = false; t.hasShield = false; t.hasBow = false;
   }
   const tileMap = new Map(tiles.map(t => [t.col + ',' + t.row, t]));
   for (const d of data) {
@@ -93,6 +100,6 @@ export function deserializeTiles(tiles, data) {
     if (!t) continue;
     t.water = !!d.water; t.tree = !!d.tree;
     t.apples = d.apples || 0; t.ticksToApple = d.ticksToApple || 0;
-    t.hasSword = !!d.hasSword; t.hasShield = !!d.hasShield;
+    t.hasSword = !!d.hasSword; t.hasShield = !!d.hasShield; t.hasBow = !!d.hasBow;
   }
 }

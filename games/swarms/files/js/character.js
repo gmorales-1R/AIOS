@@ -23,6 +23,7 @@ export class Character {
     this.shieldTimer         = 0;
     this.shieldCooldown      = 0;
     this.shieldEffectiveness = 0;
+    this.bowCooldown         = 0;
   }
 
   get moving() { return this.path.length > 0; }
@@ -34,6 +35,7 @@ export class Character {
     this.atkAnim = null; this.hitAnim = null;
     this.shieldActive = false; this.shieldTimer = 0;
     this.shieldCooldown = 0; this.shieldEffectiveness = 0;
+    this.bowCooldown = 0;
   }
 
   startAttack(armed = false, range = 1.5) {
@@ -67,7 +69,7 @@ export class Character {
   serialize() {
     return {
       x: this.x, y: this.y, health: this.health, hunger: this.hunger,
-      shieldCooldown: this.shieldCooldown,
+      shieldCooldown: this.shieldCooldown, bowCooldown: this.bowCooldown,
     };
   }
 
@@ -78,6 +80,7 @@ export class Character {
     this.atkAnim = null; this.hitAnim = null;
     this.shieldActive = false; this.shieldTimer = 0;
     this.shieldCooldown = d.shieldCooldown || 0; this.shieldEffectiveness = 0;
+    this.bowCooldown = d.bowCooldown || 0;
   }
 
   onTick() {
@@ -114,6 +117,9 @@ export class Character {
     }
     if (this.shieldCooldown > 0) {
       this.shieldCooldown = Math.max(0, this.shieldCooldown - dt);
+    }
+    if (this.bowCooldown > 0) {
+      this.bowCooldown = Math.max(0, this.bowCooldown - dt);
     }
 
     // Advance attack and hit animations.
