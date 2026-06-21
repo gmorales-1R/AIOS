@@ -12,7 +12,7 @@ Each fix is applied to `code/src/css/style.css` and/or `code/src/js/render.js`, 
 elements (action bar, HUD buttons, screens) trigger re-compositing, Firefox may expose the
 canvas layer momentarily in an undrawn or previous state, producing a flash.
 **Fix:** Remove `will-change: transform` (or replace with `will-change: contents`).
-**Result:** [ ] worked / [ ] no change / [ ] made worse
+**Result:** [x] no change — reverted
 
 ---
 
@@ -21,7 +21,7 @@ canvas layer momentarily in an undrawn or previous state, producing a flash.
 when the canvas draw hasn't completed yet, briefly revealing the background through
 incompletely-drawn pixels (especially during resize or compositing events).
 **Fix:** Remove `background` from `#game` — the JS `fillRect` on every frame already covers it.
-**Result:** [ ] worked / [ ] no change / [ ] made worse
+**Result:** [x] no change — reverted (applied alongside #1, both reverted together)
 
 ---
 
@@ -57,4 +57,5 @@ different paint order on certain frames, briefly showing the element behind the 
 
 ## Applied so far
 
-- **#1 + #2** — removed `will-change: transform` and `background` from `#game` (commit pending test)
+- **#1 + #2** — removed `will-change: transform` and `background` from `#game` → no change, reverted
+- **#3 (integer rounding)** — `Math.round()` on all `worldToScreen` results in render.js (pending test)
