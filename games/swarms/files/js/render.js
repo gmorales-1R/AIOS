@@ -1,5 +1,5 @@
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME, ARROW_SPEED } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME, ARROW_SPEED, BOW_RANGE_MAX } from './config.js';
 
 const grassImg = new Image();
 grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
@@ -20,12 +20,7 @@ export function resetPatterns() {
   waterPattern = null;
 }
 
-const APPLE_POS = [
-  [[0, 0]],
-  [[-0.22, 0], [0.22, 0]],
-  [[0, -0.28], [-0.22, 0.13], [0.22, 0.13]],
-];
-const APPLE_R = CHAR_RADIUS / 3;
+const TREE_APPLE_POS = [[-0.13, -0.02], [0.10, -0.15], [0.04, 0.11]];
 
 // Shared expanding-ring hit flash (red). opacity is the peak alpha.
 function drawHitRing(ctx, x, y, anim, ppu) {
@@ -92,13 +87,6 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
         c.y < -margin || c.y > viewH + margin) continue;
 
     const isTarget = t === character.targetTile;
-    let borderColor = t.water ? COLORS.waterBorder : COLORS.tileBorder;
-    let lineWidth   = Math.max(1, 0.04 * ppu);
-    if (isTarget) {
-      borderColor = character.targetState === 'unreachable'
-        ? COLORS.targetBad : COLORS.targetActive;
-      lineWidth = Math.max(1.5, 0.08 * ppu);
-    }
 
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -113,25 +101,35 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
     } else if (t.water) {
       ctx.fillStyle = waterPattern || COLORS.waterFill;
     } else {
-      ctx.fillStyle = t.tree ? COLORS.treeFill : COLORS.tileFill;
+      ctx.fillStyle = COLORS.treeFill;
     }
     ctx.fill();
 
-    ctx.lineWidth   = lineWidth;
-    ctx.strokeStyle = borderColor;
-    ctx.stroke();
+    // Only draw a border on the target tile.
+    if (isTarget) {
+      ctx.lineWidth   = Math.max(1.5, 0.08 * ppu);
+      ctx.strokeStyle = character.targetState === 'unreachable'
+        ? COLORS.targetBad : COLORS.targetActive;
+      ctx.stroke();
+    }
 
-    // Apples on tree tiles
+    // Apple tree on grass tiles
     if (t.apples > 0 && !t.water) {
-      const positions = APPLE_POS[t.apples - 1];
-      for (const [ox, oy] of positions) {
+      // Foliage
+      ctx.fillStyle = '#1e5018';
+      ctx.beginPath();
+      ctx.arc(c.x, c.y - 0.08 * ppu, 0.28 * ppu, 0, Math.PI * 2);
+      ctx.fill();
+      // Trunk
+      ctx.fillStyle = '#5a3010';
+      ctx.fillRect(c.x - 0.035 * ppu, c.y + 0.18 * ppu, 0.07 * ppu, 0.22 * ppu);
+      // Small apple dots
+      for (let ai = 0; ai < t.apples; ai++) {
+        const [ax, ay] = TREE_APPLE_POS[ai];
+        ctx.fillStyle = COLORS.apple;
         ctx.beginPath();
-        ctx.arc(c.x + ox * ppu, c.y + oy * ppu, APPLE_R * ppu, 0, Math.PI * 2);
-        ctx.fillStyle   = COLORS.apple;
+        ctx.arc(c.x + ax * ppu, c.y - 0.08 * ppu + ay * ppu, 0.055 * ppu, 0, Math.PI * 2);
         ctx.fill();
-        ctx.lineWidth   = Math.max(0.5, 0.025 * ppu);
-        ctx.strokeStyle = COLORS.appleEdge;
-        ctx.stroke();
       }
     }
 
@@ -348,18 +346,25 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
 
     if (bowState.aim.down) {
       const charge = bowState.aim.charge;
-      const tc     = camera.worldToScreen(bowState.aim.wx, bowState.aim.wy);
+      const dx = bowState.aim.wx - character.x;
+      const dy = bowState.aim.wy - character.y;
+      const dist = Math.hypot(dx, dy);
 
-      // Dashed aim line from player to target
-      ctx.globalAlpha = 0.45 + charge * 0.45;
-      ctx.strokeStyle = COLORS.aimLine;
-      ctx.lineWidth   = Math.max(1, 0.025 * ppu);
-      ctx.setLineDash([Math.max(3, 0.06 * ppu), Math.max(4, 0.08 * ppu)]);
-      ctx.beginPath();
-      ctx.moveTo(cc.x, charY);
-      ctx.lineTo(tc.x, tc.y);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      if (dist > 0.05) {
+        const nx = dx / dist, ny = dy / dist;
+        const lineLen = charge * BOW_RANGE_MAX * ppu;
+
+        // Solid growing aim line — length = charge * maxRange
+        ctx.globalAlpha = 0.55 + charge * 0.40;
+        ctx.strokeStyle = COLORS.aimLine;
+        ctx.lineWidth   = Math.max(1.5, 0.035 * ppu);
+        ctx.lineCap     = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cc.x, charY);
+        ctx.lineTo(cc.x + nx * lineLen, charY + ny * lineLen);
+        ctx.stroke();
+        ctx.lineCap = 'butt';
+      }
 
       // Charge arc fills clockwise from 12:00
       if (charge > 0) {

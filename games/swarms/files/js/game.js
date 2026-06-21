@@ -335,6 +335,16 @@ setupInput(canvas, camera, {
   onBowDown,
   onBowMove,
   onBowUp,
+  onHold(sx, sy) {
+    if (gameState !== 'playing') return;
+    if (sy > camera.viewH - DEAD_BAR_H && sx < DEAD_BAR_W) return;
+    if (sx > camera.viewW - DEAD_COL_W && sy > camera.viewH - DEAD_COL_H) return;
+    if (!getBowEquipped(inventory)) return;
+    if (character.moving || character.bowCooldown > 0) return;
+    bowMode = true;
+    onBowDown(sx, sy);
+    updateActionBar();
+  },
 });
 
 ui.bind({
