@@ -10,7 +10,8 @@ import {
 import {
   createInventory, addApple, canPickupApple, consumeApple,
   addSword, hasSword, addShield, hasShield, getShieldEffectiveness, toggleEquip,
-  getMeleeStats, serializeInventory, deserializeInventory,
+  getMeleeStats, hasBow, addBow, getBowEquipped,
+  serializeInventory, deserializeInventory,
 } from './inventory.js';
 import {
   spawnCreatures, deserializeCreatures,
@@ -19,6 +20,8 @@ import { saveGame, loadLatestSave, hasSaves } from './save.js';
 import { UI } from './ui.js';
 import {
   COLS, AUTO_SAVE_SECS, SIDE, SHIELD_DURATION, SHIELD_COOLDOWN,
+  BOW_DMG_MIN, BOW_DMG_MAX, BOW_RANGE_MIN, BOW_RANGE_MAX,
+  BOW_CHARGE_SECS, BOW_COOLDOWN, ARROW_SPEED, CHAR_RADIUS,
 } from './config.js';
 
 const canvas    = document.getElementById('game');
@@ -39,6 +42,11 @@ let currentTile   = null;
 let inventory     = createInventory();
 let creatures     = [];
 
+// ---- bow state ----
+let bowMode = false;
+let bowAim  = { down: false, charge: 0, wx: 0, wy: 0, history: [] };
+let arrows  = [];
+
 // Track which tile the character is standing on.
 character.onTileEnter = (tile) => {
   currentTile = tile;
@@ -58,11 +66,13 @@ function updateActionBar() {
   ui.setActionEnabled('melee', playing);
   const shieldOn = inventory.slots.some(s => s && s.type === 'shield' && s.equipped);
   ui.setActionEnabled('defend', playing && shieldOn && !character.shieldActive && character.shieldCooldown <= 0);
-  ui.setActionEnabled('range',  false);
+  const bowOn = getBowEquipped(inventory);
+  ui.setActionEnabled('range', playing && bowOn && !character.moving && character.bowCooldown <= 0);
 
   const canUse = playing && !!currentTile && (
     (currentTile.hasSword  && !hasSword(inventory))  ||
     (currentTile.hasShield && !hasShield(inventory)) ||
+    (currentTile.hasBow    && !hasBow(inventory))    ||
     (currentTile.apples > 0 && canPickupApple(inventory))
   );
   ui.setActionEnabled('interact', !!canUse);
@@ -97,6 +107,15 @@ function doDefend() {
   if (character.startDefend(getShieldEffectiveness(inventory))) updateActionBar();
 }
 
+function doRange() {
+  if (gameState !== 'playing') return;
+  if (!getBowEquipped(inventory)) return;
+  if (!bowMode && (character.moving || character.bowCooldown > 0)) return;
+  bowMode = !bowMode;
+  if (!bowMode) { bowAim.down = false; bowAim.charge = 0; }
+  updateActionBar();
+}
+
 function doUse() {
   if (gameState !== 'playing' || !currentTile) return;
   if (currentTile.hasSword && !hasSword(inventory)) {
@@ -113,6 +132,13 @@ function doUse() {
     if (i !== -1) toggleEquip(inventory, i);   // auto-equip: had no shield
     updateInventoryUI();
     updateActionBar();
+  } else if (currentTile.hasBow && !hasBow(inventory)) {
+    currentTile.hasBow = false;
+    addBow(inventory);
+    const i = inventory.slots.findIndex(s => s && s.type === 'bow');
+    if (i !== -1) toggleEquip(inventory, i);   // auto-equip
+    updateInventoryUI();
+    updateActionBar();
   } else if (currentTile.apples > 0 && canPickupApple(inventory)) {
     pickApple(currentTile);
     addApple(inventory);
@@ -121,8 +147,62 @@ function doUse() {
   }
 }
 
+// ---- bow aim handlers (called from input.js) ----
+function onBowDown(sx, sy) {
+  if (gameState !== 'playing' || !bowMode) return;
+  const w = camera.screenToWorld(sx, sy);
+  bowAim.down    = true;
+  bowAim.charge  = 0;
+  bowAim.wx      = w.x;
+  bowAim.wy      = w.y;
+  bowAim.history = [{ wx: w.x, wy: w.y, t: performance.now() }];
+}
+
+function onBowMove(sx, sy) {
+  if (!bowAim.down) return;
+  const w = camera.screenToWorld(sx, sy);
+  bowAim.wx = w.x;
+  bowAim.wy = w.y;
+  const now = performance.now();
+  bowAim.history.push({ wx: w.x, wy: w.y, t: now });
+  const cutoff = now - 300;
+  while (bowAim.history.length > 1 && bowAim.history[0].t < cutoff) bowAim.history.shift();
+}
+
+function onBowUp(sx, sy) {
+  if (!bowAim.down) return;
+  bowAim.down = false;
+
+  // Sample aim direction from 100ms before release to avoid accidental slip.
+  const now    = performance.now();
+  const target = now - 100;
+  let best = bowAim.history[0] || { wx: bowAim.wx, wy: bowAim.wy };
+  for (const h of bowAim.history) {
+    if (h.t <= target) best = h;
+    else break;
+  }
+
+  const dx  = best.wx - character.x;
+  const dy  = best.wy - character.y;
+  const len = Math.hypot(dx, dy);
+  if (len < 0.1) { bowMode = false; updateActionBar(); return; }
+
+  const charge  = bowAim.charge;
+  const dmg     = Math.round(BOW_DMG_MIN + (BOW_DMG_MAX - BOW_DMG_MIN) * charge);
+  const maxDist = BOW_RANGE_MIN + (BOW_RANGE_MAX - BOW_RANGE_MIN) * charge;
+  const vx      = (dx / len) * ARROW_SPEED;
+  const vy      = (dy / len) * ARROW_SPEED;
+
+  arrows.push({ x: character.x, y: character.y, vx, vy, traveled: 0, maxDist, dmg });
+
+  character.bowCooldown = BOW_COOLDOWN;
+  bowMode = false;
+  bowAim.charge = 0;
+  updateActionBar();
+}
+
 // ---- save/load helpers ----
-function doSave(label = '\u25CF SAVED') {
+function doSave(label = '● SAVED') {
   const savedAt = saveGame({
     character: character.serialize(),
     camera:    camera.serialize(),
@@ -133,6 +213,12 @@ function doSave(label = '\u25CF SAVED') {
   });
   lastSaveTime = savedAt;
   ui.toast(label);
+}
+
+function resetBowState() {
+  bowMode = false;
+  bowAim  = { down: false, charge: 0, wx: 0, wy: 0, history: [] };
+  arrows  = [];
 }
 
 // ---- state transitions ----
@@ -146,6 +232,7 @@ function startNew() {
   camera.deserialize({ x: spawnTile.x, y: spawnTile.y, z: 1 });
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
   currentTile = spawnTile;
+  resetBowState();
   gameState = 'playing';
   ui.hideStart();
   ui.hideDead();
@@ -169,6 +256,7 @@ function doContinue() {
   autoSaveAccum = 0;
   const { tile: startTile } = nearestTile(tiles, character.x, character.y);
   currentTile = startTile;
+  resetBowState();
   gameState = 'playing';
   ui.hideStart();
   ui.hideDead();
@@ -192,6 +280,7 @@ function togglePause() {
 function goToMenu() {
   gameState   = 'menu';
   currentTile = null;
+  resetBowState();
   ui.hidePause();
   ui.hideDead();
   ui.hideActionBar();
@@ -235,12 +324,17 @@ const DEAD_COL_H = 230;
 setupInput(canvas, camera, {
   onTap(wx, wy, sx, sy) {
     if (gameState !== 'playing') return;
+    if (bowMode) return;   // no movement while aiming
     if (sy > camera.viewH - DEAD_BAR_H && sx < DEAD_BAR_W) return;
     if (sx > camera.viewW - DEAD_COL_W && sy > camera.viewH - DEAD_COL_H) return;
     const { tile, dist } = nearestTile(tiles, wx, wy);
     if (!tile || dist > SIDE) return;
     character.setDestination(tiles, tile, isBlocked);
   },
+  isBowMode() { return bowMode; },
+  onBowDown,
+  onBowMove,
+  onBowUp,
 });
 
 ui.bind({
@@ -253,6 +347,7 @@ ui.bind({
   onAttack:     doAttack,
   onDefend:     doDefend,
   onInteract:   doUse,
+  onRange:      doRange,
   onReloadSave: doContinue,
   onDeadNewGame: startNew,
   onDeadMenu:   goToMenu,
@@ -272,6 +367,10 @@ function activateSlot(idx) {
     toggleEquip(inventory, idx);
     updateInventoryUI();
     updateActionBar();
+  } else if (slot.type === 'bow') {
+    toggleEquip(inventory, idx);
+    updateInventoryUI();
+    updateActionBar();
   }
 }
 
@@ -283,6 +382,7 @@ document.addEventListener('keydown', e => {
   if (key === ' ')         { e.preventDefault(); doUse(); }
   else if (key === 'z')   doAttack();
   else if (key === 'x')   doDefend();
+  else if (key === 'c')   doRange();
   else if (key >= '1' && key <= '5') activateSlot(parseInt(key, 10) - 1);
 });
 
@@ -309,12 +409,23 @@ function loop(now) {
 
     if (autoSaveAccum >= AUTO_SAVE_SECS) {
       autoSaveAccum -= AUTO_SAVE_SECS;
-      doSave('\u25CF AUTO-SAVED');
+      doSave('● AUTO-SAVED');
     }
 
-    const wasShielded = character.shieldActive;
+    // Bow charge while aiming.
+    if (bowAim.down) {
+      bowAim.charge = Math.min(1, bowAim.charge + dt / BOW_CHARGE_SECS);
+    }
+
+    const wasShielded    = character.shieldActive;
+    const wasBowCooldown = character.bowCooldown > 0;
     character.update(dt);
     if (wasShielded && !character.shieldActive) updateActionBar();
+    if (wasBowCooldown && character.bowCooldown <= 0) updateActionBar();
+
+    // Cancel bow mode if character started moving (safety guard).
+    if (bowMode && character.moving) { bowMode = false; bowAim.down = false; updateActionBar(); }
+
     for (const c of creatures) c.update(dt, character);
     // Remove dead creatures once their hit flash finishes.
     for (let i = creatures.length - 1; i >= 0; i--) {
@@ -322,9 +433,35 @@ function loop(now) {
     }
     if (character.moving) camera.focusOn({ x: character.x, y: character.y });
 
+    // Advance arrows and check creature hitboxes.
+    for (let i = arrows.length - 1; i >= 0; i--) {
+      const a = arrows[i];
+      const step = ARROW_SPEED * dt;
+      a.x += a.vx * dt;
+      a.y += a.vy * dt;
+      a.traveled += step;
+      if (a.traveled >= a.maxDist) { arrows.splice(i, 1); continue; }
+
+      let hit = false;
+      for (const cr of creatures) {
+        if (!cr.alive) continue;
+        const hw = (cr.kind === 'hog' ? CHAR_RADIUS * 1.2 : CHAR_RADIUS * 0.85);
+        const hh = (cr.kind === 'hog' ? CHAR_RADIUS * 0.8 : CHAR_RADIUS * 0.85);
+        if (Math.abs(a.x - cr.x) <= hw && Math.abs(a.y - cr.y) <= hh) {
+          cr.takeDamage(a.dmg, BOW_DMG_MAX * 1.5);
+          if (cr.alive) cr.onHit(tiles, isBlocked, character);
+          arrows.splice(i, 1);
+          hit = true;
+          break;
+        }
+      }
+      if (hit) continue;
+    }
+
     if (character.health <= 0) {
       gameState = 'dead';
       character.path = [];
+      resetBowState();
       ui.hideActionBar();
       ui.showDead(hasSaves());
     }
@@ -341,8 +478,17 @@ function loop(now) {
     });
   }
 
+  const bowIdx = inventory.slots.findIndex(s => s && s.type === 'bow');
+  if (bowIdx !== -1) {
+    ui.updateSlotTimer(bowIdx, {
+      active:   null,
+      cooldown: character.bowCooldown > 0
+        ? { remaining: character.bowCooldown, total: BOW_COOLDOWN } : null,
+    });
+  }
+
   camera.update();
-  render(ctx, camera, tiles, character, creatures);
+  render(ctx, camera, tiles, character, creatures, arrows, { active: bowMode, aim: bowAim });
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);

@@ -1,4 +1,4 @@
-export const BUILD_TIME = 'v66 21/06/2026 15:46';
+export const BUILD_TIME = 'v68 21/06/2026 16:06';
 
 export const COLS = 20;
 export const ROWS = 12;
@@ -69,6 +69,14 @@ export const SHIELD_BLOCK_VAR  = 0.20;
 export const SHIELD_DURATION   = 10;
 export const SHIELD_COOLDOWN   = 20;
 
+export const BOW_DMG_MIN     = 2;
+export const BOW_DMG_MAX     = 10;
+export const BOW_RANGE_MIN   = 2;
+export const BOW_RANGE_MAX   = 12;
+export const BOW_CHARGE_SECS = 1.0;
+export const BOW_COOLDOWN    = 0.5;
+export const ARROW_SPEED     = 20;
+
 export const ZOOM_MIN       = 0.3;
 export const ZOOM_MAX       = 5;
 export const FIT_HEXES      = 6;
@@ -102,4 +110,10 @@ export const COLORS = {
   hog:           '#f07090',
   hogEdge:       '#a03050',
   hogAggro:      '#ff2020',
+  bow:           '#c8a060',
+  bowEdge:       '#5a3a10',
+  arrow:         '#c8a060',
+  arrowTip:      '#ffe600',
+  aimLine:       '#ffe600',
+  chargeArc:     '#ffe600',
 };

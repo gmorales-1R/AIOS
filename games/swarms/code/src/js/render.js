@@ -1,5 +1,5 @@
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME, ARROW_SPEED } from './config.js';
 
 const grassImg = new Image();
 grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
@@ -40,7 +40,7 @@ function drawHitRing(ctx, x, y, anim, ppu) {
   ctx.restore();
 }
 
-export function render(ctx, camera, tiles, character, creatures) {
+export function render(ctx, camera, tiles, character, creatures, arrows = [], bowState = null) {
   // Defensive: reset any state that might have leaked from a previous render
   // or from a browser compositing artifact.
   ctx.globalAlpha = 1;
@@ -136,8 +136,8 @@ export function render(ctx, camera, tiles, character, creatures) {
 
     // Shield on ground
     if (t.hasShield) {
-      const sw = 0.30 * ppu;   // half width
-      const sh = 0.36 * ppu;   // half height
+      const sw = 0.30 * ppu;
+      const sh = 0.36 * ppu;
       ctx.fillStyle   = COLORS.shieldRing;
       ctx.strokeStyle = '#2255cc';
       ctx.lineWidth   = Math.max(0.5, 0.018 * ppu);
@@ -155,18 +155,37 @@ export function render(ctx, camera, tiles, character, creatures) {
 
     // Sword on ground (two rectangles forming a cross)
     if (t.hasSword) {
-      const hw = 0.09 * ppu;   // half arm width
-      const hl = 0.42 * ppu;   // half blade length
-      const gl = 0.30 * ppu;   // half guard length
+      const hw = 0.09 * ppu;
+      const hl = 0.42 * ppu;
+      const gl = 0.30 * ppu;
       ctx.fillStyle   = COLORS.sword;
       ctx.strokeStyle = COLORS.swordEdge;
       ctx.lineWidth   = Math.max(0.5, 0.018 * ppu);
-      // blade (vertical)
       ctx.fillRect(c.x - hw, c.y - hl, hw * 2, hl * 2);
       ctx.strokeRect(c.x - hw, c.y - hl, hw * 2, hl * 2);
-      // guard (horizontal, offset slightly upward)
       ctx.fillRect(c.x - gl, c.y - hw * 1.2, gl * 2, hw * 2.4);
       ctx.strokeRect(c.x - gl, c.y - hw * 1.2, gl * 2, hw * 2.4);
+    }
+
+    // Bow on ground
+    if (t.hasBow) {
+      const bh  = 0.34 * ppu;
+      const bx  = 0.06 * ppu;
+      const bcx = 0.24 * ppu;
+      ctx.strokeStyle = COLORS.bow;
+      ctx.lineWidth   = Math.max(1, 0.055 * ppu);
+      ctx.lineCap     = 'round';
+      ctx.beginPath();
+      ctx.moveTo(c.x + bx, c.y - bh);
+      ctx.quadraticCurveTo(c.x + bx + bcx, c.y, c.x + bx, c.y + bh);
+      ctx.stroke();
+      ctx.strokeStyle = COLORS.bowEdge;
+      ctx.lineWidth   = Math.max(0.5, 0.022 * ppu);
+      ctx.beginPath();
+      ctx.moveTo(c.x + bx, c.y - bh);
+      ctx.lineTo(c.x + bx, c.y + bh);
+      ctx.stroke();
+      ctx.lineCap = 'butt';
     }
   }
 
@@ -296,6 +315,69 @@ export function render(ctx, camera, tiles, character, creatures) {
     ctx.restore();
   }
 
+  // Bow aim overlay (drawn on top of character)
+  if (bowState && bowState.active) {
+    const arcR = (CHAR_RADIUS + 0.18) * ppu;
+    ctx.save();
+
+    // Subtle dashed circle indicates bow mode is active.
+    ctx.strokeStyle = COLORS.chargeArc;
+    ctx.lineWidth   = Math.max(1, 0.03 * ppu);
+    ctx.globalAlpha = 0.25;
+    ctx.setLineDash([Math.max(2, 0.04 * ppu), Math.max(4, 0.08 * ppu)]);
+    ctx.beginPath();
+    ctx.arc(cc.x, charY, arcR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    if (bowState.aim.down) {
+      const charge = bowState.aim.charge;
+      const tc     = camera.worldToScreen(bowState.aim.wx, bowState.aim.wy);
+
+      // Dashed aim line from player to target
+      ctx.globalAlpha = 0.45 + charge * 0.45;
+      ctx.strokeStyle = COLORS.aimLine;
+      ctx.lineWidth   = Math.max(1, 0.025 * ppu);
+      ctx.setLineDash([Math.max(3, 0.06 * ppu), Math.max(4, 0.08 * ppu)]);
+      ctx.beginPath();
+      ctx.moveTo(cc.x, charY);
+      ctx.lineTo(tc.x, tc.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Charge arc fills clockwise from 12:00
+      if (charge > 0) {
+        ctx.globalAlpha = 0.85;
+        ctx.strokeStyle = COLORS.chargeArc;
+        ctx.lineWidth   = Math.max(2, 0.06 * ppu);
+        ctx.beginPath();
+        ctx.arc(cc.x, charY, arcR, -Math.PI / 2, -Math.PI / 2 + charge * Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  // Arrows in flight
+  for (const a of arrows) {
+    const ac  = camera.worldToScreen(a.x, a.y);
+    const len = 0.32 * ppu;
+    const nx  = a.vx / ARROW_SPEED;
+    const ny  = a.vy / ARROW_SPEED;
+    ctx.lineCap     = 'round';
+    ctx.strokeStyle = COLORS.arrow;
+    ctx.lineWidth   = Math.max(1.5, 0.055 * ppu);
+    ctx.beginPath();
+    ctx.moveTo(ac.x - nx * len, ac.y - ny * len);
+    ctx.lineTo(ac.x + nx * len * 0.25, ac.y + ny * len * 0.25);
+    ctx.stroke();
+    ctx.fillStyle = COLORS.arrowTip;
+    ctx.beginPath();
+    ctx.arc(ac.x + nx * len * 0.3, ac.y + ny * len * 0.3, Math.max(1.5, 0.045 * ppu), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineCap = 'butt';
+  }
+
   // Character damage flash (drawn on top of circle)
   if (character.hitAnim) drawHitRing(ctx, cc.x, charY, character.hitAnim, ppu);
 
@@ -312,7 +394,7 @@ function renderHUD(ctx, char) {
   ctx.fillStyle = COLORS.hudHealth;
   ctx.fillRect(M + 18, M, BW * char.health / 100, BH);
   ctx.fillStyle = '#ff9090';
-  ctx.fillText('\u2665', M + 2, M + BH / 2);
+  ctx.fillText('♥', M + 2, M + BH / 2);
 
   const hy = M + BH + G;
   ctx.fillStyle = COLORS.hudBg;
@@ -320,7 +402,7 @@ function renderHUD(ctx, char) {
   ctx.fillStyle = COLORS.hudHunger;
   ctx.fillRect(M + 18, hy, BW * char.hunger / 100, BH);
   ctx.fillStyle = '#ffd090';
-  ctx.fillText('\u25C9', M + 2, hy + BH / 2);
+  ctx.fillText('◉', M + 2, hy + BH / 2);
 
   ctx.font = '9px monospace';
   ctx.textBaseline = 'top';

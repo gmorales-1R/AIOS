@@ -53,10 +53,10 @@ export function addSword(inv) {
 }
 
 // Toggle equip on the item at slot i. Unequips other items of the same type.
-// Swords and shields are equipped independently.
+// Swords, shields and bows are equipped independently.
 export function toggleEquip(inv, i) {
   const s = inv.slots[i];
-  if (!s || !['sword', 'shield'].includes(s.type)) return;
+  if (!s || !['sword', 'shield', 'bow'].includes(s.type)) return;
   const equipping = !s.equipped;
   for (const slot of inv.slots) {
     if (slot && slot.type === s.type) slot.equipped = false;
@@ -96,6 +96,21 @@ export function deserializeInventory(data) {
     inv.slots[i] = data[i] ? { ...data[i] } : null;
   }
   return inv;
+}
+
+export function hasBow(inv) {
+  return inv.slots.some(s => s && s.type === 'bow');
+}
+
+export function addBow(inv) {
+  const i = inv.slots.findIndex(s => !s);
+  if (i === -1) return false;
+  inv.slots[i] = { type: 'bow', equipped: false };
+  return true;
+}
+
+export function getBowEquipped(inv) {
+  return inv.slots.some(s => s && s.type === 'bow' && s.equipped);
 }
 
 // Returns { dmg, range, acc } for the currently equipped melee weapon.
