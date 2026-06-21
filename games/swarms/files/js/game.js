@@ -258,7 +258,8 @@ ui.bind({
   onDeadMenu:   goToMenu,
 });
 
-ui.bindInventory((idx) => {
+// ---- inventory slot action (shared by mouse click and keyboard) ----
+function activateSlot(idx) {
   if (gameState !== 'playing') return;
   const slot = inventory.slots[idx];
   if (!slot) return;
@@ -272,6 +273,17 @@ ui.bindInventory((idx) => {
     updateInventoryUI();
     updateActionBar();
   }
+}
+
+ui.bindInventory((idx) => activateSlot(idx));
+
+// ---- keyboard controls ----
+document.addEventListener('keydown', e => {
+  const key = e.key.toLowerCase();
+  if (key === ' ')         { e.preventDefault(); doUse(); }
+  else if (key === 'z')   doAttack();
+  else if (key === 'x')   doDefend();
+  else if (key >= '1' && key <= '5') activateSlot(parseInt(key, 10) - 1);
 });
 
 ui.showStart(hasSaves());
