@@ -112,12 +112,22 @@ export function render(ctx, camera, tiles, character, creatures) {
       if (cc.x < -margin || cc.x > viewW + margin ||
           cc.y < -margin || cc.y > viewH + margin) continue;
       if (c.alive) {
-        const hs = CHAR_RADIUS * 0.85 * ppu;
-        ctx.fillStyle   = COLORS.chicken;
-        ctx.fillRect(cc.x - hs, cc.y - hs, hs * 2, hs * 2);
-        ctx.strokeStyle = COLORS.chickenEdge;
-        ctx.lineWidth   = Math.max(0.5, 0.04 * ppu);
-        ctx.strokeRect(cc.x - hs, cc.y - hs, hs * 2, hs * 2);
+        if (c.kind === 'hog') {
+          const hw = CHAR_RADIUS * 1.2 * ppu;
+          const hh = CHAR_RADIUS * 0.8 * ppu;
+          ctx.fillStyle   = COLORS.hog;
+          ctx.fillRect(cc.x - hw, cc.y - hh, hw * 2, hh * 2);
+          ctx.strokeStyle = c.state === 'aggro' ? COLORS.hogAggro : COLORS.hogEdge;
+          ctx.lineWidth   = Math.max(1, (c.state === 'aggro' ? 0.07 : 0.04) * ppu);
+          ctx.strokeRect(cc.x - hw, cc.y - hh, hw * 2, hh * 2);
+        } else {
+          const hs = CHAR_RADIUS * 0.85 * ppu;
+          ctx.fillStyle   = COLORS.chicken;
+          ctx.fillRect(cc.x - hs, cc.y - hs, hs * 2, hs * 2);
+          ctx.strokeStyle = COLORS.chickenEdge;
+          ctx.lineWidth   = Math.max(0.5, 0.04 * ppu);
+          ctx.strokeRect(cc.x - hs, cc.y - hs, hs * 2, hs * 2);
+        }
       }
       if (c.hitAnim) drawHitRing(ctx, cc.x, cc.y, c.hitAnim, ppu);
     }

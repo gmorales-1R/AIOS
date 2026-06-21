@@ -13,12 +13,12 @@ import {
   getMeleeStats, serializeInventory, deserializeInventory,
 } from './inventory.js';
 import {
-  spawnChickens, deserializeChickens,
+  spawnCreatures, deserializeCreatures,
 } from './creatures.js';
 import { saveGame, loadLatestSave, hasSaves } from './save.js';
 import { UI } from './ui.js';
 import {
-  COLS, AUTO_SAVE_SECS, CHICKEN_EVADE, CHICKEN_SPAWN_COUNT,
+  COLS, AUTO_SAVE_SECS,
 } from './config.js';
 
 const canvas    = document.getElementById('game');
@@ -81,8 +81,9 @@ function doAttack() {
     const accFactor = stats.acc > 0
       ? 1 + (Math.random() * 2 - 1) * stats.acc
       : 1;
-    const finalDmg = Math.max(0, Math.floor(stats.dmg * accFactor * (1 - CHICKEN_EVADE)));
+    const finalDmg = Math.max(0, Math.floor(stats.dmg * accFactor * (1 - cr.evade)));
     cr.takeDamage(finalDmg, refDmg);
+    if (cr.alive) cr.onHit(tiles, isBlocked, character);
   }
 }
 
@@ -121,7 +122,7 @@ function startNew() {
   const s = tileCenter((COLS / 2) | 0, 0);
   character.reset(s.x, s.y);
   initWorld(tiles);
-  creatures = spawnChickens(tiles, isBlocked, CHICKEN_SPAWN_COUNT);
+  creatures = spawnCreatures(tiles, isBlocked);
   camera.deserialize({ ...boardCenter(), z: 1 });
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
   const { tile: startTile } = nearestTile(tiles, s.x, s.y);
@@ -140,8 +141,8 @@ function doContinue() {
   camera.deserialize(save.camera);
   deserializeTiles(tiles, save.tiles);
   inventory     = save.inventory ? deserializeInventory(save.inventory) : createInventory();
-  creatures     = save.creatures ? deserializeChickens(save.creatures, tiles)
-                                 : spawnChickens(tiles, isBlocked, CHICKEN_SPAWN_COUNT);
+  creatures     = save.creatures ? deserializeCreatures(save.creatures, tiles)
+                                 : spawnCreatures(tiles, isBlocked);
   tickAccum     = save.tickAccum || 0;
   lastSaveTime  = save.savedAt;
   autoSaveAccum = 0;
@@ -246,7 +247,7 @@ function loop(now) {
       tickAccum -= 1.0;
       character.onTick();
       tickWorld(tiles);
-      for (const c of creatures) c.tick(tiles, isBlocked);
+      for (const c of creatures) c.tick(tiles, isBlocked, character);
       updateActionBar();   // apples may have grown on currentTile
     }
 
@@ -256,7 +257,7 @@ function loop(now) {
     }
 
     character.update(dt);
-    for (const c of creatures) c.update(dt);
+    for (const c of creatures) c.update(dt, character);
     // Remove dead creatures once their hit flash finishes.
     for (let i = creatures.length - 1; i >= 0; i--) {
       if (!creatures[i].alive && !creatures[i].hitAnim) creatures.splice(i, 1);
