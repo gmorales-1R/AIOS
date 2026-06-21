@@ -1,26 +1,41 @@
-export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowMove, onBowUp }) {
+export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowMove, onBowUp, onHold }) {
   const pointers = new Map();
   let mode = 'none';
   let last = null, downPos = null, moved = 0, pinchPrev = 0;
+  let holdTimer = null;
 
   const rel = (e) => {
     const r = canvas.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   };
 
+  const clearHold = () => {
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+  };
+
   canvas.addEventListener('pointerdown', (e) => {
     canvas.setPointerCapture(e.pointerId);
-    pointers.set(e.pointerId, rel(e));
+    const p = rel(e);
+    pointers.set(e.pointerId, p);
     if (pointers.size === 1) {
       if (isBowMode && isBowMode()) {
         mode = 'bow';
-        const p = rel(e);
         if (onBowDown) onBowDown(p.x, p.y);
       } else {
         mode = 'drag'; moved = 0;
-        last = rel(e); downPos = rel(e);
+        last = p; downPos = p;
+        // Long-press activates bow mode after 180 ms if pointer hasn't moved much.
+        if (onHold) {
+          holdTimer = setTimeout(() => {
+            holdTimer = null;
+            if (mode !== 'drag') return;
+            onHold(downPos.x, downPos.y);
+            if (isBowMode && isBowMode()) mode = 'bow';
+          }, 180);
+        }
       }
     } else if (pointers.size === 2) {
+      clearHold();
       mode = 'pinch'; pinchPrev = pinchDist();
     }
   });
@@ -35,6 +50,7 @@ export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowM
       const p = rel(e);
       const dx = p.x - last.x, dy = p.y - last.y;
       moved += Math.abs(dx) + Math.abs(dy);
+      if (moved > 10) clearHold();  // moved too far — cancel hold
       camera.panByPixels(dx, dy);
       last = p;
     } else if (mode === 'pinch' && pointers.size === 2) {
@@ -45,6 +61,7 @@ export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowM
   });
 
   const end = (e) => {
+    clearHold();
     const p = rel(e);
     pointers.delete(e.pointerId);
     if (mode === 'bow') {
