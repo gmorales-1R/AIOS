@@ -1,3 +1,5 @@
+export const BUILD_TIME = '__BUILD_TIME__';
+
 export const COLS = 20;
 export const ROWS = 12;
 

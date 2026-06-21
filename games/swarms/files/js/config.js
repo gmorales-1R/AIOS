@@ -1,3 +1,5 @@
+export const BUILD_TIME = '20/06/2026 22:05:54';
+
 export const COLS = 20;
 export const ROWS = 12;
 

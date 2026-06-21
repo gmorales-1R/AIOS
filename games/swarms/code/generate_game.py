@@ -12,10 +12,19 @@ Run from anywhere:  python games/swarms/code/generate_game.py
 """
 
 from pathlib import Path
+from datetime import datetime
+try:
+    from zoneinfo import ZoneInfo
+    _tz = ZoneInfo("America/Santiago")
+except ImportError:
+    from datetime import timezone as _timezone
+    _tz = _timezone.utc
 
 HERE  = Path(__file__).parent
 SRC   = HERE / "src"
 FILES = HERE.parent / "files"
+
+BUILD_TIME = datetime.now(_tz).strftime("%d/%m/%Y %H:%M:%S")
 
 COPIES = [
     (SRC / "game.html",          FILES / "game.html"),
@@ -41,7 +50,10 @@ def main():
     (FILES / "css").mkdir(parents=True, exist_ok=True)
 
     for src, dst in COPIES:
-        dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+        text = src.read_text(encoding="utf-8")
+        if dst.name == "config.js":
+            text = text.replace("__BUILD_TIME__", BUILD_TIME)
+        dst.write_text(text, encoding="utf-8")
         print(f"Written: {dst}")
 
 

@@ -1,5 +1,5 @@
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS, HIT_ANIM_SECS } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS, HIT_ANIM_SECS, BUILD_TIME } from './config.js';
 
 const grassImg = new Image();
 grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
@@ -194,4 +194,9 @@ function renderHUD(ctx, char) {
   ctx.fillRect(M + 18, hy, BW * char.hunger / 100, BH);
   ctx.fillStyle = '#ffd090';
   ctx.fillText('\u25C9', M + 2, hy + BH / 2);
+
+  ctx.font = '9px monospace';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  ctx.fillText(BUILD_TIME, M, hy + BH + G + 4);
 }
