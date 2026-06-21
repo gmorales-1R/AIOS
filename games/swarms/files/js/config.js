@@ -1,4 +1,4 @@
-export const BUILD_TIME = 'v50 21/06/2026 01:21';
+export const BUILD_TIME = 'v56 21/06/2026 11:55';
 
 export const COLS = 20;
 export const ROWS = 12;
@@ -10,7 +10,7 @@ export const HEX_H       = 2 * SIDE;
 export const COL_SPACING = SQRT3 * SIDE;
 export const ROW_SPACING = 1.5 * SIDE;
 
-export const CHAR_RADIUS      = 0.42 * SIDE;
+export const CHAR_RADIUS      = 0.28 * SIDE;
 export const MOVE_SPEED       = 5.5;
 export const TILE_HUNGER_COST = 1;
 
@@ -28,10 +28,11 @@ export const APPLE_HUNGER_GAIN = 15;
 export const APPLE_HEALTH_GAIN = 5;
 export const APPLE_STACK_MAX   = 10;
 
-export const ATK_DMG_BASE    = 2;
-export const ATK_DMG_SWORD   = 5;
-export const ATK_ANIM_SECS   = 0.38;
-export const ATK_RANGE_FIST  = 1.5;
+export const ATK_DMG_BASE       = 2;
+export const ATK_DMG_SWORD      = 5;
+export const ATK_ANIM_SECS      = 0.38;
+export const ATK_ANIM_SECS_SWORD = 0.25;
+export const ATK_RANGE_FIST     = 1.5;
 export const ATK_RANGE_SWORD = 2.0;
 export const ATK_ACC_FIST    = 0;
 export const ATK_ACC_SWORD   = 0.10;
@@ -59,6 +60,9 @@ export const HOG_ATK_INTERVAL   = 0.5;
 export const HOG_DISENGAGE_DIST = 6.0;
 export const HOG_SPEED_NATURAL  = 2.0;
 export const HOG_SPEED_AGGRO    = 3.5;
+
+export const CREATURE_DRIFT_RADIUS = 0.75;
+export const CREATURE_DRIFT_CHANCE = 0.40;
 
 export const SHIELD_BLOCK_BASE = 0.70;
 export const SHIELD_BLOCK_VAR  = 0.20;

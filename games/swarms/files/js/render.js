@@ -1,5 +1,5 @@
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS, SIDE, HEX_H, ATK_ANIM_SECS, HIT_ANIM_SECS, BUILD_TIME } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME } from './config.js';
 
 const grassImg = new Image();
 grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
@@ -198,22 +198,68 @@ export function render(ctx, camera, tiles, character, creatures) {
     }
   }
 
-  // Attack animation ring (drawn behind character)
+  // Attack animation (drawn behind character)
   const cc = camera.worldToScreen(character.x, character.y);
   if (character.atkAnim) {
-    const prog  = character.atkAnim.t / ATK_ANIM_SECS;
-    const r     = (CHAR_RADIUS * 0.4 + character.atkAnim.range * prog) * ppu;
-    const lw    = Math.max(1.5, (0.18 - 0.10 * prog) * ppu);
-    const alpha = (1 - prog) * 0.80;
-    const color = character.atkAnim.armed ? COLORS.atkRing : COLORS.atkRingAlt;
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.beginPath();
-    ctx.arc(cc.x, cc.y, r, 0, Math.PI * 2);
-    ctx.strokeStyle = color;
-    ctx.lineWidth   = lw;
-    ctx.stroke();
-    ctx.restore();
+    const anim = character.atkAnim;
+    const prog = anim.t / anim.duration;
+
+    if (anim.armed) {
+      // Sword: sonar sweep clockwise from 12:00, fading trail
+      const range        = anim.range * ppu;
+      const startAngle   = -Math.PI / 2;
+      const sweepSoFar   = prog * Math.PI * 2;
+      const currentAngle = startAngle + sweepSoFar;
+
+      ctx.save();
+
+      // Fading trail: 20 wedge slices ramping from transparent at 12:00 to opaque at sweep line
+      const N = 20;
+      for (let i = 0; i < N; i++) {
+        const a0 = startAngle + (i / N) * sweepSoFar;
+        const a1 = startAngle + ((i + 1) / N) * sweepSoFar;
+        ctx.globalAlpha = ((i + 1) / N) * 0.45;
+        ctx.beginPath();
+        ctx.moveTo(cc.x, cc.y);
+        ctx.arc(cc.x, cc.y, range, a0, a1);
+        ctx.closePath();
+        ctx.fillStyle = COLORS.atkRing;
+        ctx.fill();
+      }
+
+      // Faint range boundary circle
+      ctx.globalAlpha = 0.20;
+      ctx.beginPath();
+      ctx.arc(cc.x, cc.y, range, 0, Math.PI * 2);
+      ctx.strokeStyle = COLORS.atkRing;
+      ctx.lineWidth = Math.max(1, 0.025 * ppu);
+      ctx.stroke();
+
+      // Bright sweep line
+      ctx.globalAlpha = 0.95;
+      ctx.beginPath();
+      ctx.moveTo(cc.x, cc.y);
+      ctx.lineTo(cc.x + Math.cos(currentAngle) * range, cc.y + Math.sin(currentAngle) * range);
+      ctx.strokeStyle = COLORS.atkRing;
+      ctx.lineWidth = Math.max(2, 0.055 * ppu);
+      ctx.stroke();
+
+      ctx.restore();
+
+    } else {
+      // Fists: expanding ring fade-out
+      const r     = (CHAR_RADIUS * 0.4 + anim.range * prog) * ppu;
+      const lw    = Math.max(1.5, (0.18 - 0.10 * prog) * ppu);
+      const alpha = (1 - prog) * 0.80;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(cc.x, cc.y, r, 0, Math.PI * 2);
+      ctx.strokeStyle = COLORS.atkRingAlt;
+      ctx.lineWidth   = lw;
+      ctx.stroke();
+      ctx.restore();
+    }
   }
 
   // Character

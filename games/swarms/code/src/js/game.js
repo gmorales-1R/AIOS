@@ -71,6 +71,7 @@ function updateActionBar() {
 // ---- actions ----
 function doAttack() {
   if (gameState !== 'playing') return;
+  if (character.atkAnim && character.atkAnim.armed) return;
   const stats  = getMeleeStats(inventory);
   const armed  = stats.acc > 0;
   character.startAttack(armed, stats.range);
