@@ -1,4 +1,4 @@
-export const BUILD_TIME = 'v59 21/06/2026 12:59';
+export const BUILD_TIME = 'v61 21/06/2026 14:26';
 
 export const COLS = 20;
 export const ROWS = 12;
@@ -45,7 +45,7 @@ export const CHICKEN_MOVE_CHANCE = 0.30;
 export const CHICKEN_EAT_CHANCE  = 0.50;
 export const CHICKEN_SPEED       = 2.5;
 export const CHICKEN_FLEE_SPEED  = 4.0;
-export const CHICKEN_FLEE_TILES  = 2;
+export const CHICKEN_FLEE_TILES  = 4;
 
 export const HOG_HP             = 100;
 export const HOG_SPAWN_COUNT    = 2;
