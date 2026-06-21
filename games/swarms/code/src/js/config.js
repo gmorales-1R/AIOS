@@ -66,7 +66,7 @@ export const COLORS = {
   sword:         '#c8c8e8',
   swordEdge:     '#ffffff',
   atkRing:       '#ffe600',
-  atkRingAlt:    '#33ff6a',
+  atkRingAlt:    '#00cfff',
   hitRing:       '#ff4040',
   chicken:       '#f0f0f0',
   chickenEdge:   '#888888',

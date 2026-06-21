@@ -2,7 +2,7 @@ import { generateGrid, nearestTile, tileCenter, boardCenter } from './hex.js';
 import { Camera } from './camera.js';
 import { Character } from './character.js';
 import { setupInput } from './input.js';
-import { render } from './render.js';
+import { render, resetPatterns } from './render.js';
 import {
   initWorld, tickWorld, pickApple,
   serializeTiles, deserializeTiles,
@@ -190,6 +190,7 @@ function resize() {
   canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   camera.setViewport(w, h);
+  resetPatterns(); // canvas.width resets context state; patterns must be recreated
 }
 window.addEventListener('resize', resize);
 resize();

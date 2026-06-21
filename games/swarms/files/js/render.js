@@ -9,6 +9,12 @@ const grassImg2 = new Image();
 grassImg2.src = new URL('../assets/tiles/grass2.png', import.meta.url).href;
 let grassPattern2 = null;
 
+// Call after canvas.width/height is set (context reset invalidates cached patterns).
+export function resetPatterns() {
+  grassPattern = null;
+  grassPattern2 = null;
+}
+
 const APPLE_POS = [
   [[0, 0]],
   [[-0.22, 0], [0.22, 0]],
