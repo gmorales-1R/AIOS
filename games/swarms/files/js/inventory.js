@@ -52,15 +52,33 @@ export function addSword(inv) {
   return true;
 }
 
-// Toggle equip on the sword at slot i. Unequips all other weapons first.
+// Toggle equip on the item at slot i. Unequips other items of the same type.
+// Swords and shields are equipped independently.
 export function toggleEquip(inv, i) {
   const s = inv.slots[i];
-  if (!s || s.type !== 'sword') return;
+  if (!s || !['sword', 'shield'].includes(s.type)) return;
   const equipping = !s.equipped;
   for (const slot of inv.slots) {
-    if (slot && slot.type === 'sword') slot.equipped = false;
+    if (slot && slot.type === s.type) slot.equipped = false;
   }
   s.equipped = equipping;
+}
+
+export function hasShield(inv) {
+  return inv.slots.some(s => s && s.type === 'shield');
+}
+
+export function addShield(inv, effectiveness = 0) {
+  const i = inv.slots.findIndex(s => !s);
+  if (i === -1) return false;
+  inv.slots[i] = { type: 'shield', equipped: false, effectiveness };
+  return true;
+}
+
+// Returns the effectiveness bonus of the currently equipped shield, or 0.
+export function getShieldEffectiveness(inv) {
+  const s = inv.slots.find(s => s && s.type === 'shield' && s.equipped);
+  return s ? (s.effectiveness || 0) : 0;
 }
 
 export function getMeleeDmg(inv) {

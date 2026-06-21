@@ -1,4 +1,4 @@
-export const BUILD_TIME = '21/06/2026 00:37:01';
+export const BUILD_TIME = '21/06/2026 00:49:21';
 
 export const COLS = 20;
 export const ROWS = 12;
@@ -60,6 +60,11 @@ export const HOG_DISENGAGE_DIST = 6.0;
 export const HOG_SPEED_NATURAL  = 2.0;
 export const HOG_SPEED_AGGRO    = 3.5;
 
+export const SHIELD_BLOCK_BASE = 0.70;
+export const SHIELD_BLOCK_VAR  = 0.20;
+export const SHIELD_DURATION   = 10;
+export const SHIELD_COOLDOWN   = 20;
+
 export const ZOOM_MIN       = 0.3;
 export const ZOOM_MAX       = 5;
 export const FIT_HEXES      = 6;
@@ -87,6 +92,7 @@ export const COLORS = {
   atkRing:       '#ffe600',
   atkRingAlt:    '#00cfff',
   hitRing:       '#ff4040',
+  shieldRing:    '#4488ff',
   chicken:       '#f0f0f0',
   chickenEdge:   '#888888',
   hog:           '#f07090',

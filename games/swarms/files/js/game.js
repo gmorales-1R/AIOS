@@ -9,7 +9,7 @@ import {
 } from './world.js';
 import {
   createInventory, addApple, canPickupApple, consumeApple,
-  addSword, hasSword, toggleEquip,
+  addSword, hasSword, addShield, hasShield, getShieldEffectiveness, toggleEquip,
   getMeleeStats, serializeInventory, deserializeInventory,
 } from './inventory.js';
 import {
@@ -54,12 +54,15 @@ function updateInventoryUI() {
 
 // ---- action bar state ----
 function updateActionBar() {
-  ui.setActionEnabled('melee', gameState === 'playing');
-  ui.setActionEnabled('defend', false);
+  const playing = gameState === 'playing';
+  ui.setActionEnabled('melee', playing);
+  const shieldOn = inventory.slots.some(s => s && s.type === 'shield' && s.equipped);
+  ui.setActionEnabled('defend', playing && shieldOn && !character.shieldActive && character.shieldCooldown <= 0);
   ui.setActionEnabled('range',  false);
 
-  const canUse = gameState === 'playing' && !!currentTile && (
-    (currentTile.hasSword && !hasSword(inventory)) ||
+  const canUse = playing && !!currentTile && (
+    (currentTile.hasSword  && !hasSword(inventory))  ||
+    (currentTile.hasShield && !hasShield(inventory)) ||
     (currentTile.apples > 0 && canPickupApple(inventory))
   );
   ui.setActionEnabled('interact', !!canUse);
@@ -87,11 +90,26 @@ function doAttack() {
   }
 }
 
+function doDefend() {
+  if (gameState !== 'playing') return;
+  if (!inventory.slots.some(s => s && s.type === 'shield' && s.equipped)) return;
+  if (character.startDefend(getShieldEffectiveness(inventory))) updateActionBar();
+}
+
 function doUse() {
   if (gameState !== 'playing' || !currentTile) return;
   if (currentTile.hasSword && !hasSword(inventory)) {
     currentTile.hasSword = false;
     addSword(inventory);
+    const i = inventory.slots.findIndex(s => s && s.type === 'sword');
+    if (i !== -1) toggleEquip(inventory, i);   // auto-equip: was empty-handed
+    updateInventoryUI();
+    updateActionBar();
+  } else if (currentTile.hasShield && !hasShield(inventory)) {
+    currentTile.hasShield = false;
+    addShield(inventory);
+    const i = inventory.slots.findIndex(s => s && s.type === 'shield');
+    if (i !== -1) toggleEquip(inventory, i);   // auto-equip: had no shield
     updateInventoryUI();
     updateActionBar();
   } else if (currentTile.apples > 0 && canPickupApple(inventory)) {
@@ -222,6 +240,7 @@ ui.bind({
   onBackMenu: backToMenu,
   onToggle:   togglePause,
   onAttack:   doAttack,
+  onDefend:   doDefend,
   onInteract: doUse,
 });
 
@@ -263,7 +282,9 @@ function loop(now) {
       doSave('\u25CF AUTO-SAVED');
     }
 
+    const wasShielded = character.shieldActive;
     character.update(dt);
+    if (wasShielded && !character.shieldActive) updateActionBar();
     for (const c of creatures) c.update(dt, character);
     // Remove dead creatures once their hit flash finishes.
     for (let i = creatures.length - 1; i >= 0; i--) {

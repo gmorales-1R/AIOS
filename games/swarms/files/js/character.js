@@ -5,6 +5,7 @@ import {
   HEALTH_MAX, HUNGER_MAX,
   TICK_HUNGER, STARVE_DMG, HEAL_RATE, HEAL_THRESH,
   ATK_ANIM_SECS, HIT_ANIM_SECS,
+  SHIELD_BLOCK_BASE, SHIELD_BLOCK_VAR, SHIELD_DURATION, SHIELD_COOLDOWN,
 } from './config.js';
 
 export class Character {
@@ -15,9 +16,13 @@ export class Character {
     this.targetState = null;
     this.health      = HEALTH_MAX;
     this.hunger      = HUNGER_MAX;
-    this.onTileEnter = null;
-    this.atkAnim     = null;   // { t, armed } while animating
-    this.hitAnim     = null;   // { t, opacity } while damage flash plays
+    this.onTileEnter         = null;
+    this.atkAnim             = null;   // { t, armed } while animating
+    this.hitAnim             = null;   // { t, opacity } while damage flash plays
+    this.shieldActive        = false;
+    this.shieldTimer         = 0;
+    this.shieldCooldown      = 0;
+    this.shieldEffectiveness = 0;
   }
 
   get moving() { return this.path.length > 0; }
@@ -27,20 +32,42 @@ export class Character {
     this.path = []; this.targetTile = null; this.targetState = null;
     this.health = HEALTH_MAX; this.hunger = HUNGER_MAX;
     this.atkAnim = null; this.hitAnim = null;
+    this.shieldActive = false; this.shieldTimer = 0;
+    this.shieldCooldown = 0; this.shieldEffectiveness = 0;
   }
 
   startAttack(armed = false, range = 1.5) {
     this.atkAnim = { t: 0, armed, range };
   }
 
+  // Returns false if shield is already active or on cooldown.
+  startDefend(effectiveness = 0) {
+    if (this.shieldActive || this.shieldCooldown > 0) return false;
+    this.shieldActive        = true;
+    this.shieldTimer         = SHIELD_DURATION;
+    this.shieldEffectiveness = effectiveness;
+    return true;
+  }
+
   // dmg: final calculated damage; refDmg: baseDmg*1.5 scale reference for opacity.
   takeDamage(dmg, refDmg) {
-    this.health = Math.max(0, this.health - dmg);
-    this.hitAnim = { t: 0, opacity: Math.min(1, dmg / refDmg) };
+    let effective = dmg;
+    if (this.shieldActive) {
+      const reduction = Math.min(1,
+        SHIELD_BLOCK_BASE + this.shieldEffectiveness +
+        (Math.random() * 2 - 1) * SHIELD_BLOCK_VAR
+      );
+      effective = Math.max(0, Math.round(dmg * (1 - reduction)));
+    }
+    this.health  = Math.max(0, this.health - effective);
+    this.hitAnim = { t: 0, opacity: Math.min(1, effective / refDmg) };
   }
 
   serialize() {
-    return { x: this.x, y: this.y, health: this.health, hunger: this.hunger };
+    return {
+      x: this.x, y: this.y, health: this.health, hunger: this.hunger,
+      shieldCooldown: this.shieldCooldown,
+    };
   }
 
   deserialize(d) {
@@ -48,6 +75,8 @@ export class Character {
     this.health = d.health; this.hunger = d.hunger;
     this.path = []; this.targetTile = null; this.targetState = null;
     this.atkAnim = null; this.hitAnim = null;
+    this.shieldActive = false; this.shieldTimer = 0;
+    this.shieldCooldown = d.shieldCooldown || 0; this.shieldEffectiveness = 0;
   }
 
   onTick() {
@@ -74,6 +103,18 @@ export class Character {
   }
 
   update(dt) {
+    // Shield timers.
+    if (this.shieldActive) {
+      this.shieldTimer -= dt;
+      if (this.shieldTimer <= 0) {
+        this.shieldActive = false;
+        this.shieldCooldown = SHIELD_COOLDOWN;
+      }
+    }
+    if (this.shieldCooldown > 0) {
+      this.shieldCooldown = Math.max(0, this.shieldCooldown - dt);
+    }
+
     // Advance attack and hit animations.
     if (this.atkAnim) {
       this.atkAnim.t += dt;

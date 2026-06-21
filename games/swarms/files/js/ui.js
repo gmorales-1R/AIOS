@@ -8,7 +8,7 @@ export class UI {
     this._toastId = null;
   }
 
-  bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle, onAttack, onInteract }) {
+  bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle, onAttack, onDefend, onInteract }) {
     document.getElementById('btn-new-game').onclick  = onNewGame;
     document.getElementById('btn-continue').onclick  = onContinue;
     document.getElementById('btn-resume').onclick    = onResume;
@@ -16,6 +16,7 @@ export class UI {
     document.getElementById('btn-back-menu').onclick = onBackMenu;
     this._toggle.onclick = onToggle;
     if (onAttack)   document.getElementById('act-melee').onclick    = onAttack;
+    if (onDefend)   document.getElementById('act-defend').onclick   = onDefend;
     if (onInteract) document.getElementById('act-interact').onclick = onInteract;
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') onToggle();
@@ -114,6 +115,13 @@ export class UI {
         '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
         '<rect x="-0.13" y="-0.9" width="0.26" height="1.8" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
         '<rect x="-0.65" y="-0.14" width="1.3" height="0.28" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
+        '</svg>';
+      if (item.equipped) slot.classList.add('equipped');
+    } else if (item.type === 'shield') {
+      icon.innerHTML =
+        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
+        '<path d="M0,-0.88 L0.78,-0.45 L0.78,0.18 Q0.6,0.84 0,0.93 Q-0.6,0.84 -0.78,0.18 L-0.78,-0.45 Z"' +
+        ' fill="#4488ff" stroke="#2255cc" stroke-width="0.08"/>' +
         '</svg>';
       if (item.equipped) slot.classList.add('equipped');
     }

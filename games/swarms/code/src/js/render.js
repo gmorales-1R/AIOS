@@ -135,6 +135,25 @@ export function render(ctx, camera, tiles, character, creatures) {
       }
     }
 
+    // Shield on ground
+    if (t.hasShield) {
+      const sw = 0.30 * ppu;   // half width
+      const sh = 0.36 * ppu;   // half height
+      ctx.fillStyle   = COLORS.shieldRing;
+      ctx.strokeStyle = '#2255cc';
+      ctx.lineWidth   = Math.max(0.5, 0.018 * ppu);
+      ctx.beginPath();
+      ctx.moveTo(c.x,      c.y - sh);
+      ctx.lineTo(c.x + sw, c.y - sh * 0.45);
+      ctx.lineTo(c.x + sw, c.y + sh * 0.18);
+      ctx.quadraticCurveTo(c.x + sw * 0.7, c.y + sh, c.x, c.y + sh * 1.05);
+      ctx.quadraticCurveTo(c.x - sw * 0.7, c.y + sh, c.x - sw, c.y + sh * 0.18);
+      ctx.lineTo(c.x - sw, c.y - sh * 0.45);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
     // Sword on ground (two rectangles forming a cross)
     if (t.hasSword) {
       const hw = 0.09 * ppu;   // half arm width
@@ -208,6 +227,17 @@ export function render(ctx, camera, tiles, character, creatures) {
   ctx.lineWidth   = Math.max(1, 0.05 * ppu);
   ctx.strokeStyle = COLORS.characterEdge;
   ctx.stroke();
+
+  // Shield ring (drawn on top of character circle)
+  if (character.shieldActive) {
+    ctx.save();
+    ctx.strokeStyle = COLORS.shieldRing;
+    ctx.lineWidth   = Math.max(1.5, 0.07 * ppu);
+    ctx.beginPath();
+    ctx.arc(cc.x, cc.y, (CHAR_RADIUS + 0.1) * ppu, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
 
   // Character damage flash (drawn on top of circle)
   if (character.hitAnim) drawHitRing(ctx, cc.x, cc.y, character.hitAnim, ppu);
