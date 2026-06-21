@@ -38,6 +38,10 @@ export function initWorld(tiles) {
     t.grassVar = Math.random() < 0.3;
   }
   generateWater(tiles);
+  // Keep map edges always passable so water can't bisect the board.
+  for (const t of tiles) {
+    if (t.col === 0 || t.col === COLS - 1 || t.row === 0 || t.row === ROWS - 1) t.water = false;
+  }
   for (const t of tiles) {
     if (t.water) continue;
     t.tree         = Math.random() < TREE_DENSITY;
