@@ -147,6 +147,7 @@ function startNew() {
   currentTile = startTile;
   gameState = 'playing';
   ui.hideStart();
+  ui.hideDead();
   ui.showActionBar();
   updateInventoryUI();
   updateActionBar();
@@ -168,6 +169,7 @@ function doContinue() {
   currentTile = startTile;
   gameState = 'playing';
   ui.hideStart();
+  ui.hideDead();
   ui.showActionBar();
   updateInventoryUI();
   updateActionBar();
@@ -185,19 +187,21 @@ function togglePause() {
   }
 }
 
+function goToMenu() {
+  gameState   = 'menu';
+  currentTile = null;
+  ui.hidePause();
+  ui.hideDead();
+  ui.hideActionBar();
+  ui.showStart(hasSaves());
+}
+
 function backToMenu() {
   const stale = lastSaveTime === 0 || (Date.now() - lastSaveTime) > 30_000;
-  const toMenu = () => {
-    gameState   = 'menu';
-    currentTile = null;
-    ui.hidePause();
-    ui.hideActionBar();
-    ui.showStart(hasSaves());
-  };
   if (stale) {
-    ui.showConfirm(toMenu);
+    ui.showConfirm(goToMenu);
   } else {
-    toMenu();
+    goToMenu();
   }
 }
 
@@ -238,15 +242,18 @@ setupInput(canvas, camera, {
 });
 
 ui.bind({
-  onNewGame:  startNew,
-  onContinue: doContinue,
-  onResume:   togglePause,
-  onSave:     () => doSave(),
-  onBackMenu: backToMenu,
-  onToggle:   togglePause,
-  onAttack:   doAttack,
-  onDefend:   doDefend,
-  onInteract: doUse,
+  onNewGame:    startNew,
+  onContinue:   doContinue,
+  onResume:     togglePause,
+  onSave:       () => doSave(),
+  onBackMenu:   backToMenu,
+  onToggle:     togglePause,
+  onAttack:     doAttack,
+  onDefend:     doDefend,
+  onInteract:   doUse,
+  onReloadSave: doContinue,
+  onDeadNewGame: startNew,
+  onDeadMenu:   goToMenu,
 });
 
 ui.bindInventory((idx) => {
@@ -296,6 +303,13 @@ function loop(now) {
       if (!creatures[i].alive && !creatures[i].hitAnim) creatures.splice(i, 1);
     }
     if (character.moving) camera.focusOn({ x: character.x, y: character.y });
+
+    if (character.health <= 0) {
+      gameState = 'dead';
+      character.path = [];
+      ui.hideActionBar();
+      ui.showDead(hasSaves());
+    }
   }
 
   // Slot timer arcs (always run so paused state stays accurate).

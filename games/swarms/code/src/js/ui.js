@@ -3,21 +3,26 @@ export class UI {
     this._start   = document.getElementById('start-screen');
     this._pause   = document.getElementById('pause-screen');
     this._confirm = document.getElementById('confirm-screen');
+    this._dead    = document.getElementById('dead-screen');
     this._toggle  = document.getElementById('btn-menu-toggle');
     this._toast   = document.getElementById('save-toast');
     this._toastId = null;
   }
 
-  bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle, onAttack, onDefend, onInteract }) {
+  bind({ onNewGame, onContinue, onResume, onSave, onBackMenu, onToggle, onAttack, onDefend, onInteract,
+         onReloadSave, onDeadNewGame, onDeadMenu }) {
     document.getElementById('btn-new-game').onclick  = onNewGame;
     document.getElementById('btn-continue').onclick  = onContinue;
     document.getElementById('btn-resume').onclick    = onResume;
     document.getElementById('btn-save').onclick      = onSave;
     document.getElementById('btn-back-menu').onclick = onBackMenu;
     this._toggle.onclick = onToggle;
-    if (onAttack)   document.getElementById('act-melee').onclick    = onAttack;
-    if (onDefend)   document.getElementById('act-defend').onclick   = onDefend;
-    if (onInteract) document.getElementById('act-interact').onclick = onInteract;
+    if (onAttack)      document.getElementById('act-melee').onclick        = onAttack;
+    if (onDefend)      document.getElementById('act-defend').onclick       = onDefend;
+    if (onInteract)    document.getElementById('act-interact').onclick     = onInteract;
+    if (onReloadSave)  document.getElementById('btn-reload-save').onclick  = onReloadSave;
+    if (onDeadNewGame) document.getElementById('btn-dead-new-game').onclick = onDeadNewGame;
+    if (onDeadMenu)    document.getElementById('btn-dead-menu').onclick    = onDeadMenu;
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') onToggle();
     });
@@ -31,6 +36,14 @@ export class UI {
       });
     });
   }
+
+  showDead(hasSave) {
+    document.getElementById('btn-reload-save').disabled = !hasSave;
+    this._hide(this._pause);
+    this._show(this._dead);
+  }
+
+  hideDead() { this._hide(this._dead); }
 
   showStart(hasSave) {
     document.getElementById('btn-continue').disabled = !hasSave;
