@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Swarms</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- Start screen -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SWARMS</h1>
+    <div class="menu">
+      <button class="menu-btn" id="btn-new-game">New Game</button>
+      <button class="menu-btn" id="btn-continue" disabled>Continue</button>
+      <button class="menu-btn" disabled>Options</button>
+      <button class="menu-btn" disabled>Tutorial</button>
+    </div>
+  </div>
+
+  <!-- Pause screen -->
+  <div id="pause-screen" class="screen hidden">
+    <div class="menu">
+      <p class="screen-label">PAUSED</p>
+      <button class="menu-btn" id="btn-resume">Resume</button>
+      <button class="menu-btn" id="btn-save">Save Game</button>
+      <button class="menu-btn" id="btn-back-menu">Back to Menu</button>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div id="confirm-screen" class="screen hidden">
+    <div class="dialog">
+      <p class="dialog-msg">Unsaved progress will be lost.<br>Return to main menu?</p>
+      <div class="dialog-btns">
+        <button class="menu-btn warn" id="btn-confirm-yes">Leave</button>
+        <button class="menu-btn"      id="btn-confirm-no">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save toast -->
+  <div id="save-toast" class="toast hidden"></div>
+
+  <!-- In-game hamburger toggle (hidden on start screen) -->
+  <button id="btn-menu-toggle" class="hud-btn hidden">&#9776;</button>
+
+  <!-- Inventory bar (hidden until game starts) -->
+  <div id="action-bar" class="hidden">
+    <div id="inv-slots">
+      <div class="inv-slot" data-slot="0"><span class="slot-num">1</span></div>
+      <div class="inv-slot" data-slot="1"><span class="slot-num">2</span></div>
+      <div class="inv-slot" data-slot="2"><span class="slot-num">3</span></div>
+      <div class="inv-slot" data-slot="3"><span class="slot-num">4</span></div>
+      <div class="inv-slot" data-slot="4"><span class="slot-num">5</span></div>
+    </div>
+  </div>
+
+  <!-- Action column — right side vertical strip (hidden until game starts) -->
+  <div id="action-column" class="hidden">
+    <button class="action-btn" id="act-melee"    disabled>M</button>
+    <button class="action-btn" id="act-defend"   disabled>D</button>
+    <button class="action-btn" id="act-range"    disabled>R</button>
+    <button class="action-btn" id="act-interact" disabled>U</button>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
