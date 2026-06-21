@@ -1,4 +1,4 @@
-import { generateGrid, nearestTile, tileCenter, boardCenter } from './hex.js';
+import { generateGrid, nearestTile, boardCenter } from './hex.js';
 import { Camera } from './camera.js';
 import { Character } from './character.js';
 import { setupInput } from './input.js';
@@ -137,14 +137,14 @@ function doSave(label = '\u25CF SAVED') {
 // ---- state transitions ----
 function startNew() {
   inventory = createInventory();
-  const s = tileCenter((COLS / 2) | 0, 0);
-  character.reset(s.x, s.y);
-  initWorld(tiles);
+  initWorld(tiles);  // must run first so water tiles are known before picking spawn
+  const passable   = tiles.filter(t => !isBlocked(t));
+  const spawnTile  = passable[Math.floor(Math.random() * passable.length)];
+  character.reset(spawnTile.x, spawnTile.y);
   creatures = spawnCreatures(tiles, isBlocked);
   camera.deserialize({ ...boardCenter(), z: 1 });
   tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
-  const { tile: startTile } = nearestTile(tiles, s.x, s.y);
-  currentTile = startTile;
+  currentTile = spawnTile;
   gameState = 'playing';
   ui.hideStart();
   ui.hideDead();
