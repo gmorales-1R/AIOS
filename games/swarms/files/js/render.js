@@ -9,10 +9,15 @@ const grassImg2 = new Image();
 grassImg2.src = new URL('../assets/tiles/grass2.png', import.meta.url).href;
 let grassPattern2 = null;
 
+const waterImg = new Image();
+waterImg.src = new URL('../assets/tiles/water.png', import.meta.url).href;
+let waterPattern = null;
+
 // Call after canvas.width/height is set (context reset invalidates cached patterns).
 export function resetPatterns() {
   grassPattern = null;
   grassPattern2 = null;
+  waterPattern = null;
 }
 
 const APPLE_POS = [
@@ -41,6 +46,9 @@ export function render(ctx, camera, tiles, character, creatures) {
   }
   if (!grassPattern2 && grassImg2.complete && grassImg2.naturalWidth) {
     grassPattern2 = ctx.createPattern(grassImg2, 'repeat');
+  }
+  if (!waterPattern && waterImg.complete && waterImg.naturalWidth) {
+    waterPattern = ctx.createPattern(waterImg, 'repeat');
   }
 
   const { viewW, viewH } = camera;
@@ -82,10 +90,17 @@ export function render(ctx, camera, tiles, character, creatures) {
       } else {
         ctx.fillStyle = COLORS.tileFill;
       }
+    } else if (t.water) {
+      if (waterPattern) {
+        const s = HEX_H * ppu;
+        const sc = s / waterImg.width;
+        waterPattern.setTransform(new DOMMatrix([sc, 0, 0, sc, c.x - s / 2, c.y - s / 2]));
+        ctx.fillStyle = waterPattern;
+      } else {
+        ctx.fillStyle = COLORS.waterFill;
+      }
     } else {
-      ctx.fillStyle = t.water ? COLORS.waterFill
-                    : t.tree  ? COLORS.treeFill
-                    : COLORS.tileFill;
+      ctx.fillStyle = t.tree ? COLORS.treeFill : COLORS.tileFill;
     }
     ctx.fill();
 
