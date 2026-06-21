@@ -11,8 +11,6 @@ html, body {
   position: fixed;
   top: 0; left: 0;
   touch-action: none;
-  background: #0a0a0f;
-  will-change: transform;
 }
 
 /* ---- screens ---- */
