@@ -126,8 +126,9 @@ export class UI {
     } else if (item.type === 'sword') {
       icon.innerHTML =
         '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
-        '<rect x="-0.13" y="-0.9" width="0.26" height="1.8" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
-        '<rect x="-0.65" y="-0.14" width="1.3" height="0.28" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
+        '<rect x="-0.11" y="-0.62" width="0.22" height="0.70" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
+        '<rect x="-0.58" y="0.06" width="1.16" height="0.22" fill="#c8c8e8" stroke="#fff" stroke-width="0.04"/>' +
+        '<rect x="-0.09" y="0.30" width="0.18" height="0.48" fill="#8b4513" stroke="#5a2e0a" stroke-width="0.04"/>' +
         '</svg>';
       if (item.equipped) slot.classList.add('equipped');
     } else if (item.type === 'shield') {
