@@ -70,6 +70,22 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
   ctx.fillStyle = COLORS.page;
   ctx.fillRect(0, 0, viewW, viewH);
 
+  // Set pattern transforms in world-space so all tiles share one continuous texture (no seams).
+  const wo = camera.worldToScreen(0, 0);
+  const tileScale = HEX_H * ppu;
+  if (grassPattern && grassImg.naturalWidth) {
+    const sc = tileScale / grassImg.naturalWidth;
+    grassPattern.setTransform(new DOMMatrix([sc, 0, 0, sc, wo.x, wo.y]));
+  }
+  if (grassPattern2 && grassImg2.naturalWidth) {
+    const sc = tileScale / grassImg2.naturalWidth;
+    grassPattern2.setTransform(new DOMMatrix([sc, 0, 0, sc, wo.x, wo.y]));
+  }
+  if (waterPattern && waterImg.naturalWidth) {
+    const sc = tileScale / waterImg.naturalWidth;
+    waterPattern.setTransform(new DOMMatrix([sc, 0, 0, sc, wo.x, wo.y]));
+  }
+
   for (const t of tiles) {
     const c = camera.worldToScreen(t.x, t.y);
     if (c.x < -margin || c.x > viewW + margin ||
@@ -93,24 +109,9 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
     ctx.closePath();
     if (!t.water && !t.tree) {
       const pat = t.grassVar ? grassPattern2 : grassPattern;
-      const img = t.grassVar ? grassImg2 : grassImg;
-      if (pat) {
-        const s = HEX_H * ppu;
-        const sc = s / img.width;
-        pat.setTransform(new DOMMatrix([sc, 0, 0, sc, c.x - s / 2, c.y - s / 2]));
-        ctx.fillStyle = pat;
-      } else {
-        ctx.fillStyle = COLORS.tileFill;
-      }
+      ctx.fillStyle = pat || COLORS.tileFill;
     } else if (t.water) {
-      if (waterPattern) {
-        const s = HEX_H * ppu;
-        const sc = s / waterImg.width;
-        waterPattern.setTransform(new DOMMatrix([sc, 0, 0, sc, c.x - s / 2, c.y - s / 2]));
-        ctx.fillStyle = waterPattern;
-      } else {
-        ctx.fillStyle = COLORS.waterFill;
-      }
+      ctx.fillStyle = waterPattern || COLORS.waterFill;
     } else {
       ctx.fillStyle = t.tree ? COLORS.treeFill : COLORS.tileFill;
     }
@@ -153,18 +154,33 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
       ctx.stroke();
     }
 
-    // Sword on ground (two rectangles forming a cross)
+    // Sword on ground — matches inventory icon: tapered blade, crossguard, grip, pommel
     if (t.hasSword) {
-      const hw = 0.09 * ppu;
-      const hl = 0.42 * ppu;
-      const gl = 0.30 * ppu;
-      ctx.fillStyle   = COLORS.sword;
-      ctx.strokeStyle = COLORS.swordEdge;
-      ctx.lineWidth   = Math.max(0.5, 0.018 * ppu);
-      ctx.fillRect(c.x - hw, c.y - hl, hw * 2, hl * 2);
-      ctx.strokeRect(c.x - hw, c.y - hl, hw * 2, hl * 2);
-      ctx.fillRect(c.x - gl, c.y - hw * 1.2, gl * 2, hw * 2.4);
-      ctx.strokeRect(c.x - gl, c.y - hw * 1.2, gl * 2, hw * 2.4);
+      const sc = 0.38 * ppu;
+      const ox = c.x, oy = c.y - 0.045 * sc;
+      const lw = Math.max(0.5, 0.018 * ppu);
+      ctx.lineWidth = lw;
+      // Blade (triangle)
+      ctx.beginPath();
+      ctx.moveTo(ox,             oy - 0.84 * sc);
+      ctx.lineTo(ox + 0.10 * sc, oy + 0.06 * sc);
+      ctx.lineTo(ox - 0.10 * sc, oy + 0.06 * sc);
+      ctx.closePath();
+      ctx.fillStyle = '#d4d4f0'; ctx.strokeStyle = '#ffffff';
+      ctx.fill(); ctx.stroke();
+      // Crossguard
+      ctx.fillStyle = '#b8b8d8'; ctx.strokeStyle = '#ffffff';
+      ctx.fillRect(ox - 0.64*sc, oy + 0.06*sc, 1.28*sc, 0.18*sc);
+      ctx.strokeRect(ox - 0.64*sc, oy + 0.06*sc, 1.28*sc, 0.18*sc);
+      // Grip
+      ctx.fillStyle = '#8b4513'; ctx.strokeStyle = '#5a2e0a';
+      ctx.fillRect(ox - 0.09*sc, oy + 0.24*sc, 0.18*sc, 0.44*sc);
+      ctx.strokeRect(ox - 0.09*sc, oy + 0.24*sc, 0.18*sc, 0.44*sc);
+      // Pommel
+      ctx.beginPath();
+      ctx.arc(ox, oy + 0.79*sc, 0.14*sc, 0, Math.PI * 2);
+      ctx.fillStyle = '#d4d4f0'; ctx.strokeStyle = '#ffffff';
+      ctx.fill(); ctx.stroke();
     }
 
     // Bow on ground
