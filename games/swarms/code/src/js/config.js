@@ -10,7 +10,7 @@ export const HEX_H       = 2 * SIDE;
 export const COL_SPACING = SQRT3 * SIDE;
 export const ROW_SPACING = 1.5 * SIDE;
 
-export const CHAR_RADIUS      = 0.42 * SIDE;
+export const CHAR_RADIUS      = 0.28 * SIDE;
 export const MOVE_SPEED       = 5.5;
 export const TILE_HUNGER_COST = 1;
 
