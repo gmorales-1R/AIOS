@@ -39,7 +39,7 @@ export function setupInput(canvas, camera, { onTap }) {
     pointers.delete(e.pointerId);
     if (mode === 'drag' && moved < 8 && downPos) {
       const w = camera.screenToWorld(downPos.x, downPos.y);
-      onTap(w.x, w.y);
+      onTap(w.x, w.y, downPos.x, downPos.y);
     }
     if (pointers.size === 0) {
       mode = 'none';

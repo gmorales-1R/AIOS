@@ -18,7 +18,7 @@ import {
 import { saveGame, loadLatestSave, hasSaves } from './save.js';
 import { UI } from './ui.js';
 import {
-  COLS, AUTO_SAVE_SECS,
+  COLS, AUTO_SAVE_SECS, SIDE,
 } from './config.js';
 
 const canvas    = document.getElementById('game');
@@ -200,11 +200,17 @@ camera.deserialize({ ...boardCenter(), z: 1 });
 
 const isBlocked = (tile) => !!tile.water;
 
+// Dead zone margins (CSS px) around the bottom and right UI bars.
+const DEAD_BOTTOM = 80;
+const DEAD_RIGHT  = 80;
+
 setupInput(canvas, camera, {
-  onTap(wx, wy) {
+  onTap(wx, wy, sx, sy) {
     if (gameState !== 'playing') return;
-    const { tile } = nearestTile(tiles, wx, wy);
-    if (tile) character.setDestination(tiles, tile, isBlocked);
+    if (sy > camera.viewH - DEAD_BOTTOM || sx > camera.viewW - DEAD_RIGHT) return;
+    const { tile, dist } = nearestTile(tiles, wx, wy);
+    if (!tile || dist > SIDE) return;
+    character.setDestination(tiles, tile, isBlocked);
   },
 });
 
