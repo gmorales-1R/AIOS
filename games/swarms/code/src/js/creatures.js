@@ -7,7 +7,15 @@ import {
   HOG_DETECT_DIST, HOG_AGGRO_CHANCE, HOG_ATK_RANGE, HOG_ATK_DMG, HOG_ATK_VAR,
   HOG_ATK_INTERVAL, HOG_DISENGAGE_DIST, HOG_SPEED_NATURAL, HOG_SPEED_AGGRO,
   HIT_ANIM_SECS, APPLE_GROW_TICKS,
+  CREATURE_DRIFT_RADIUS, CREATURE_DRIFT_CHANCE,
 } from './config.js';
+
+// Returns [ox, oy] — a random point within a circle of the given radius.
+function randSubTile(r) {
+  const angle = Math.random() * Math.PI * 2;
+  const dist  = Math.random() * r;
+  return [Math.cos(angle) * dist, Math.sin(angle) * dist];
+}
 
 function getNeighborTiles(tiles, tile, isBlocked) {
   const neighbors = [];
@@ -43,7 +51,9 @@ export class Chicken {
   constructor(tile) {
     this.kind    = 'chicken';
     this.tile    = tile;
-    this.x       = tile.x; this.y = tile.y;
+    const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+    this.x       = tile.x + ox;
+    this.y       = tile.y + oy;
     this.health  = CHICKEN_HP;
     this.state   = 'natural';
     this.speed   = CHICKEN_SPEED;
@@ -61,13 +71,24 @@ export class Chicken {
       this.speed = CHICKEN_SPEED;
     }
 
+    let moved = false;
     if (Math.random() < CHICKEN_MOVE_CHANCE) {
       const neighbors = getNeighborTiles(tiles, this.tile, isBlocked);
       if (neighbors.length) {
         const target = neighbors[Math.floor(Math.random() * neighbors.length)];
         const wp = findPath(tiles, this.tile, target, isBlocked);
-        if (wp) this.path = wp;
+        if (wp) {
+          const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+          wp.push({ x: target.x + ox, y: target.y + oy });
+          this.path = wp;
+          moved = true;
+        }
       }
+    }
+
+    if (!moved && Math.random() < CREATURE_DRIFT_CHANCE) {
+      const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+      this.path = [{ x: this.tile.x + ox, y: this.tile.y + oy }];
     }
 
     if (this.tile.apples > 0 && Math.random() < CHICKEN_EAT_CHANCE) {
@@ -95,7 +116,11 @@ export class Chicken {
     }
     if (t !== this.tile) {
       const wp = findPath(tiles, this.tile, t, isBlocked);
-      if (wp) this.path = wp;
+      if (wp) {
+        const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+        wp.push({ x: t.x + ox, y: t.y + oy });
+        this.path = wp;
+      }
     }
   }
 
@@ -116,7 +141,9 @@ export class Hog {
   constructor(tile) {
     this.kind     = 'hog';
     this.tile     = tile;
-    this.x        = tile.x; this.y = tile.y;
+    const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+    this.x        = tile.x + ox;
+    this.y        = tile.y + oy;
     this.health   = HOG_HP;
     this.state    = 'natural';
     this.speed    = HOG_SPEED_NATURAL;
@@ -140,7 +167,14 @@ export class Hog {
         const { tile: charTile } = nearestTile(tiles, character.x, character.y);
         if (charTile && charTile !== this.tile) {
           const wp = findPath(tiles, this.tile, charTile, isBlocked);
-          if (wp) this.path = wp;
+          if (wp) {
+            const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+            wp.push({ x: charTile.x + ox, y: charTile.y + oy });
+            this.path = wp;
+          }
+        } else if (Math.random() < CREATURE_DRIFT_CHANCE) {
+          const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+          this.path = [{ x: this.tile.x + ox, y: this.tile.y + oy }];
         }
       }
     } else {
@@ -161,8 +195,17 @@ export class Hog {
           }
           const target = weighted[Math.floor(Math.random() * weighted.length)];
           const wp = findPath(tiles, this.tile, target, isBlocked);
-          if (wp) this.path = wp;
+          if (wp) {
+            const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+            wp.push({ x: target.x + ox, y: target.y + oy });
+            this.path = wp;
+          }
         }
+      }
+
+      if (this.path.length === 0 && Math.random() < CREATURE_DRIFT_CHANCE) {
+        const [ox, oy] = randSubTile(CREATURE_DRIFT_RADIUS);
+        this.path = [{ x: this.tile.x + ox, y: this.tile.y + oy }];
       }
 
       if (this.tile.apples > 0 && Math.random() < HOG_EAT_CHANCE) {

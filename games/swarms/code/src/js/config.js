@@ -60,6 +60,9 @@ export const HOG_DISENGAGE_DIST = 6.0;
 export const HOG_SPEED_NATURAL  = 2.0;
 export const HOG_SPEED_AGGRO    = 3.5;
 
+export const CREATURE_DRIFT_RADIUS = 0.75;
+export const CREATURE_DRIFT_CHANCE = 0.40;
+
 export const SHIELD_BLOCK_BASE = 0.70;
 export const SHIELD_BLOCK_VAR  = 0.20;
 export const SHIELD_DURATION   = 10;
