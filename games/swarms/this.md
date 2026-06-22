@@ -4,7 +4,7 @@ A hex-tile survival game built inside the AIOS framework. All frontend code live
 
 ## Identity
 
-Swarms is a browser-based hex-tile survival game: player character, inventory, two creature types (chicken, hog), melee combat, shield/defend mechanic, and a procedurally generated world. The name points toward the long-term goal of emergent swarm AI. In active incremental development.
+Swarms is a browser-based hex-tile survival game: Robin Hood hero character, inventory system, two creature types (chicken, hog), melee + ranged combat (bow with long-press aim), shield/defend mechanic, day/night cycle, and a procedurally generated world. The name points toward the long-term goal of emergent swarm AI. In active incremental development.
 
 ## North star
 
@@ -73,12 +73,18 @@ y = row × ROW_SPACING + (col%2===1 ? 0.5 : 0)
 ## Rendering
 
 - `ppu` (pixels-per-unit) = `baseScale × zoom`. Multiply all world coords by `ppu`.
-- Tiles: grass uses `ctx.createPattern()` (lazy init) + `setTransform` per tile. **No clip().** Two grass variants (`grassVar` bool, 30/70 split).
-- Tile draw order: fill (pattern or solid) → border stroke → item overlays (apples, sword, shield) → creatures → character → HUD.
+- Tiles: grass uses `ctx.createPattern()` (lazy init) + `setTransform(DOMMatrix)` anchored to world origin each frame. **No clip().** Two grass variants (`grassVar` bool, 30/70 split). ALL non-water tiles (including tree tiles) use grass pattern.
+- Tile draw order: fill (pattern or solid) → target border only → tree overlay (foliage + trunk + apples) → creatures → character → day/night overlay → HUD.
+- No border on non-target tiles. Target tile: yellow (reachable) or red (unreachable) border.
+- Tree: dark foliage circle (#0f2a0b, r=0.28*ppu, center y-0.08*ppu), brown trunk rect (0.07*ppu wide, 0.22*ppu tall), red apple dots at TREE_APPLE_POS offsets. Always drawn when t.tree (not gated on apple count).
+- Character: `drawHero()` — green tunic, skin face, dark pointed hat, yellow feather, eyes.
+- Creatures: `drawHog()` — ears, oval body/head, snout, nostrils, eyes (red when aggro), white tusks. `drawChicken()` — oval body, wing, head, red comb, beak, wattle, eye.
 - Hit ring: red expanding arc, `opacity = dmg / (baseDmg × 1.5)`, fades over `HIT_ANIM_SECS`.
 - Attack ring: yellow (armed) or cyan (unarmed) expanding arc, fades over `ATK_ANIM_SECS`.
 - Shield active: blue ring arc on character (`COLORS.shieldRing`, `CHAR_RADIUS + 0.1`).
 - Slot timer arc: SVG overlay per inventory slot. Yellow = active, blue = cooldown. `stroke-dashoffset = C*(1-fraction)`, `rotate(-90)` for 12-o'clock start.
+- Day/night overlay: radial gradient from player position (oa×0.15 inner → oa outer at 2*ppu). Lantern effect — near-player region is much dimmer than the overlay. Keyframes: day (transparent) → dusk (orange) → night (dark purple, oa≈0.20) → dawn (blue→yellow) → day.
+- Bow aim line: solid line from character, length = charge × BOW_RANGE_MAX × ppu, direction toward aim point.
 
 ## Combat
 
@@ -97,8 +103,11 @@ accFactor = 1 + uniform(-acc, +acc)
 |--------|-----|-------|-----|
 | Fist | 2 | 1.5u | 0 |
 | Sword | 5 | 2.0u | ±10% |
+| Bow | — | BOW_RANGE_MAX | charge-based |
 
 Shield block: `reduction = min(1, 0.70 + effectiveness + uniform(-0.20,+0.20))`, active 10s, cooldown 20s. Effectiveness from equipped shield item.
+
+Bow (ranged): long-press (180ms) to enter aim mode. Drag to aim. Yellow line grows from player as charge fills up to BOW_RANGE_MAX. Release to fire. Arrow travels along aim vector, collision with creatures (within CHAR_RADIUS) or tree foliage circle (r=0.28u, center t.y-0.08).
 
 ## Game states
 
@@ -111,7 +120,9 @@ Death triggers when `character.health <= 0` at end of any playing frame. Shows "
 - 5 slots. Single apple stack (max 10). Second stack never opens.
 - Sword: one slot, equip toggle (yellow border). Auto-equips on first pickup.
 - Shield: one slot, equip toggle. Auto-equips on first pickup. Shows timer arc when active/cooling.
-- `USE` (U) picks up one apple, the sword, or the shield from current tile.
+- Bow: one slot, equip toggle. Required for ranged attack.
+- Auto-pickup: on tile entry, all available items (sword, shield, bow, apples) are picked up automatically. Inventory-full handling (drop to swap) not yet implemented.
+- Auto-consume: each tick, if `character.hunger < 60` and apple slot has count > 0, one apple is consumed automatically.
 
 ## Creatures
 
@@ -148,9 +159,9 @@ Death triggers when `character.health <= 0` at end of any playing frame. Shows "
 
 ## Open issues
 
-- **Firefox canvas flashing** — tracked in `sessions/firefox-flash.md`; 3 attempts failed (will-change, CSS background, integer rounding). See GitHub issue for handoff.
+- **Firefox canvas flashing** — tracked in `sessions/firefox-flash.md`; 3 attempts failed (will-change, CSS background, integer rounding). Candidates 3–5 untried.
 - No directional facing for player — attack is omnidirectional.
 - Chicken/hog death has no loot drop or death animation.
-- R (range attack) button is wired but has no logic.
+- Inventory full: auto-pickup everything now; no "drop to make room" mechanic yet (planned).
 - No player progression / levelling system.
 - Map is fixed size (20×12); no chunk loading.
