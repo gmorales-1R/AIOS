@@ -124,13 +124,11 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.closePath();
-    if (!t.water && !t.tree) {
-      const pat = t.grassVar ? grassPattern2 : grassPattern;
-      ctx.fillStyle = pat || COLORS.tileFill;
-    } else if (t.water) {
+    if (t.water) {
       ctx.fillStyle = waterPattern || COLORS.waterFill;
     } else {
-      ctx.fillStyle = COLORS.treeFill;
+      const pat = t.grassVar ? grassPattern2 : grassPattern;
+      ctx.fillStyle = pat || COLORS.tileFill;
     }
     ctx.fill();
 
