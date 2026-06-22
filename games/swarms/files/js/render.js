@@ -40,13 +40,13 @@ function drawHitRing(ctx, x, y, anim, ppu) {
 const DAY_KF = [
   [  0,   0,   0,   0, 0.00],
   [105,   0,   0,   0, 0.00],  // dusk starts
-  [110, 255, 120,   0, 0.25],  // orange
-  [116,  80,   0, 120, 0.60],  // purple
-  [120,   5,   0,  20, 0.80],  // night
-  [142,   5,   0,  20, 0.80],
-  [165,   5,   0,  20, 0.80],  // dawn starts
-  [170,   0,  20, 100, 0.55],  // blue
-  [175, 120,  80,   0, 0.25],  // warm yellow
+  [110, 255, 120,   0, 0.13],  // orange
+  [116,  80,   0, 120, 0.30],  // purple
+  [120,   5,   0,  20, 0.40],  // night
+  [142,   5,   0,  20, 0.40],
+  [165,   5,   0,  20, 0.40],  // dawn starts
+  [170,   0,  20, 100, 0.23],  // blue
+  [175, 120,  80,   0, 0.13],  // warm yellow
   [180,   0,   0,   0, 0.00],
 ];
 
@@ -431,14 +431,18 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
   // Character damage flash (drawn on top of circle)
   if (character.hitAnim) drawHitRing(ctx, cc.x, charY, character.hitAnim, ppu);
 
-  // Day/night colour overlay — applied before HUD so stats remain readable
+  // Day/night colour overlay — radial gradient dims less near the player.
+  // The inner zone (2 world-unit radius) is ~15 % opacity; full opacity at edge.
   const [or, og, ob, oa] = getDayOverlay(dayTime);
   if (oa > 0.005) {
-    ctx.save();
-    ctx.globalAlpha = oa;
-    ctx.fillStyle   = `rgb(${or},${og},${ob})`;
+    const pc  = camera.worldToScreen(character.x, character.y);
+    const r   = 2 * ppu;
+    const col = (a) => `rgba(${or},${og},${ob},${a.toFixed(3)})`;
+    const grad = ctx.createRadialGradient(pc.x, pc.y, 0, pc.x, pc.y, r);
+    grad.addColorStop(0, col(oa * 0.15));
+    grad.addColorStop(1, col(oa));
+    ctx.fillStyle = grad;
     ctx.fillRect(0, 0, viewW, viewH);
-    ctx.restore();
   }
 
   renderHUD(ctx, character);
