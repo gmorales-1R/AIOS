@@ -1,4 +1,7 @@
-export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowMove, onBowUp, onHold }) {
+export function setupInput(canvas, camera, {
+  onTap, isBowMode, onBowDown, onBowMove, onBowUp, onHold,
+  isMeleeMode, onMeleeMove, onMeleeUp,
+}) {
   const pointers = new Map();
   let mode = 'none';
   let last = null, downPos = null, moved = 0, pinchPrev = 0;
@@ -24,13 +27,13 @@ export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowM
       } else {
         mode = 'drag'; moved = 0;
         last = p; downPos = p;
-        // Long-press activates bow mode after 180 ms if pointer hasn't moved much.
         if (onHold) {
           holdTimer = setTimeout(() => {
             holdTimer = null;
             if (mode !== 'drag') return;
             onHold(downPos.x, downPos.y);
-            if (isBowMode && isBowMode()) mode = 'bow';
+            if (isMeleeMode && isMeleeMode())    mode = 'melee';
+            else if (isBowMode && isBowMode())   mode = 'bow';
           }, 180);
         }
       }
@@ -46,6 +49,9 @@ export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowM
     if (mode === 'bow' && pointers.size === 1) {
       const p = rel(e);
       if (onBowMove) onBowMove(p.x, p.y);
+    } else if (mode === 'melee' && pointers.size === 1) {
+      const p = rel(e);
+      if (onMeleeMove) onMeleeMove(p.x, p.y);
     } else if (mode === 'drag' && pointers.size === 1) {
       const p = rel(e);
       const dx = p.x - last.x, dy = p.y - last.y;
@@ -68,13 +74,17 @@ export function setupInput(canvas, camera, { onTap, isBowMode, onBowDown, onBowM
       if (onBowUp) onBowUp(p.x, p.y);
       if (pointers.size === 0) mode = 'none';
       else if (pointers.size === 1) { mode = 'drag'; last = [...pointers.values()][0]; moved = 999; }
+    } else if (mode === 'melee') {
+      if (onMeleeUp) onMeleeUp();
+      if (pointers.size === 0) mode = 'none';
+      else if (pointers.size === 1) { mode = 'drag'; last = [...pointers.values()][0]; moved = 999; }
     } else if (mode === 'drag' && moved < 8 && downPos) {
       const w = camera.screenToWorld(downPos.x, downPos.y);
       onTap(w.x, w.y, downPos.x, downPos.y);
     }
-    if (mode !== 'bow' && pointers.size === 0) {
+    if (mode !== 'bow' && mode !== 'melee' && pointers.size === 0) {
       mode = 'none';
-    } else if (mode !== 'bow' && pointers.size === 1) {
+    } else if (mode !== 'bow' && mode !== 'melee' && pointers.size === 1) {
       mode = 'drag'; last = [...pointers.values()][0]; moved = 999;
     }
   };

@@ -1,4 +1,4 @@
-export const BUILD_TIME = 'v81 21/06/2026 21:29';
+export const BUILD_TIME = 'v109 22/06/2026 15:49';
 
 export const COLS = 20;
 export const ROWS = 12;
@@ -68,6 +68,8 @@ export const SHIELD_BLOCK_BASE = 0.70;
 export const SHIELD_BLOCK_VAR  = 0.20;
 export const SHIELD_DURATION   = 10;
 export const SHIELD_COOLDOWN   = 20;
+
+export const MELEE_AUTO_RADIUS = 1.75;
 
 export const BOW_DMG_MIN     = 2;
 export const BOW_DMG_MAX     = 10;

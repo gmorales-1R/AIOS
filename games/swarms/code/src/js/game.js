@@ -22,6 +22,7 @@ import {
   COLS, AUTO_SAVE_SECS, SIDE, SHIELD_DURATION, SHIELD_COOLDOWN,
   BOW_DMG_MIN, BOW_DMG_MAX, BOW_RANGE_MIN, BOW_RANGE_MAX,
   BOW_CHARGE_SECS, BOW_COOLDOWN, ARROW_SPEED, CHAR_RADIUS,
+  MELEE_AUTO_RADIUS,
 } from './config.js';
 
 const canvas    = document.getElementById('game');
@@ -46,6 +47,10 @@ let creatures     = [];
 let bowMode = false;
 let bowAim  = { down: false, charge: 0, wx: 0, wy: 0, history: [] };
 let arrows  = [];
+
+// ---- melee auto-attack state ----
+let meleeMode = false;
+let meleeWx = 0, meleeWy = 0;
 
 // ---- day/night cycle ----
 let dayTime = 0;   // real seconds, 0-180 (120 day + 60 night)
@@ -118,7 +123,7 @@ function autoPickup(tile) {
 // ---- actions ----
 function doAttack() {
   if (gameState !== 'playing') return;
-  if (character.atkAnim && character.atkAnim.armed) return;
+  if (character.atkAnim) return;
   const stats  = getMeleeStats(inventory);
   const armed  = stats.acc > 0;
   character.startAttack(armed, stats.range);
@@ -253,9 +258,10 @@ function doSave(label = '● SAVED') {
 }
 
 function resetBowState() {
-  bowMode = false;
-  bowAim  = { down: false, charge: 0, wx: 0, wy: 0, history: [] };
-  arrows  = [];
+  bowMode   = false;
+  meleeMode = false;
+  bowAim    = { down: false, charge: 0, wx: 0, wy: 0, history: [] };
+  arrows    = [];
 }
 
 // ---- state transitions ----
@@ -362,7 +368,7 @@ const DEAD_COL_H = 230;
 setupInput(canvas, camera, {
   onTap(wx, wy, sx, sy) {
     if (gameState !== 'playing') return;
-    if (bowMode) return;   // no movement while aiming
+    if (bowMode || meleeMode) return;   // no movement while aiming or attacking
     if (sy > camera.viewH - DEAD_BAR_H && sx < DEAD_BAR_W) return;
     if (sx > camera.viewW - DEAD_COL_W && sy > camera.viewH - DEAD_COL_H) return;
     const { tile, dist } = nearestTile(tiles, wx, wy);
@@ -377,11 +383,25 @@ setupInput(canvas, camera, {
     if (gameState !== 'playing') return;
     if (sy > camera.viewH - DEAD_BAR_H && sx < DEAD_BAR_W) return;
     if (sx > camera.viewW - DEAD_COL_W && sy > camera.viewH - DEAD_COL_H) return;
-    if (!getBowEquipped(inventory)) return;
-    if (character.moving || character.bowCooldown > 0) return;
-    bowMode = true;
-    onBowDown(sx, sy);
-    updateActionBar();
+    if (character.moving) return;
+    const w = camera.screenToWorld(sx, sy);
+    const d = Math.hypot(w.x - character.x, w.y - character.y);
+    if (d <= MELEE_AUTO_RADIUS) {
+      meleeMode = true;
+      meleeWx = w.x; meleeWy = w.y;
+    } else if (getBowEquipped(inventory) && character.bowCooldown <= 0) {
+      bowMode = true;
+      onBowDown(sx, sy);
+      updateActionBar();
+    }
+  },
+  isMeleeMode() { return meleeMode; },
+  onMeleeMove(sx, sy) {
+    const w = camera.screenToWorld(sx, sy);
+    meleeWx = w.x; meleeWy = w.y;
+  },
+  onMeleeUp() {
+    meleeMode = false;
   },
 });
 
@@ -470,6 +490,16 @@ function loop(now) {
     // Bow charge while aiming.
     if (bowAim.down) {
       bowAim.charge = Math.min(1, bowAim.charge + dt / BOW_CHARGE_SECS);
+    }
+
+    // Auto melee: fire each time atkAnim clears; cancel if pointer leaves radius or character moves.
+    if (meleeMode) {
+      const meleeDist = Math.hypot(meleeWx - character.x, meleeWy - character.y);
+      if (meleeDist > MELEE_AUTO_RADIUS || character.moving) {
+        meleeMode = false;
+      } else if (!character.atkAnim) {
+        doAttack();
+      }
     }
 
     const wasShielded    = character.shieldActive;
