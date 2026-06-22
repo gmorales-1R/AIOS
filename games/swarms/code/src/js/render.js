@@ -140,10 +140,10 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
       ctx.stroke();
     }
 
-    // Apple tree on grass tiles
-    if (t.apples > 0 && !t.water) {
-      // Foliage
-      ctx.fillStyle = '#1e5018';
+    // Tree on grass tiles — always visible; apple dots only when apples > 0
+    if (t.tree && !t.water) {
+      // Foliage (darker than grass for contrast)
+      ctx.fillStyle = '#0f2a0b';
       ctx.beginPath();
       ctx.arc(c.x, c.y - 0.08 * ppu, 0.28 * ppu, 0, Math.PI * 2);
       ctx.fill();

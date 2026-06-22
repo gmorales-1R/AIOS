@@ -511,6 +511,18 @@ function loop(now) {
         }
       }
       if (hit) continue;
+
+      // Tree trunk collision (world-space box matching the rendered trunk)
+      for (const t of tiles) {
+        if (!t.tree) continue;
+        if (Math.abs(a.x - t.x) <= 0.035 &&
+            a.y >= t.y + 0.18 && a.y <= t.y + 0.40) {
+          arrows.splice(i, 1);
+          hit = true;
+          break;
+        }
+      }
+      if (hit) continue;
     }
 
     if (character.health <= 0) {
