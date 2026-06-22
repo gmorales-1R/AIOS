@@ -1,5 +1,5 @@
 import { CORNERS } from './hex.js';
-import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME, ARROW_SPEED, BOW_RANGE_MAX } from './config.js';
+import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME, ARROW_SPEED, BOW_RANGE_MAX, HEALTH_MAX } from './config.js';
 
 const grassImg = new Image();
 grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
@@ -541,6 +541,21 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
     const grad = ctx.createRadialGradient(pc.x, pc.y, 0, pc.x, pc.y, r);
     grad.addColorStop(0, col(oa * 0.15));
     grad.addColorStop(1, col(oa));
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, viewW, viewH);
+  }
+
+  // Low-health danger vignette — red pulsing edge glow below 30% HP
+  const hpFrac = character.health / HEALTH_MAX;
+  if (hpFrac < 0.30) {
+    const danger = 1 - hpFrac / 0.30;                          // 0→1 as HP drops 30%→0
+    const pulse  = 0.5 + 0.5 * Math.sin(performance.now() / 420 * Math.PI); // ~1.2 Hz
+    const alpha  = danger * 0.65 * (0.35 + 0.65 * pulse);
+    const cx = viewW / 2, cy = viewH / 2;
+    const grad = ctx.createRadialGradient(cx, cy, Math.min(viewW, viewH) * 0.28,
+                                          cx, cy, Math.hypot(viewW, viewH) / 2);
+    grad.addColorStop(0, 'rgba(180,0,0,0)');
+    grad.addColorStop(1, `rgba(180,0,0,${alpha.toFixed(3)})`);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, viewW, viewH);
   }

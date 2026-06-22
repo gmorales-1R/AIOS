@@ -87,6 +87,7 @@ export class Character {
     this.hunger = Math.max(0, this.hunger - TICK_HUNGER);
     if (this.hunger === 0) {
       this.health = Math.max(0, this.health - STARVE_DMG);
+      this.hitAnim = { t: 0, opacity: 0.55 };
     } else if (this.hunger > HEAL_THRESH) {
       this.health = Math.min(HEALTH_MAX, this.health + HEAL_RATE);
     }
