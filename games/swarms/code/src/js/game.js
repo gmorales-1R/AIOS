@@ -47,9 +47,13 @@ let bowMode = false;
 let bowAim  = { down: false, charge: 0, wx: 0, wy: 0, history: [] };
 let arrows  = [];
 
+// ---- day/night cycle ----
+let dayTime = 0;   // real seconds, 0-180 (120 day + 60 night)
+
 // Track which tile the character is standing on.
 character.onTileEnter = (tile) => {
   currentTile = tile;
+  autoPickup(tile);
   updateActionBar();
 };
 
@@ -76,6 +80,39 @@ function updateActionBar() {
     (currentTile.apples > 0 && canPickupApple(inventory))
   );
   ui.setActionEnabled('interact', !!canUse);
+}
+
+// ---- auto pickup ----
+function autoPickup(tile) {
+  if (gameState !== 'playing' || !tile) return;
+  let changed = false;
+  if (tile.hasSword && !hasSword(inventory)) {
+    tile.hasSword = false;
+    addSword(inventory);
+    const i = inventory.slots.findIndex(s => s && s.type === 'sword');
+    if (i !== -1) toggleEquip(inventory, i);
+    changed = true;
+  }
+  if (tile.hasShield && !hasShield(inventory)) {
+    tile.hasShield = false;
+    addShield(inventory);
+    const i = inventory.slots.findIndex(s => s && s.type === 'shield');
+    if (i !== -1) toggleEquip(inventory, i);
+    changed = true;
+  }
+  if (tile.hasBow && !hasBow(inventory)) {
+    tile.hasBow = false;
+    addBow(inventory);
+    const i = inventory.slots.findIndex(s => s && s.type === 'bow');
+    if (i !== -1) toggleEquip(inventory, i);
+    changed = true;
+  }
+  while (tile.apples > 0 && canPickupApple(inventory)) {
+    pickApple(tile);
+    addApple(inventory);
+    changed = true;
+  }
+  if (changed) { updateInventoryUI(); updateActionBar(); }
 }
 
 // ---- actions ----
@@ -209,7 +246,7 @@ function doSave(label = '● SAVED') {
     tiles:     serializeTiles(tiles),
     inventory: serializeInventory(inventory),
     creatures: creatures.filter(c => c.alive).map(c => c.serialize()),
-    tickAccum,
+    tickAccum, dayTime,
   });
   lastSaveTime = savedAt;
   ui.toast(label);
@@ -230,7 +267,7 @@ function startNew() {
   character.reset(spawnTile.x, spawnTile.y);
   creatures = spawnCreatures(tiles, isBlocked);
   camera.deserialize({ x: spawnTile.x, y: spawnTile.y, z: 1 });
-  tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0;
+  tickAccum = 0; autoSaveAccum = 0; lastSaveTime = 0; dayTime = 0;
   currentTile = spawnTile;
   resetBowState();
   gameState = 'playing';
@@ -252,6 +289,7 @@ function doContinue() {
   creatures     = save.creatures ? deserializeCreatures(save.creatures, tiles)
                                  : spawnCreatures(tiles, isBlocked);
   tickAccum     = save.tickAccum || 0;
+  dayTime       = save.dayTime   || 0;
   lastSaveTime  = save.savedAt;
   autoSaveAccum = 0;
   const { tile: startTile } = nearestTile(tiles, character.x, character.y);
@@ -409,11 +447,18 @@ function loop(now) {
     tickAccum     += dt;
     autoSaveAccum += dt;
 
+    dayTime = (dayTime + dt) % 180;
+
     while (tickAccum >= 1.0) {
       tickAccum -= 1.0;
       character.onTick();
       tickWorld(tiles);
       for (const c of creatures) c.tick(tiles, isBlocked, character);
+      // Auto-consume apple when hungry
+      if (character.hunger < 60) {
+        const ai = inventory.slots.findIndex(s => s && s.type === 'apple' && s.count > 0);
+        if (ai !== -1 && consumeApple(inventory, ai, character)) updateInventoryUI();
+      }
       updateActionBar();   // apples may have grown on currentTile
     }
 
@@ -498,7 +543,7 @@ function loop(now) {
   }
 
   camera.update();
-  render(ctx, camera, tiles, character, creatures, arrows, { active: bowMode, aim: bowAim });
+  render(ctx, camera, tiles, character, creatures, arrows, { active: bowMode, aim: bowAim }, dayTime);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
