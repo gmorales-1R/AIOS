@@ -179,9 +179,10 @@ html, body {
   inset: 5px;
   pointer-events: none;
 }
-.slot-svg {
+.slot-icon img {
   width: 100%;
   height: 100%;
+  object-fit: contain;
   display: block;
 }
 
@@ -226,24 +227,33 @@ html, body {
 .action-btn {
   width:  clamp(36px, 10vw, 48px);
   height: clamp(36px, 10vw, 48px);
-  font-family: monospace;
-  font-size: clamp(0.8rem, 2.5vw, 1rem);
-  font-weight: bold;
+  padding: 4px;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid #33ff6a;
-  color: #33ff6a;
   cursor: pointer;
-  transition: background 0.1s, color 0.1s;
+  transition: background 0.1s, border-color 0.1s;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.action-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  opacity: 0.92;
+  pointer-events: none;
 }
 .action-btn:hover:not(:disabled) {
   background: rgba(51, 255, 106, 0.12);
-  color: #7fffaa;
 }
 .action-btn:disabled {
   border-color: #33ff6a22;
-  color: #33ff6a22;
   cursor: default;
+}
+.action-btn:disabled img {
+  opacity: 0.22;
 }
 
 /* ---- save toast (top-center, clear of all UI) ---- */

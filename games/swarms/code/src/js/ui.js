@@ -1,3 +1,8 @@
+const ITEM_IMGS = {};
+for (const type of ['apple', 'sword', 'bow', 'shield']) {
+  ITEM_IMGS[type] = new URL(`../assets/items/${type}.png`, import.meta.url).href;
+}
+
 export class UI {
   constructor() {
     this._start   = document.getElementById('start-screen');
@@ -115,40 +120,18 @@ export class UI {
     const icon = document.createElement('div');
     icon.className = 'slot-icon';
 
+    const img = document.createElement('img');
+    img.src = ITEM_IMGS[item.type] || '';
+    img.alt = item.type;
+    icon.appendChild(img);
+
     if (item.type === 'apple') {
-      icon.innerHTML =
-        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
-        '<circle r="0.82" fill="#e83a2a" stroke="#7a1a10" stroke-width="0.14"/>' +
-        '</svg>';
       const cnt = document.createElement('span');
       cnt.className = 'slot-count';
       cnt.textContent = item.count;
       slot.appendChild(cnt);
-    } else if (item.type === 'sword') {
-      icon.innerHTML =
-        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
-        '<polygon points="0,-0.84 0.10,0.06 -0.10,0.06" fill="#d4d4f0" stroke="#ffffff" stroke-width="0.05" stroke-linejoin="round"/>' +
-        '<rect x="-0.64" y="0.06" width="1.28" height="0.18" rx="0.07" fill="#b8b8d8" stroke="#ffffff" stroke-width="0.05"/>' +
-        '<rect x="-0.09" y="0.24" width="0.18" height="0.44" rx="0.04" fill="#8b4513" stroke="#5a2e0a" stroke-width="0.05"/>' +
-        '<circle cx="0" cy="0.79" r="0.14" fill="#d4d4f0" stroke="#ffffff" stroke-width="0.05"/>' +
-        '</svg>';
-      if (item.equipped) slot.classList.add('equipped');
-    } else if (item.type === 'shield') {
-      icon.innerHTML =
-        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M0,-0.88 L0.78,-0.45 L0.78,0.18 Q0.6,0.84 0,0.93 Q-0.6,0.84 -0.78,0.18 L-0.78,-0.45 Z"' +
-        ' fill="#4488ff" stroke="#2255cc" stroke-width="0.08"/>' +
-        '</svg>';
-      if (item.equipped) slot.classList.add('equipped');
-    } else if (item.type === 'bow') {
-      icon.innerHTML =
-        '<svg viewBox="-1 -1 2 2" class="slot-svg" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M-0.10,-0.82 Q0.62,0 -0.10,0.82" fill="none" stroke="#c8a060" stroke-width="0.16" stroke-linecap="round"/>' +
-        '<line x1="-0.10" y1="-0.82" x2="-0.10" y2="0.82" stroke="#e8d090" stroke-width="0.05"/>' +
-        '<line x1="-0.10" y1="0.10" x2="0.72" y2="0.10" stroke="#c8a060" stroke-width="0.09" stroke-linecap="round"/>' +
-        '<polygon points="0.72,0.10 0.54,0.00 0.54,0.20" fill="#ffe600"/>' +
-        '</svg>';
-      if (item.equipped) slot.classList.add('equipped');
+    } else if (item.equipped) {
+      slot.classList.add('equipped');
     }
 
     slot.appendChild(icon);

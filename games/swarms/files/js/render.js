@@ -2,16 +2,23 @@ import { CORNERS } from './hex.js';
 import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME, ARROW_SPEED, BOW_RANGE_MAX } from './config.js';
 
 const grassImg = new Image();
-grassImg.src = new URL('../raw_assets/textures/grass-1.png', import.meta.url).href;
+grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
 let grassPattern = null;
 
 const grassImg2 = new Image();
-grassImg2.src = new URL('../raw_assets/textures/grass-2.png', import.meta.url).href;
+grassImg2.src = new URL('../assets/tiles/grass2.png', import.meta.url).href;
 let grassPattern2 = null;
 
 const waterImg = new Image();
-waterImg.src = new URL('../raw_assets/textures/water-1.png', import.meta.url).href;
+waterImg.src = new URL('../assets/tiles/water.png', import.meta.url).href;
 let waterPattern = null;
+
+const itemImgs = {};
+for (const type of ['apple', 'sword', 'bow', 'shield']) {
+  const img = new Image();
+  img.src = new URL(`../assets/items/${type}.png`, import.meta.url).href;
+  itemImgs[type] = img;
+}
 
 // Call after canvas.width/height is set (context reset invalidates cached patterns).
 export function resetPatterns() {
@@ -329,73 +336,18 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
       }
     }
 
-    // Shield on ground
-    if (t.hasShield) {
-      const sw = 0.30 * ppu;
-      const sh = 0.36 * ppu;
-      ctx.fillStyle   = COLORS.shieldRing;
-      ctx.strokeStyle = '#2255cc';
-      ctx.lineWidth   = Math.max(0.5, 0.018 * ppu);
-      ctx.beginPath();
-      ctx.moveTo(c.x,      c.y - sh);
-      ctx.lineTo(c.x + sw, c.y - sh * 0.45);
-      ctx.lineTo(c.x + sw, c.y + sh * 0.18);
-      ctx.quadraticCurveTo(c.x + sw * 0.7, c.y + sh, c.x, c.y + sh * 1.05);
-      ctx.quadraticCurveTo(c.x - sw * 0.7, c.y + sh, c.x - sw, c.y + sh * 0.18);
-      ctx.lineTo(c.x - sw, c.y - sh * 0.45);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
+    // Ground items — drawn with real art; skip silently until image loads
+    const itemSz = 0.72 * ppu;
+    const itemX  = c.x - itemSz / 2;
+    const itemY  = c.y - itemSz / 2;
+    if (t.hasShield && itemImgs.shield.complete && itemImgs.shield.naturalWidth) {
+      ctx.drawImage(itemImgs.shield, itemX, itemY, itemSz, itemSz);
     }
-
-    // Sword on ground — matches inventory icon: tapered blade, crossguard, grip, pommel
-    if (t.hasSword) {
-      const sc = 0.38 * ppu;
-      const ox = c.x, oy = c.y - 0.045 * sc;
-      const lw = Math.max(0.5, 0.018 * ppu);
-      ctx.lineWidth = lw;
-      // Blade (triangle)
-      ctx.beginPath();
-      ctx.moveTo(ox,             oy - 0.84 * sc);
-      ctx.lineTo(ox + 0.10 * sc, oy + 0.06 * sc);
-      ctx.lineTo(ox - 0.10 * sc, oy + 0.06 * sc);
-      ctx.closePath();
-      ctx.fillStyle = '#d4d4f0'; ctx.strokeStyle = '#ffffff';
-      ctx.fill(); ctx.stroke();
-      // Crossguard
-      ctx.fillStyle = '#b8b8d8'; ctx.strokeStyle = '#ffffff';
-      ctx.fillRect(ox - 0.64*sc, oy + 0.06*sc, 1.28*sc, 0.18*sc);
-      ctx.strokeRect(ox - 0.64*sc, oy + 0.06*sc, 1.28*sc, 0.18*sc);
-      // Grip
-      ctx.fillStyle = '#8b4513'; ctx.strokeStyle = '#5a2e0a';
-      ctx.fillRect(ox - 0.09*sc, oy + 0.24*sc, 0.18*sc, 0.44*sc);
-      ctx.strokeRect(ox - 0.09*sc, oy + 0.24*sc, 0.18*sc, 0.44*sc);
-      // Pommel
-      ctx.beginPath();
-      ctx.arc(ox, oy + 0.79*sc, 0.14*sc, 0, Math.PI * 2);
-      ctx.fillStyle = '#d4d4f0'; ctx.strokeStyle = '#ffffff';
-      ctx.fill(); ctx.stroke();
+    if (t.hasSword && itemImgs.sword.complete && itemImgs.sword.naturalWidth) {
+      ctx.drawImage(itemImgs.sword, itemX, itemY, itemSz, itemSz);
     }
-
-    // Bow on ground
-    if (t.hasBow) {
-      const bh  = 0.34 * ppu;
-      const bx  = 0.06 * ppu;
-      const bcx = 0.24 * ppu;
-      ctx.strokeStyle = COLORS.bow;
-      ctx.lineWidth   = Math.max(1, 0.055 * ppu);
-      ctx.lineCap     = 'round';
-      ctx.beginPath();
-      ctx.moveTo(c.x + bx, c.y - bh);
-      ctx.quadraticCurveTo(c.x + bx + bcx, c.y, c.x + bx, c.y + bh);
-      ctx.stroke();
-      ctx.strokeStyle = COLORS.bowEdge;
-      ctx.lineWidth   = Math.max(0.5, 0.022 * ppu);
-      ctx.beginPath();
-      ctx.moveTo(c.x + bx, c.y - bh);
-      ctx.lineTo(c.x + bx, c.y + bh);
-      ctx.stroke();
-      ctx.lineCap = 'butt';
+    if (t.hasBow && itemImgs.bow.complete && itemImgs.bow.naturalWidth) {
+      ctx.drawImage(itemImgs.bow, itemX, itemY, itemSz, itemSz);
     }
   }
 
