@@ -64,6 +64,175 @@ function getDayOverlay(t) {
   return [0, 0, 0, 0];
 }
 
+function drawHero(ctx, x, y, R) {
+  ctx.save();
+  // Body / tunic
+  ctx.fillStyle = '#2e6b22';
+  ctx.beginPath();
+  ctx.ellipse(x, y + R*0.25, R*0.68, R*0.58, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#1a4015';
+  ctx.lineWidth = Math.max(0.5, R*0.06);
+  ctx.stroke();
+  // Head
+  ctx.fillStyle = '#d4956a';
+  ctx.beginPath();
+  ctx.arc(x, y - R*0.35, R*0.36, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#9a6040';
+  ctx.lineWidth = Math.max(0.5, R*0.04);
+  ctx.stroke();
+  // Hat (pointed, dark green)
+  ctx.fillStyle = '#1b4a12';
+  ctx.beginPath();
+  ctx.moveTo(x - R*0.44, y - R*0.56);
+  ctx.lineTo(x + R*0.40, y - R*0.56);
+  ctx.lineTo(x + R*0.06, y - R*1.10);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#0d2a08';
+  ctx.lineWidth = Math.max(0.5, R*0.04);
+  ctx.stroke();
+  // Feather
+  ctx.strokeStyle = '#f0e060';
+  ctx.lineWidth = Math.max(1, R*0.055);
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x + R*0.36, y - R*0.60);
+  ctx.quadraticCurveTo(x + R*0.62, y - R*0.88, x + R*0.18, y - R*1.08);
+  ctx.stroke();
+  ctx.lineCap = 'butt';
+  // Eyes
+  ctx.fillStyle = '#1a1208';
+  for (const ex of [-0.12, 0.13]) {
+    ctx.beginPath();
+    ctx.arc(x + ex*R, y - R*0.38, Math.max(0.8, R*0.07), 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawHog(ctx, x, y, R, aggro) {
+  ctx.save();
+  const base = aggro ? '#f06878' : '#f07090';
+  const edge = aggro ? '#cc1828' : '#a03050';
+  // Ears (draw first so body overlaps their base)
+  ctx.fillStyle = '#d05070';
+  for (const ex of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(x + ex*R*0.52, y - R*0.48);
+    ctx.lineTo(x + ex*R*0.84, y - R*0.88);
+    ctx.lineTo(x + ex*R*0.26, y - R*0.70);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Body
+  ctx.fillStyle = base;
+  ctx.beginPath();
+  ctx.ellipse(x, y - R*0.05, R*1.05, R*0.68, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = edge;
+  ctx.lineWidth = Math.max(1, R*0.07);
+  ctx.stroke();
+  // Head
+  ctx.fillStyle = base;
+  ctx.beginPath();
+  ctx.ellipse(x, y + R*0.50, R*0.60, R*0.40, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = edge;
+  ctx.lineWidth = Math.max(0.5, R*0.05);
+  ctx.stroke();
+  // Snout
+  ctx.fillStyle = '#f8b0bc';
+  ctx.beginPath();
+  ctx.ellipse(x, y + R*0.74, R*0.28, R*0.18, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = edge;
+  ctx.lineWidth = Math.max(0.5, R*0.04);
+  ctx.stroke();
+  // Nostrils
+  ctx.fillStyle = '#802040';
+  for (const nx of [-0.10, 0.10]) {
+    ctx.beginPath();
+    ctx.arc(x + nx*R, y + R*0.76, Math.max(1, R*0.06), 0, Math.PI*2);
+    ctx.fill();
+  }
+  // Eyes
+  ctx.fillStyle = aggro ? '#ff2020' : '#1a0808';
+  for (const ex of [-0.28, 0.28]) {
+    ctx.beginPath();
+    ctx.arc(x + ex*R, y + R*0.28, Math.max(1.5, R*0.09), 0, Math.PI*2);
+    ctx.fill();
+  }
+  // Tusks
+  ctx.strokeStyle = '#f4f0e8';
+  ctx.lineWidth = Math.max(1, R*0.07);
+  ctx.lineCap = 'round';
+  for (const ex of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(x + ex*R*0.16, y + R*0.62);
+    ctx.lineTo(x + ex*R*0.32, y + R*0.84);
+    ctx.stroke();
+  }
+  ctx.lineCap = 'butt';
+  ctx.restore();
+}
+
+function drawChicken(ctx, x, y, R) {
+  ctx.save();
+  // Body
+  ctx.fillStyle = '#f0f0ee';
+  ctx.beginPath();
+  ctx.ellipse(x, y + R*0.08, R*0.52, R*0.58, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#888888';
+  ctx.lineWidth = Math.max(0.5, R*0.05);
+  ctx.stroke();
+  // Wing hint
+  ctx.fillStyle = '#d8d8d4';
+  ctx.beginPath();
+  ctx.ellipse(x - R*0.10, y + R*0.10, R*0.28, R*0.40, -0.3, 0, Math.PI*2);
+  ctx.fill();
+  // Head
+  ctx.fillStyle = '#f0f0ee';
+  ctx.beginPath();
+  ctx.arc(x + R*0.06, y - R*0.48, R*0.27, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#888888';
+  ctx.lineWidth = Math.max(0.5, R*0.04);
+  ctx.stroke();
+  // Comb
+  ctx.fillStyle = '#cc2020';
+  for (let ci = 0; ci < 3; ci++) {
+    ctx.beginPath();
+    ctx.arc(x + (ci-1)*R*0.10, y - R*0.72, Math.max(1, R*0.08), 0, Math.PI*2);
+    ctx.fill();
+  }
+  // Wattle
+  ctx.fillStyle = '#cc2020';
+  ctx.beginPath();
+  ctx.ellipse(x + R*0.30, y - R*0.40, R*0.06, R*0.10, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Beak
+  ctx.fillStyle = '#dda020';
+  ctx.beginPath();
+  ctx.moveTo(x + R*0.28, y - R*0.52);
+  ctx.lineTo(x + R*0.28, y - R*0.42);
+  ctx.lineTo(x + R*0.48, y - R*0.47);
+  ctx.closePath();
+  ctx.fill();
+  // Eye + highlight
+  ctx.fillStyle = '#111111';
+  ctx.beginPath();
+  ctx.arc(x + R*0.14, y - R*0.52, Math.max(1, R*0.07), 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(x + R*0.17, y - R*0.54, Math.max(0.5, R*0.03), 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
 export function render(ctx, camera, tiles, character, creatures, arrows = [], bowState = null, dayTime = 0) {
   // Defensive: reset any state that might have leaked from a previous render
   // or from a browser compositing artifact.
@@ -248,22 +417,9 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
       }
 
       if (c.alive) {
-        if (c.kind === 'hog') {
-          const hw = CHAR_RADIUS * 1.2 * ppu;
-          const hh = CHAR_RADIUS * 0.8 * ppu;
-          ctx.fillStyle   = COLORS.hog;
-          ctx.fillRect(dx - hw, dy - hh, hw * 2, hh * 2);
-          ctx.strokeStyle = c.state === 'aggro' ? COLORS.hogAggro : COLORS.hogEdge;
-          ctx.lineWidth   = Math.max(1, (c.state === 'aggro' ? 0.07 : 0.04) * ppu);
-          ctx.strokeRect(dx - hw, dy - hh, hw * 2, hh * 2);
-        } else {
-          const hs = CHAR_RADIUS * 0.85 * ppu;
-          ctx.fillStyle   = COLORS.chicken;
-          ctx.fillRect(dx - hs, dy - hs, hs * 2, hs * 2);
-          ctx.strokeStyle = COLORS.chickenEdge;
-          ctx.lineWidth   = Math.max(0.5, 0.04 * ppu);
-          ctx.strokeRect(dx - hs, dy - hs, hs * 2, hs * 2);
-        }
+        const R = CHAR_RADIUS * ppu;
+        if (c.kind === 'hog') drawHog(ctx, dx, dy, R, c.state === 'aggro');
+        else                  drawChicken(ctx, dx, dy, R);
       }
       if (c.hitAnim) drawHitRing(ctx, dx, dy, c.hitAnim, ppu);
     }
@@ -337,13 +493,7 @@ export function render(ctx, camera, tiles, character, creatures, arrows = [], bo
   const charY = cc.y + (character.moving
     ? Math.sin(performance.now() / 1000 * 12) * 0.08 * ppu
     : 0);
-  ctx.beginPath();
-  ctx.arc(cc.x, charY, CHAR_RADIUS * ppu, 0, Math.PI * 2);
-  ctx.fillStyle   = COLORS.character;
-  ctx.fill();
-  ctx.lineWidth   = Math.max(1, 0.05 * ppu);
-  ctx.strokeStyle = COLORS.characterEdge;
-  ctx.stroke();
+  drawHero(ctx, cc.x, charY, CHAR_RADIUS * ppu);
 
   // Shield ring (drawn on top of character circle)
   if (character.shieldActive) {
