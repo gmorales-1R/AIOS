@@ -512,11 +512,11 @@ function loop(now) {
       }
       if (hit) continue;
 
-      // Tree trunk collision (world-space box matching the rendered trunk)
+      // Tree collision: foliage circle (center t.x, t.y-0.08, radius 0.28)
+      // Using circle avoids frame-skip; trunk AABB (0.22u tall) was too thin at 20u/s
       for (const t of tiles) {
         if (!t.tree) continue;
-        if (Math.abs(a.x - t.x) <= 0.035 &&
-            a.y >= t.y + 0.18 && a.y <= t.y + 0.40) {
+        if (Math.hypot(a.x - t.x, a.y - (t.y - 0.08)) <= 0.28) {
           arrows.splice(i, 1);
           hit = true;
           break;
