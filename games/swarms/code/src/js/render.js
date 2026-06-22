@@ -2,15 +2,15 @@ import { CORNERS } from './hex.js';
 import { COLORS, CHAR_RADIUS, SIDE, HEX_H, HIT_ANIM_SECS, BUILD_TIME, ARROW_SPEED, BOW_RANGE_MAX } from './config.js';
 
 const grassImg = new Image();
-grassImg.src = new URL('../assets/tiles/grass.png', import.meta.url).href;
+grassImg.src = new URL('../raw_assets/textures/grass-1.png', import.meta.url).href;
 let grassPattern = null;
 
 const grassImg2 = new Image();
-grassImg2.src = new URL('../assets/tiles/grass2.png', import.meta.url).href;
+grassImg2.src = new URL('../raw_assets/textures/grass-2.png', import.meta.url).href;
 let grassPattern2 = null;
 
 const waterImg = new Image();
-waterImg.src = new URL('../assets/tiles/water.png', import.meta.url).href;
+waterImg.src = new URL('../raw_assets/textures/water-1.png', import.meta.url).href;
 let waterPattern = null;
 
 // Call after canvas.width/height is set (context reset invalidates cached patterns).
