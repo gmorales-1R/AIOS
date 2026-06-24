@@ -8,7 +8,7 @@ Every `this.md` is the entry point for its node. It should cover what is relevan
 
 - **Identity** — one short paragraph: what this node is and why it exists
 - **Purpose / north star** — for namespaces: the goals or principles active in this subtree
-- **Domain concepts** — for modules: the entities managed here, their fields, enums, status values
+- **Domain concepts** *(optional)* — for modules with structured data: the entities managed here, their fields, enums, status values. Omit for namespaces, agents, or any node whose children are unstructured
 - **Children table** — a `| Node | Purpose |` table of direct child nodes with meaningful constraints; omit children that are self-explanatory from their name
 - **Conventions / behavioral rules** — anything agents operating here must know that isn't obvious from the identity
 - **`.this/` references** — list which facets are loaded and whether they are `required` (load always) or `optional` (load when the task needs them)

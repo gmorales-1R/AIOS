@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AIOS Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0d;--surface:#111;--surface2:#161616;--border:#222;
+  --text:#e0e0e0;--muted:#666;--dim:#333;--accent:#5b9cf6;--hover:#1a1a1a;
+  --sidebar-w:220px;--panel-w:440px;--bar-h:48px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px}
+
+/* layout */
+.layout{display:flex;height:100vh}
+
+/* sidebar */
+.sidebar{width:var(--sidebar-w);background:var(--surface);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  flex-shrink:0;transition:width .22s ease;overflow:hidden}
+.sidebar.collapsed{width:0;border-right:none}
+.sb-header{height:var(--bar-h);display:flex;align-items:center;padding:0 16px;
+  border-bottom:1px solid var(--border);font-weight:600;letter-spacing:.1em;
+  color:#fff;font-size:13px;flex-shrink:0;white-space:nowrap}
+.sb-nav{padding:12px 0;flex:1}
+.sb-nav a{display:block;padding:8px 16px;color:var(--muted);text-decoration:none;
+  font-size:13px;border-radius:6px;margin:0 8px;transition:background .1s,color .1s;
+  white-space:nowrap}
+.sb-nav a:hover{background:var(--hover);color:var(--text)}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:var(--bar-h);display:flex;align-items:center;padding:0 16px;gap:12px;
+  border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.burger{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;
+  display:flex;align-items:center;border-radius:4px;transition:color .1s,background .1s}
+.burger:hover{color:var(--text);background:var(--hover)}
+.topbar-title{font-size:13px;color:var(--muted)}
+
+/* tree */
+.tree-area{flex:1;overflow-y:auto;padding:8px 0}
+.tree-children{display:none}
+.tree-children.open{display:block}
+.tree-row{display:flex;align-items:center;gap:4px;padding:3px 8px 3px 0;
+  cursor:pointer;border-radius:4px;position:relative;user-select:none}
+.tree-row:hover{background:var(--hover)}
+.tree-row:hover .row-actions{opacity:1}
+.chevron{flex-shrink:0;width:16px;height:16px;display:flex;align-items:center;
+  justify-content:center;color:var(--dim);font-size:10px;transition:transform .15s}
+.chevron.open{transform:rotate(90deg)}
+.ch-spacer{width:16px;flex-shrink:0}
+.node-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:13px;color:var(--text)}
+.node-name.lit{color:#fff;font-weight:500}
+.node-name.dot{color:var(--muted);font-style:italic}
+.this-pip{width:5px;height:5px;border-radius:50%;background:var(--accent);
+  flex-shrink:0;opacity:.5}
+.row-actions{display:flex;gap:2px;opacity:0;transition:opacity .1s;flex-shrink:0}
+.act{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 5px;
+  border-radius:4px;font-size:12px;display:flex;align-items:center;
+  transition:color .1s,background .1s;line-height:1}
+.act:hover{color:var(--text);background:var(--border)}
+.act.lit{color:var(--accent);opacity:.7}
+.act.lit:hover{opacity:1}
+
+/* panel */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;
+  pointer-events:none;transition:opacity .2s;z-index:10}
+.overlay.open{opacity:1;pointer-events:all}
+.panel{position:fixed;top:0;right:0;width:var(--panel-w);height:100%;
+  background:var(--surface);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;transform:translateX(100%);
+  transition:transform .25s ease;z-index:11}
+.panel.open{transform:translateX(0)}
+.panel-head{height:var(--bar-h);display:flex;align-items:center;padding:0 16px;
+  border-bottom:1px solid var(--border);gap:8px;flex-shrink:0}
+.panel-path{flex:1;font-family:monospace;font-size:12px;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.panel-x{background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:16px;padding:4px;border-radius:4px;transition:color .1s;line-height:1}
+.panel-x:hover{color:var(--text)}
+.panel-body{flex:1;overflow-y:auto;padding:20px;line-height:1.65}
+
+/* markdown */
+.panel-body h1{font-size:1.25rem;margin-bottom:12px;color:#fff}
+.panel-body h2{font-size:1rem;margin:20px 0 8px;color:#fff;
+  border-bottom:1px solid var(--border);padding-bottom:4px}
+.panel-body h3{font-size:.92rem;margin:16px 0 6px;color:#ddd}
+.panel-body p{margin-bottom:10px;font-size:13px}
+.panel-body ul,.panel-body ol{margin:0 0 10px 20px}
+.panel-body li{margin:3px 0;font-size:13px}
+.panel-body code{font-family:monospace;background:var(--surface2);padding:1px 5px;
+  border-radius:3px;font-size:12px;color:#a8d8ff}
+.panel-body pre{background:var(--surface2);padding:12px;border-radius:6px;
+  overflow-x:auto;margin-bottom:12px;border:1px solid var(--border)}
+.panel-body pre code{background:none;padding:0}
+.panel-body table{border-collapse:collapse;width:100%;margin-bottom:12px;font-size:13px}
+.panel-body th{background:var(--surface2);padding:6px 10px;text-align:left;
+  border:1px solid var(--border);color:#ccc;font-weight:500}
+.panel-body td{padding:5px 10px;border:1px solid var(--border)}
+.panel-body strong{color:#fff;font-weight:600}
+.panel-body em{color:#bbb}
+.no-content{color:var(--muted);font-style:italic;font-size:13px}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--dim)}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sb">
+    <div class="sb-header">AIOS</div>
+    <nav class="sb-nav">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="burger" id="burger" title="Toggle sidebar">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <rect y="2"    width="16" height="1.5" rx=".75"/>
+          <rect y="7.25" width="16" height="1.5" rx=".75"/>
+          <rect y="12.5" width="16" height="1.5" rx=".75"/>
+        </svg>
+      </button>
+      <span class="topbar-title">Dashboard</span>
+    </div>
+    <div class="tree-area" id="tree-area"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <span class="panel-path" id="panel-path"></span>
+    <button class="panel-x" id="panel-x">✕</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</div>
+
+<script>
+const TREE = {"name": "AIOS", "rel": "", "hasThis": true, "content": "# AIOS — Root\n\nAIOS is an AI Operating System: a hierarchical framework for defining, composing, and activating agents and modules through a structured tree of context nodes.\n\n## Node model\n\nEvery directory may contain a `this.md` (node entry point) and a `.this/` directory (optional facet expansion). See `/.this/node_structure.md` for the full contract: what `this.md` must cover, standard `.this/` facets, and the caching principle.\n\n## Root extras\n\n| File | When to load |\n|------|-------------|\n| `/.this/etiquette.md` | Always — behavioral patterns learned from past interactions |\n| `/.this/node_structure.md` | When creating or modifying any node |\n\n## Activation skill: `load-context`\n\nExecute before any other action when active paths are provided:\n\n1. This file is already loaded (root is always first).\n2. Load required root extras from the table above.\n3. For each active path, walk root → leaf loading `this.md` at each level in order.\n4. At each node, load any `.this/` facets declared as `required`; defer `optional` ones unless the task needs them.\n5. Context is assembled. Proceed.\n\nIf no active paths are provided, operate from root context only.\n\n## Conventions\n\n- Always update the parent's children table when adding or removing a node.\n- Keep upper-level nodes stable and concise — they are shared prefix for all nodes below them.\n- Prefer depth over breadth: a well-defined narrow node is better than a vague broad one.\n\n## Top-level nodes\n\n| Path | Purpose |\n|------|---------|\n| `agents/` | User-defined agent definitions |\n| `templates/` | Node type templates used by the steward |\n| `personal/` | Personal tools and knowledge namespace |\n\nSprout-internal agents live in `/.this/agents/`. `/index.md` is the curator-maintained tree map.\n", "children": [{"name": ".this", "rel": ".this", "hasThis": false, "content": "", "children": [{"name": "agents", "rel": ".this/agents", "hasThis": true, "content": "# .this/agents/\n\nPrefab framework agents. Internal to the sprout — do not modify unless extending the framework itself.\n\n| Agent | Role |\n|-------|------|\n| `archivist/` | Processes interaction logs into structured experience and behavioral patterns |\n| `curator/` | Maintains tree integrity, references, index, and convention compliance |\n| `steward/` | Guides node creation and modification, from need to scaffolded tree |\n", "children": [{"name": "archivist", "rel": ".this/agents/archivist", "hasThis": true, "content": "# .this/agents/archivist\n\nThe archivist converts raw interaction logs into structured experience and distills it into behavioral patterns for agents. It is part of the sprout.\n\n## Role\n\nKeep the tree's institutional memory clean, current, and actionable: process logs, extract signal, update etiquette, and keep the raw log small.\n\n## When to invoke\n\n- Periodically (e.g. after every N steward interactions, or on a schedule)\n- After any significant interaction that involved a conflict, negotiation, or unexpected outcome\n- Before a major tree restructuring, to capture current patterns first\n\n## How it works\n\nExecute these steps in order:\n\n1. **Read** `/.this/customer_interactions.log` — load all unprocessed entries\n2. **Detect** — identify entries that contain:\n   - A **conflict** (user pushed back, agent was corrected, expectation mismatch)\n   - A **resolution** (how the conflict was settled)\n   - A **compromise** (outcome that neither fully satisfied — note the tension)\n3. **Log** — append findings to `/.this/customer_experience.md` under the appropriate section\n4. **Trim** — remove the processed entries from `customer_interactions.log`; leave only entries not yet processed\n5. **Conclude** — review the full `customer_experience.md` and extract generalizable rules\n6. **Update** `/.this/etiquette.md`:\n   - Add new rules or strengthen existing ones based on conclusions\n   - Each rule gets at most **3 examples** — replace the weakest when a stronger one emerges\n   - Remove rules that are no longer supported by recent experience\n\n## What makes a good etiquette rule\n\n- Describes a recurring pattern, not a one-off\n- Is actionable (an agent reading it can change its behavior)\n- Is grounded in actual interactions, not assumptions\n\n## Active paths\n\n`/.this/agents/archivist`\n\n## Files owned\n\n| File | Role |\n|------|------|\n| `/.this/customer_interactions.log` | Source — read and trim |\n| `/.this/customer_experience.md` | Intermediate — structured findings |\n| `/.this/etiquette.md` | Output — behavioral rules for all agents |\n", "children": []}, {"name": "curator", "rel": ".this/agents/curator", "hasThis": true, "content": "# .this/agents/curator\n\nThe curator maintains the integrity and coherence of the AIOS node tree. It is part of the sprout — it ships with the framework and is available in any tree that grows from it.\n\n## Role\n\nKeep the tree self-consistent: references accurate, definitions current, structure aligned with root conventions, and the index reflecting reality.\n\n## When to invoke\n\n- After any structural change (new node, moved node, renamed node, promoted/demoted between `this.md` and `.this/`)\n- After root or upper-level conventions are updated, to propagate compliance downward\n- Periodically as a background trim\n\nOther agents should invoke the curator after operations that modify the tree structure.\n\n## Traversal strategy\n\nAlways breadth-first. Process all nodes at depth N before descending to depth N+1. This ensures parent consistency is established before children are evaluated against it.\n\n## What the curator does\n\n**Reference integrity**\n- Every node listed in a parent's `this.md` table must have a corresponding directory and `this.md`\n- Every existing child directory must be listed in its parent's `this.md` table\n- Fix discrepancies in place; log what was changed\n\n**Promotion / demotion**\n- If a `this.md` has grown beyond ~40 lines of meaningful content, flag it for promotion: move the detail into `.this/` and replace with a reference\n- If a `.this/` file is sparse or only referenced from one place, flag it for demotion back into `this.md`\n- Never auto-promote/demote without noting the change in the index\n\n**Index maintenance**\n- After each traversal, rewrite `/index.md` to reflect the current tree state\n- Each entry: path, one-line description (pulled from the node's first paragraph), and depth\n\n**Definition refresh**\n- If a node's `this.md` stub comment (`<!-- stub -->`) is still present, flag it as undefined\n- Surface a list of undefined nodes at the end of each run\n\n**Convention propagation**\n- Compare each node's `this.md` against active root and namespace-level conventions\n- Flag nodes that predate a convention change and may be non-compliant\n- Do not silently rewrite node content — surface findings for owner review\n\n## Active paths\n\n`/.this/agents/curator` (this node only — the curator loads the full tree itself during traversal)\n\n## Expansion\n\n`.this/skills.md` — breadth-first traversal implementation and per-check logic (to be defined)\n", "children": [{"name": ".this", "rel": ".this/agents/curator/.this", "hasThis": false, "content": "", "children": []}]}, {"name": "steward", "rel": ".this/agents/steward", "hasThis": true, "content": "# .this/agents/steward\n\nThe steward guides the creation and modification of nodes — from a stated need to a well-structured, correctly placed subtree. It is part of the sprout.\n\n## Role\n\nTranslate a user or agent need into a tree of nodes: choose the right template, scaffold the structure, fill in the definitions, and ensure the new nodes are registered with their parents.\n\n## When to invoke\n\n- When a new module, tool, namespace, or agent needs to be added to the tree\n- When an existing node needs structural revision (adding a layer, splitting, merging)\n- Before building anything — the steward defines the shape, then development follows\n\n## How it works\n\n1. **Understand the need** — ask clarifying questions until the scope is clear (one question at a time)\n2. **Select a template** — consult the catalog to find the closest matching node type\n3. **Propose the structure** — present the planned tree shape for owner confirmation before writing anything\n4. **Scaffold** — create directories, stub `this.md` files, and seed files per the template\n5. **Register** — update all parent `this.md` tables to include the new nodes\n6. **Hand off** — invoke the curator to verify integrity after scaffolding\n\n## Interaction logging\n\nEvery user interaction handled by the steward is appended to `/.this/customer_interactions.log` with a timestamp. This is best implemented via a Claude Code hook rather than inline — the hook fires after each session turn and appends the exchange.\n\n## Active paths\n\n`/.this/agents/steward`, `/templates`\n\n## Expansion\n\n`.this/catalog.md` — index of available templates with selection guidance (load when matching a need to a template)\n", "children": [{"name": ".this", "rel": ".this/agents/steward/.this", "hasThis": false, "content": "", "children": []}]}]}, {"name": "interfaces", "rel": ".this/interfaces", "hasThis": false, "content": "", "children": []}]}, {"name": "agents", "rel": "agents", "hasThis": true, "content": "# agents/\n\nUser-defined agent definitions. Add a child node here for any agent specific to your tree.\n\nPrefab framework agents (curator, steward, archivist) live in `/.this/agents/` and are internal to the sprout.\n\n## Expected child structure\n\n```\nagents/\n  <agent-name>/\n    this.md         ← role, active paths, behavioral constraints\n    .this/\n      skills.md     ← skills this agent can invoke\n      memory.md     ← agent-scoped persistent context (if any)\n```\n\n## Conventions for agent nodes\n\n- `this.md` must declare the agent's **role** (one sentence) and its **default active paths**.\n- An agent should only claim paths it genuinely needs in context — loading unnecessary nodes wastes context.\n- Behavioral constraints defined here (or inherited from parent nodes) take precedence over agent-level instructions.\n", "children": []}, {"name": "personal", "rel": "personal", "hasThis": true, "content": "# personal/\n\nThis is a personal namespace. Everything here exists to serve one person: its owner.\n\n## Purpose\n\nTo contain the tools and knowledge that support day-to-day life and long-term goals. The north star for anything built or operated under this namespace:\n\n- **Own your time** — protect it, account for it, spend it intentionally\n- **Health and fitness** — physical and mental wellbeing as a foundation, not an afterthought\n- **Efficiency and focus** — reduce friction, cut noise, stay on what matters\n- **Technology as leverage** — tools should quietly enhance life, not demand attention\n- **Mental unburden** — offload tasks, reminders, and chaos so the mind stays clear\n\n## Agent behavior in this namespace\n\nAgents operating here have the owner as their sole focus. When in doubt:\n- Reduce complexity, do not add it\n- Prefer calm and clarity over completeness\n- Surface only what is needed, when it is needed\n- Never optimize for the system — optimize for the person\n\n## What lives here\n\n| Node | Purpose |\n|------|---------|\n| `calendar/` | Time and scheduling |\n| `ToDo/` | Task and action management |\n\nMore nodes will be added as the namespace grows (health, finance, goals, knowledge, etc.).\n", "children": [{"name": "calendar", "rel": "personal/calendar", "hasThis": true, "content": "# calendar\n\nA minimal, modular calendar module. Manages time slots for its owner and exposes them to direct use, agents, and external integrations.\n\n## Domain concepts\n\n- **Entry** — the base unit: a time slot with a title, start, end, and status\n- **Status** — `proposed` (not yet committed), `confirmed` (firm), `cancelled`, `done`\n- **Recurrence** — entries may repeat on a schedule (daily, weekly, custom RRULE-style)\n- **Day types** — days are classified as workday, weekend, or holiday; scheduling logic respects this\n- **Priority** — entries carry a priority level to resolve conflicts and guide agent scheduling\n\n## Modularity principle\n\nEach layer is independently replaceable. Swapping the CSV backend for Postgres, or the MCP interface for a REST API, must not require changes to other layers. The `code/` layer is the only one that touches `db/` directly — interfaces go through code.\n\n## Structure\n\n| Node | Role |\n|------|------|\n| `db/` | Storage layer — currently CSV, replaceable |\n| `code/` | Core logic — the only layer that reads/writes db |\n| `interfaces/` | Consumers — web UI, REST API, MCP tool |\n| `tests/` | Test suite |\n\n## What agents should know\n\n- Read entries via the interfaces, not directly from `db/`\n- When proposing a new entry, set status `proposed` — never `confirmed` without owner acknowledgment\n- Respect day types: do not schedule over holidays or outside workday bounds unless explicitly asked\n- Recurring entries are expanded at query time, not stored as individual rows\n", "children": [{"name": "code", "rel": "personal/calendar/code", "hasThis": true, "content": "# calendar/code\n\n<!-- stub -->\n", "children": [{"name": "lib", "rel": "personal/calendar/code/lib", "hasThis": false, "content": "", "children": []}, {"name": "src", "rel": "personal/calendar/code/src", "hasThis": false, "content": "", "children": []}]}, {"name": "db", "rel": "personal/calendar/db", "hasThis": true, "content": "# calendar/db\n\n<!-- stub -->\n", "children": []}, {"name": "interfaces", "rel": "personal/calendar/interfaces", "hasThis": true, "content": "# calendar/interfaces\n\n<!-- stub -->\n", "children": [{"name": "api", "rel": "personal/calendar/interfaces/api", "hasThis": true, "content": "# calendar/interfaces/api\n\n<!-- stub -->\n", "children": []}, {"name": "mcp", "rel": "personal/calendar/interfaces/mcp", "hasThis": true, "content": "# calendar/interfaces/mcp\n\n<!-- stub -->\n", "children": []}, {"name": "web", "rel": "personal/calendar/interfaces/web", "hasThis": true, "content": "# calendar/interfaces/web\n\n<!-- stub -->\n", "children": []}]}, {"name": "tests", "rel": "personal/calendar/tests", "hasThis": false, "content": "", "children": []}]}, {"name": "ToDo", "rel": "personal/ToDo", "hasThis": true, "content": "# ToDo\n\n<!-- stub -->\n", "children": [{"name": "code", "rel": "personal/ToDo/code", "hasThis": true, "content": "# ToDo/code\n\n<!-- stub -->\n", "children": [{"name": "lib", "rel": "personal/ToDo/code/lib", "hasThis": false, "content": "", "children": []}, {"name": "src", "rel": "personal/ToDo/code/src", "hasThis": false, "content": "", "children": []}]}, {"name": "db", "rel": "personal/ToDo/db", "hasThis": true, "content": "# ToDo/db\n\n<!-- stub -->\n", "children": []}, {"name": "integrations", "rel": "personal/ToDo/integrations", "hasThis": true, "content": "# ToDo/integrations\n\n<!-- stub -->\n", "children": [{"name": "calendar", "rel": "personal/ToDo/integrations/calendar", "hasThis": true, "content": "# ToDo/integrations/calendar\n\n<!-- stub -->\n", "children": []}]}, {"name": "interfaces", "rel": "personal/ToDo/interfaces", "hasThis": true, "content": "# ToDo/interfaces\n\n<!-- stub -->\n", "children": [{"name": "api", "rel": "personal/ToDo/interfaces/api", "hasThis": true, "content": "# ToDo/interfaces/api\n\n<!-- stub -->\n", "children": []}, {"name": "mcp", "rel": "personal/ToDo/interfaces/mcp", "hasThis": true, "content": "# ToDo/interfaces/mcp\n\n<!-- stub -->\n", "children": []}, {"name": "web", "rel": "personal/ToDo/interfaces/web", "hasThis": true, "content": "# ToDo/interfaces/web\n\n<!-- stub -->\n", "children": []}]}, {"name": "tests", "rel": "personal/ToDo/tests", "hasThis": false, "content": "", "children": []}]}]}, {"name": "templates", "rel": "templates", "hasThis": true, "content": "# templates/\n\nSprout-level node type templates. Each child defines a reusable structure that the architect agent instantiates when scaffolding new nodes.\n\n## What a template is\n\nA template is a prescriptive pattern — it defines the expected directory structure, required files, stub content, and key `this.md` sections for a class of node. Templates are guides, not rigid schemas: a node may omit layers it does not need, but must document why.\n\n## What lives here\n\n| Template | Purpose |\n|----------|---------|\n| `app/` | Self-contained module with data, logic, and interfaces |\n", "children": [{"name": "app", "rel": "templates/app", "hasThis": true, "content": "# template: app\n\nA self-contained module with persistent data, core logic, and one or more interfaces. Use for tools that manage a domain of information and expose it to users, agents, or external integrations.\n\n**Examples in this tree**: `personal/calendar`, `personal/ToDo`\n\n## Structure\n\n```\n<name>/\n  this.md                  ← module identity, domain concepts, modularity principle, agent rules\n  db/\n    this.md                ← storage layer description\n    schema.md              ← field definitions, types, enums\n    <name>.csv             ← primary data (headers only at creation)\n    log.csv                ← change log (headers only at creation)\n    counter.txt            ← last assigned integer ID, starts at 0\n  code/\n    this.md                ← entry points, architecture notes\n    main.py                ← executable entry point\n    requirements.txt       ← dependencies\n    src/\n      __init__.py\n    lib/\n      __init__.py\n  interfaces/\n    this.md                ← which interfaces exist and their role\n    web/\n      this.md\n    api/\n      this.md\n    mcp/\n      this.md\n  integrations/            ← optional; add only when an integration exists or is planned\n    this.md\n    <target>/\n      this.md\n  tests/\n    .gitkeep\n```\n\n## Required this.md sections for the root node\n\n- **Domain concepts** — the entities this module manages, their fields and status enums\n- **Modularity principle** — which layers are independently replaceable and the rule about interfaces never touching db directly\n- **Structure table** — one row per child directory with its role\n- **What agents should know** — behavioral rules specific to this module (e.g. proposed vs confirmed, respect for day types)\n\n## Key conventions\n\n- `db/` is only accessed by `code/` — interfaces go through code, never directly to db\n- IDs are integers managed via `counter.txt` — never derive next ID from the CSV\n- `integrations/` is omitted until an integration is real or actively planned\n- Each layer is replaceable (e.g. CSV → Postgres) without touching other layers\n", "children": []}]}]};
+
+// ── persistence ────────────────────────────────
+const openSet = new Set(JSON.parse(localStorage.getItem('aios_open') || '[]'));
+const save    = () => localStorage.setItem('aios_open', JSON.stringify([...openSet]));
+
+// ── sidebar ────────────────────────────────────
+const sb     = document.getElementById('sb');
+const burger = document.getElementById('burger');
+const setSB  = open => { sb.classList.toggle('collapsed', !open); localStorage.setItem('aios_sb', open?'1':'0'); };
+burger.addEventListener('click', () => setSB(sb.classList.contains('collapsed')));
+setSB(localStorage.getItem('aios_sb') !== '0');
+
+// ── panel ──────────────────────────────────────
+const overlay   = document.getElementById('overlay');
+const panel     = document.getElementById('panel');
+const panelPath = document.getElementById('panel-path');
+const panelBody = document.getElementById('panel-body');
+
+const openPanel = node => {
+  panelPath.textContent = node.rel ? '/'+node.rel : '/';
+  panelBody.innerHTML   = renderMd(node.content);
+  panel.classList.add('open'); overlay.classList.add('open');
+};
+const closePanel = () => { panel.classList.remove('open'); overlay.classList.remove('open'); };
+document.getElementById('panel-x').addEventListener('click', closePanel);
+overlay.addEventListener('click', closePanel);
+
+// ── markdown ───────────────────────────────────
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function inline(s) {
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g,        '<code>$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g,  '<strong>$1</strong>');
+  s = s.replace(/\*([^*]+)\*/g,      '<em>$1</em>');
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  return s;
+}
+
+function renderMd(md) {
+  if (!md || !md.trim()) return '<p class="no-content">No this.md defined.</p>';
+
+  // extract code blocks
+  const blocks = [];
+  md = md.replace(/```[^\n]*\n([\s\S]*?)```/g, (_, code) => {
+    blocks.push(`<pre><code>${esc(code.trim())}</code></pre>`);
+    return `<!--CB:${blocks.length-1}-->`;
+  });
+
+  const lines = md.split('\n');
+  const out   = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const l = lines[i];
+
+    // code block placeholder
+    if (/^<!--CB:\d+-->$/.test(l.trim())) {
+      out.push(blocks[+l.match(/\d+/)[0]]);
+      i++; continue;
+    }
+
+    // table
+    if (l.includes('|') && l.trim().startsWith('|')) {
+      const rows = [];
+      while (i < lines.length && lines[i].includes('|')) { rows.push(lines[i]); i++; }
+      const data = rows.filter(r => !/^\s*\|[-:\s|]+\|\s*$/.test(r));
+      if (data.length) {
+        let t = '<table>';
+        data.forEach((r,ri) => {
+          const cells = r.split('|').slice(1,-1);
+          const tag   = ri===0 ? 'th' : 'td';
+          t += '<tr>'+cells.map(c=>`<${tag}>${inline(c.trim())}</${tag}>`).join('')+'</tr>';
+        });
+        out.push(t+'</table>');
+      }
+      continue;
+    }
+
+    // list
+    if (/^\s*[-*+] /.test(l)) {
+      const items = [];
+      while (i < lines.length && /^\s*[-*+] /.test(lines[i]))
+        items.push(`<li>${inline(lines[i++].replace(/^\s*[-*+] /,''))}</li>`);
+      out.push('<ul>'+items.join('')+'</ul>'); continue;
+    }
+
+    // headings
+    const h = l.match(/^(#{1,3}) (.+)/);
+    if (h) { out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`); i++; continue; }
+
+    // blank
+    if (!l.trim()) { i++; continue; }
+
+    // comment / html passthrough
+    if (l.startsWith('<') || l.startsWith('<!--')) { out.push(l); i++; continue; }
+
+    // paragraph — gather until blank or structural line
+    const para = [];
+    while (i < lines.length) {
+      const cur = lines[i];
+      if (!cur.trim() || cur.match(/^#+/) || cur.includes('|') || /^\s*[-*+] /.test(cur) || cur.startsWith('<')) break;
+      para.push(cur); i++;
+    }
+    if (para.length) out.push(`<p>${inline(para.join(' '))}</p>`);
+  }
+
+  return out.join('\n');
+}
+
+// ── icons ──────────────────────────────────────
+const ICON_ADD  = `<svg width="11" height="11" viewBox="0 0 11 11" fill="currentColor"><path d="M4.75 0v4.75H0v1.5h4.75V11h1.5V6.25H11v-1.5H6.25V0z"/></svg>`;
+const ICON_FIND = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="5.5" cy="5.5" r="4"/><line x1="8.5" y1="8.5" x2="12" y2="12"/></svg>`;
+
+// ── tree ───────────────────────────────────────
+function renderNode(node, depth, container) {
+  const row = document.createElement('div');
+  row.className = 'tree-row';
+  row.style.paddingLeft = (depth * 20 + 8) + 'px';
+
+  const hasKids = node.children && node.children.length > 0;
+  const isOpen  = openSet.has(node.rel);
+
+  // chevron / spacer
+  const chev = document.createElement('span');
+  chev.className = hasKids ? 'chevron' + (isOpen ? ' open' : '') : 'ch-spacer';
+  if (hasKids) chev.innerHTML = '&#9656;';
+  row.appendChild(chev);
+
+  // name
+  const nm = document.createElement('span');
+  nm.className = 'node-name' + (node.hasThis ? ' lit' : '') + (node.name.startsWith('.') ? ' dot' : '');
+  nm.textContent = node.name;
+  row.appendChild(nm);
+
+  // pip
+  if (node.hasThis) {
+    const pip = document.createElement('span');
+    pip.className = 'this-pip';
+    row.appendChild(pip);
+  }
+
+  // actions (right-aligned via flex:1 on name)
+  const acts = document.createElement('div');
+  acts.className = 'row-actions';
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'act';
+  addBtn.title     = 'Add child node';
+  addBtn.innerHTML = ICON_ADD;
+  addBtn.onclick   = e => e.stopPropagation();
+  acts.appendChild(addBtn);
+
+  const viewBtn = document.createElement('button');
+  viewBtn.className = 'act' + (node.hasThis ? ' lit' : '');
+  viewBtn.title     = node.hasThis ? 'View this.md' : 'No this.md';
+  viewBtn.innerHTML = ICON_FIND;
+  viewBtn.onclick   = e => { e.stopPropagation(); openPanel(node); };
+  acts.appendChild(viewBtn);
+
+  row.appendChild(acts);
+
+  // children container
+  let childrenEl = null;
+  if (hasKids) {
+    childrenEl = document.createElement('div');
+    childrenEl.className = 'tree-children' + (isOpen ? ' open' : '');
+    node.children.forEach(c => renderNode(c, depth + 1, childrenEl));
+
+    row.onclick = () => {
+      const nowOpen = !childrenEl.classList.contains('open');
+      nowOpen ? openSet.add(node.rel) : openSet.delete(node.rel);
+      save();
+      chev.classList.toggle('open', nowOpen);
+      childrenEl.classList.toggle('open', nowOpen);
+    };
+  }
+
+  container.appendChild(row);
+  if (childrenEl) container.appendChild(childrenEl);
+}
+
+// render & auto-expand root on first visit
+const area = document.getElementById('tree-area');
+renderNode(TREE, 0, area);
+if (!openSet.has('')) {
+  openSet.add(''); save();
+  area.querySelector('.chevron').classList.add('open');
+  area.querySelector('.tree-children').classList.add('open');
+}
+</script>
+</body>
+</html>
