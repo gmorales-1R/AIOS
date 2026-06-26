@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Browser — Bones</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e1218;
+      --panel:     #161d2a;
+      --surface:   #1c2535;
+      --border:    #273047;
+      --text:      #b4c6e0;
+      --muted:     #4f617e;
+      --accent:    #3a8df5;
+      --accent-dim:#1d4a8a;
+      --radius:    6px;
+      --sidebar:   240px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    /* ── Layout ─────────────────────────────────── */
+    #shell {
+      display: grid;
+      grid-template-rows: 48px 1fr;
+      grid-template-columns: var(--sidebar) 1fr;
+      height: 100vh;
+    }
+
+    /* ── Topbar ─────────────────────────────────── */
+    #topbar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    #topbar .logo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    #topbar .sep { flex: 1; }
+
+    #search {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 5px 10px;
+      font-size: 12px;
+      width: 200px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    #search:focus { border-color: var(--accent); }
+    #search::placeholder { color: var(--muted); }
+
+    label.pick-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .15s;
+    }
+    label.pick-btn:hover { opacity: .85; }
+    #folderInput { display: none; }
+
+    #count-badge {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Sidebar ─────────────────────────────────── */
+    #sidebar {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    #sidebar::-webkit-scrollbar { width: 6px; }
+    #sidebar::-webkit-scrollbar-track { background: transparent; }
+    #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .sidebar-section {
+      padding: 6px 14px 2px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .pack-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px;
+      cursor: pointer;
+      gap: 8px;
+      transition: background .1s;
+      color: var(--text);
+      border-left: 2px solid transparent;
+    }
+    .pack-item:hover { background: var(--surface); }
+    .pack-item.active {
+      background: var(--accent-dim);
+      border-left-color: var(--accent);
+      color: #fff;
+    }
+
+    .pack-name {
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .pack-count {
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      background: var(--surface);
+      padding: 1px 6px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .pack-item.active .pack-count {
+      color: rgba(255,255,255,.6);
+      background: rgba(255,255,255,.12);
+    }
+
+    /* ── Main area ──────────────────────────────── */
+    #main {
+      overflow-y: auto;
+      padding: 16px;
+      position: relative;
+    }
+
+    #main::-webkit-scrollbar { width: 6px; }
+    #main::-webkit-scrollbar-track { background: transparent; }
+    #main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    #empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    #empty .icon {
+      width: 56px;
+      height: 56px;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    #empty h2 { font-size: 15px; font-weight: 600; color: var(--text); }
+    #empty p  { font-size: 12px; text-align: center; max-width: 260px; line-height: 1.7; }
+    #empty code {
+      font-family: ui-monospace, monospace;
+      background: var(--surface);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    .pack-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .pack-header h2 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: ui-monospace, "Cascadia Code", "Fira Code", monospace;
+    }
+    .pack-header .sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sub-group { margin-bottom: 24px; }
+    .sub-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      padding: 0 2px;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 8px;
+    }
+
+    .thumb-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .15s, transform .1s;
+    }
+    .thumb-card:hover {
+      border-color: var(--accent);
+      transform: scale(1.03);
+    }
+    .thumb-card img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      display: block;
+      padding: 4px;
+      background: repeating-conic-gradient(#1a2030 0% 25%, #141b28 0% 50%) 0 0 / 12px 12px;
+    }
+    .thumb-label {
+      padding: 4px 6px;
+      font-size: 9px;
+      font-family: ui-monospace, monospace;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Lightbox ───────────────────────────────── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.82);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px;
+    }
+    #lightbox.open { display: flex; }
+
+    #lb-img {
+      max-width: min(90vw, 640px);
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 4px;
+      background: repeating-conic-gradient(#1a2030 0% 25%, #141b28 0% 50%) 0 0 / 16px 16px;
+      padding: 8px;
+      border: 1px solid var(--border);
+    }
+
+    #lb-info { text-align: center; display: flex; flex-direction: column; gap: 4px; }
+    #lb-name { font-family: ui-monospace, monospace; font-size: 13px; color: var(--text); }
+    #lb-path { font-size: 11px; color: var(--muted); word-break: break-all; max-width: 560px; }
+    #lb-dims { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    #lb-close {
+      position: fixed;
+      top: 16px; right: 20px;
+      font-size: 24px;
+      color: var(--muted);
+      cursor: pointer;
+      line-height: 1;
+      transition: color .1s;
+      background: none;
+      border: none;
+    }
+    #lb-close:hover { color: var(--text); }
+    #lb-close:focus-visible { outline: 2px solid var(--accent); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div id="shell">
+  <div id="topbar">
+    <span class="logo">⬡ Asset Browser</span>
+    <div class="sep"></div>
+    <input id="search" type="search" placeholder="Filter by name…" autocomplete="off">
+    <span id="count-badge"></span>
+    <label class="pick-btn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12V6a1 1 0 0 1 1-1h3l1.5-2H13a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1Z"/>
+      </svg>
+      Open Folder
+      <input type="file" id="folderInput" webkitdirectory multiple>
+    </label>
+  </div>
+
+  <div id="sidebar">
+    <div class="sidebar-section">Packs</div>
+    <div id="pack-list"></div>
+  </div>
+
+  <div id="main">
+    <div id="empty">
+      <div class="icon">📁</div>
+      <h2>No folder loaded</h2>
+      <p>Click <strong>Open Folder</strong> and select your <code>raw_assets/</code> directory to browse all assets by pack.</p>
+    </div>
+    <div id="content" style="display:none"></div>
+  </div>
+</div>
+
+<div id="lightbox">
+  <button id="lb-close" title="Close (Esc)" aria-label="Close">✕</button>
+  <img id="lb-img" src="" alt="">
+  <div id="lb-info">
+    <div id="lb-name"></div>
+    <div id="lb-path"></div>
+    <div id="lb-dims"></div>
+  </div>
+</div>
+
+<script>
+  const folderInput = document.getElementById('folderInput');
+  const packList    = document.getElementById('pack-list');
+  const content     = document.getElementById('content');
+  const empty       = document.getElementById('empty');
+  const searchEl    = document.getElementById('search');
+  const countBadge  = document.getElementById('count-badge');
+  const lightbox    = document.getElementById('lightbox');
+  const lbImg       = document.getElementById('lb-img');
+  const lbName      = document.getElementById('lb-name');
+  const lbPath      = document.getElementById('lb-path');
+  const lbDims      = document.getElementById('lb-dims');
+
+  const IMAGE_EXT = /\.(png|jpg|jpeg|gif|webp|svg)$/i;
+
+  let packs      = {};   // packName → { subdir → [file] }
+  let urls       = {};   // webkitRelativePath → objectURL
+  let activePack = null;
+  let filterQ    = '';
+
+  // ── Load folder ─────────────────────────────────────────────────
+  folderInput.addEventListener('change', () => {
+    const files = [...folderInput.files].filter(f => IMAGE_EXT.test(f.name));
+
+    Object.values(urls).forEach(u => URL.revokeObjectURL(u));
+    urls  = {};
+    packs = {};
+
+    for (const f of files) {
+      urls[f.webkitRelativePath] = URL.createObjectURL(f);
+      const parts  = f.webkitRelativePath.split('/');
+      const pack   = parts.length >= 3 ? parts[1] : '(root)';
+      const subdir = parts.length >= 4 ? parts.slice(2, -1).join('/') : '';
+      if (!packs[pack])         packs[pack]         = {};
+      if (!packs[pack][subdir]) packs[pack][subdir] = [];
+      packs[pack][subdir].push(f);
+    }
+
+    renderSidebar();
+    const first = Object.keys(packs).sort((a,b) => a.localeCompare(b))[0];
+    if (first) {
+      showPack(first);
+    } else {
+      empty.style.display   = 'flex';
+      content.style.display = 'none';
+    }
+    countBadge.textContent = files.length
+      ? `${files.length.toLocaleString()} images`
+      : '';
+  });
+
+  // ── Sidebar ──────────────────────────────────────────────────────
+  function renderSidebar() {
+    packList.innerHTML = '';
+    const sorted = Object.entries(packs).sort(([a],[b]) => a.localeCompare(b));
+    for (const [name, subdirs] of sorted) {
+      const count = Object.values(subdirs).reduce((s, a) => s + a.length, 0);
+      const el    = document.createElement('div');
+      el.className     = 'pack-item';
+      el.dataset.pack  = name;
+      el.innerHTML     = `
+        <span class="pack-name" title="${name}">${name}</span>
+        <span class="pack-count">${count}</span>
+      `;
+      el.addEventListener('click', () => showPack(name));
+      packList.appendChild(el);
+    }
+  }
+
+  function setActiveSidebar(name) {
+    document.querySelectorAll('.pack-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.pack === name);
+    });
+  }
+
+  // ── Main content ─────────────────────────────────────────────────
+  function showPack(name) {
+    activePack = name;
+    setActiveSidebar(name);
+    renderPack();
+    content.style.display = 'block';
+    empty.style.display   = 'none';
+    document.getElementById('main').scrollTop = 0;
+  }
+
+  function renderPack() {
+    if (!activePack) return;
+    content.innerHTML = '';
+    const subdirs = packs[activePack];
+    const q       = filterQ.toLowerCase();
+
+    const totalVisible = Object.values(subdirs)
+      .reduce((s, files) => s + files.filter(f => !q || f.name.toLowerCase().includes(q)).length, 0);
+
+    const header = document.createElement('div');
+    header.className = 'pack-header';
+    header.innerHTML = `<h2>${activePack}</h2><span class="sub">${totalVisible} image${totalVisible !== 1 ? 's' : ''}</span>`;
+    content.appendChild(header);
+
+    const sortedSubs = Object.entries(subdirs).sort(([a],[b]) => a.localeCompare(b));
+
+    for (const [subdir, files] of sortedSubs) {
+      const visible = files.filter(f => !q || f.name.toLowerCase().includes(q));
+      if (!visible.length) continue;
+
+      const group = document.createElement('div');
+      group.className = 'sub-group';
+
+      if (subdir) {
+        const label     = document.createElement('div');
+        label.className = 'sub-label';
+        label.textContent = subdir;
+        group.appendChild(label);
+      }
+
+      const grid      = document.createElement('div');
+      grid.className  = 'thumb-grid';
+
+      for (const f of visible) {
+        const card      = document.createElement('div');
+        card.className  = 'thumb-card';
+        card.title      = f.name;
+        card.innerHTML  = `
+          <img src="${urls[f.webkitRelativePath]}" alt="${f.name}" loading="lazy">
+          <div class="thumb-label">${f.name}</div>
+        `;
+        card.addEventListener('click', () => openLightbox(f));
+        grid.appendChild(card);
+      }
+
+      group.appendChild(grid);
+      content.appendChild(group);
+    }
+  }
+
+  // ── Search ───────────────────────────────────────────────────────
+  searchEl.addEventListener('input', () => {
+    filterQ = searchEl.value.trim();
+    renderPack();
+  });
+
+  // ── Lightbox ─────────────────────────────────────────────────────
+  function openLightbox(file) {
+    const url   = urls[file.webkitRelativePath];
+    lbImg.src   = url;
+    lbName.textContent = file.name;
+    lbPath.textContent = file.webkitRelativePath;
+    lbDims.textContent = '';
+    lightbox.classList.add('open');
+
+    const img   = new Image();
+    img.onload  = () => { lbDims.textContent = `${img.naturalWidth} × ${img.naturalHeight} px`; };
+    img.src     = url;
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lbImg.src = '';
+  }
+
+  document.getElementById('lb-close').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+
+</body>
+</html>
