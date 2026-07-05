@@ -32,9 +32,20 @@ A necromancer/witch summoning game — "a necro spammer's paradise." The player 
 | Node | Purpose |
 |------|---------|
 | `files/` | Game source: `game.html`, `js/`, `assets/` |
-| `code/` | `prepare_assets.py` — generates placeholder sprites into `files/assets/`; run before relying on those files |
+| `code/` | `prepare_assets.py` — required run-before-use step, see below |
+| `raw_assets/` | **Required if present, gitignored, local-only** — third-party source packs (Kenney, etc.). Not committed (repo-root `.gitignore`: `**/raw_assets/`), not guaranteed to exist in any given checkout. |
 | `sessions/` | Append-only session logs |
 | `.this/` | Facets: `memory.md` |
+
+## Asset pipeline (required step)
+
+`files/assets/` is generated output, not committed source-of-truth — **always run `code/prepare_assets.py` before relying on it**:
+
+```bash
+python3 games/bones/code/prepare_assets.py
+```
+
+The script is non-breaking regardless of whether `raw_assets/` exists locally: it uses real Kenney source files when present (resized/padded onto the standard 256×512 canvas), and falls back to procedurally generated placeholders when not. Either path writes the same output filenames, so `game.js` never needs to know or care which source was used. Pets are always procedural on purpose (see Design principles) — that's not a missing-asset fallback.
 
 ## Build / run
 
