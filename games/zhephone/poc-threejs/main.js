@@ -71,15 +71,37 @@ const tokens = [
   spawnToken(5, 9, 0xffd25f),
 ];
 
+const HOVER_COLOR = 0x3d5a80;
+const SELECTED_COLOR = 0x7cfc9a;
+
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let selected = null;
+let hovered = null;
 const selectedLabel = document.getElementById('selected');
 
 function setPointer(event) {
   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
+
+function tileColorFor(tile) {
+  if (tile === selected) return SELECTED_COLOR;
+  return tile.userData.baseColor;
+}
+
+renderer.domElement.addEventListener('pointermove', (event) => {
+  setPointer(event);
+  raycaster.setFromCamera(pointer, camera);
+  const hit = raycaster.intersectObjects(tiles)[0];
+  const next = hit ? hit.object : null;
+
+  if (hovered === next) return;
+  if (hovered && hovered !== selected) hovered.material.color.set(tileColorFor(hovered));
+  hovered = next;
+  if (hovered && hovered !== selected) hovered.material.color.set(HOVER_COLOR);
+  renderer.domElement.style.cursor = hovered ? 'pointer' : 'default';
+});
 
 renderer.domElement.addEventListener('click', (event) => {
   setPointer(event);
@@ -89,7 +111,7 @@ renderer.domElement.addEventListener('click', (event) => {
 
   if (selected) selected.material.color.copy(selected.userData.baseColor);
   selected = hit.object;
-  selected.material.color.set(0x7CFC9A);
+  selected.material.color.set(SELECTED_COLOR);
   const { gx, gz } = selected.userData;
   selectedLabel.textContent = `Selected tile: (${gx}, ${gz})`;
 });
@@ -98,6 +120,24 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+}
+
+fullscreenBtn.addEventListener('click', toggleFullscreen);
+window.addEventListener('keydown', (event) => {
+  if (event.key.toLowerCase() === 'f') toggleFullscreen();
+});
+document.addEventListener('fullscreenchange', () => {
+  fullscreenBtn.innerHTML = document.fullscreenElement ? '&#x26F6; Exit fullscreen' : '&#x26F6; Fullscreen';
 });
 
 const clock = new THREE.Clock();
