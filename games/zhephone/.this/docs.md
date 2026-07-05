@@ -21,7 +21,7 @@ Reference spec. `memory.md` is the decision log (why); this is the how. Nothing 
 ### Tick engine (the Tibia-style core)
 - Fixed-interval authoritative loop. Every connected client submits *intents* (move, attack, use item, trigger claim ritual); the server never trusts client-computed outcomes.
 - Each tick: collect all intents received since the last tick → resolve in a fixed, documented order (e.g. queued-by-arrival-timestamp, ties broken by a stable per-entity id) → broadcast the resulting state delta.
-- Tick rate is a tuning knob, not a design decision yet — needs to trade off responsiveness vs. server load at 10k concurrent. Open question, see below.
+- **Tick rate: 0.1s (10 ticks/sec), decided.** Networking implication that comes with it: at 10k concurrent entities, a naive full-state broadcast 10x/sec is far too much bandwidth — this makes the line-of-sight/scouting visibility scoping (already decided for the information-asymmetry pillar) load-bearing for performance too, not just design: each client only needs deltas for entities in its visibility set, not the whole world. Delta payloads, not full snapshots, per tick.
 - This loop is the literal implementation of pillar 1 (determinism for everything non-social): given the same intents in the same order, the outcome is 100% reproducible — good for both fairness disputes and for letting players actually calculate odds.
 
 ### Combat resolution
@@ -48,6 +48,11 @@ Reference spec. `memory.md` is the decision log (why); this is the how. Nothing 
 
 ### Sponsor drops
 - A drop is a scheduled spawn event (item/resource, branded) at given coordinates/time, queued through a moderation step (brand-safety) before the tick server actually spawns it. Needs an admin-facing scheduling surface — not yet designed.
+- **Sponsor content (branding/overlay assets, not gameplay drops) syncs on its own slow cadence, decided: every 60s, hash-gated.** Client computes/receives a local hash of current sponsor content; if unchanged since the last check, skip the fetch entirely. Decouples branded-overlay delivery from the 10-tick/sec gameplay loop on purpose — sponsor assets don't need tick precision, and polling a cheap hash instead of pushing full payloads every cycle keeps this off the hot path.
+
+### Immersion & spectator-facing UX
+- **Fullscreen is a requirement, not a nice-to-have** — immersion matters enough (design owner's call) that the client must expose a working Fullscreen API toggle (button + likely a keyboard shortcut) on both the player and spectator/camera views.
+- **Spectators are stakeholders, not an afterthought** — they're the revenue stream (memory.md's business-model section), so UI has to be intuitive, visually clear, and give real interaction feedback, evaluated for someone watching a stream who never touched the controls, not just for players. Concrete implications: hover/selection states need visible feedback (not just click-response — the PoC's click-to-highlight is a start, hover feedback is the next increment), HUD elements (implied-share ticker, population countdown, alliance banners) need to be legible at streaming resolution/compression, not just on a dev monitor, and state changes (a kill, a claim-ritual trigger, a sponsor drop landing) need a clear visual/audio beat so a viewer catches it without reading combat logs.
 
 ## File structure (proposed)
 
@@ -96,8 +101,8 @@ games/zhephone/
 
 ## Open questions
 
-- Tick rate not chosen — needs a real load-test once the server skeleton exists, not a guess.
 - Combat resolution formulas not designed — this is the next concrete mechanics thread.
 - Divine-intervention event catalog not designed.
 - Sponsor drop moderation workflow (who approves, what's the SLA) not designed.
 - Payout rail specifics (which processor, international coverage, minimum payout thresholds) not researched.
+- Tick rate (0.1s) is decided as a target but not load-tested yet — needs validation once the server skeleton exists, at 10k concurrent, before treating it as final.
