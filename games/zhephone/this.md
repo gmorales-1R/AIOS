@@ -24,6 +24,8 @@ Zhephone is a "permadeath Tibia" crossed with a real-money royale: a persistent 
 
 | Node | Purpose |
 |------|---------|
+| `poc-threejs/` | Tech spike — camera/tile-render viability, no gameplay |
+| `poc-core-loop/` | Playable tech spike — tick-resolved movement, dice-free combat, clan-gated attacks. Client-only, no real server yet. |
 | `.this/` | Facets: `memory.md` |
 
 ## `.this/` facets
