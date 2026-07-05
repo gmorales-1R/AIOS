@@ -1,20 +1,33 @@
 #!/usr/bin/env python3
-"""Generate placeholder isometric sprites for bones.
+"""Prepare isometric sprites for bones.
 
-The real Kenney raw_assets packs referenced in .this/memory.md were never
-committed to the repo and are unreachable from this environment. This
-script procedurally generates size/pixel-ready placeholders on the same
-256x512 canvas / bottom-center-anchor convention documented in memory.md,
-so game.js has something real to load. Swap in real art later by keeping
-the same filenames and canvas size.
+`raw_assets/` is intentionally gitignored (see repo-root .gitignore:
+`**/raw_assets/`) — it's a local-only drop location for third-party packs
+(Kenney, etc.), never committed. It may or may not exist in any given
+checkout. This script is non-breaking either way:
+
+- If the expected Kenney source file exists under raw_assets/, it's
+  resized/padded onto the standard 256x512 canvas ("size/pixel ready")
+  and used.
+- If not, a procedural placeholder is generated instead.
+
+Either path writes the same output filenames into files/assets/, so
+game.js never needs to know or care which source was used. Run this
+before relying on files/assets/ — it's not committed output, it's
+generated.
+
+Pets are always procedural regardless of raw_assets availability: staying
+on one shared, tintable shape is the scalability design (see this.md),
+not just a fallback for missing art.
 """
-import math
 import random
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-OUT = Path(__file__).resolve().parent.parent / "files" / "assets"
+ROOT = Path(__file__).resolve().parent.parent
+RAW = ROOT / "raw_assets"
+OUT = ROOT / "files" / "assets"
 CANVAS = (256, 512)
 random.seed(7)
 
@@ -23,11 +36,30 @@ def new_canvas():
     return Image.new("RGBA", CANVAS, (0, 0, 0, 0))
 
 
-def save(img, name):
+def from_source(*relative_path):
+    """Load a real Kenney source file and normalize it onto CANVAS, or
+    return None if raw_assets isn't present / the file is missing."""
+    src = RAW.joinpath(*relative_path)
+    if not src.is_file():
+        return None
+    source = Image.open(src).convert("RGBA")
+    if source.size == CANVAS:
+        return source
+    canvas = new_canvas()
+    scale = min(CANVAS[0] / source.width, CANVAS[1] / source.height)
+    resized = source.resize((max(1, int(source.width * scale)), max(1, int(source.height * scale))))
+    x = (CANVAS[0] - resized.width) // 2
+    y = CANVAS[1] - resized.height
+    canvas.paste(resized, (x, y), resized)
+    return canvas
+
+
+def save(img, name, source_note=""):
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / name
     img.save(path)
-    print(f"wrote {path} ({img.width}x{img.height})")
+    tag = f" [{source_note}]" if source_note else ""
+    print(f"wrote {path} ({img.width}x{img.height}){tag}")
 
 
 def make_tile(base_color, seed):
@@ -110,8 +142,26 @@ def make_pet():
     return img
 
 
+DUNGEON = ("kenney_isometric-miniature-dungeon", "Isometric")
+DUNGEON_CHARS = ("kenney_isometric-miniature-dungeon", "Characters", "Male")
+
 if __name__ == "__main__":
-    save(make_tile((94, 74, 58), seed=1), "tile_dirt.png")
-    save(make_tile((104, 84, 66), seed=2), "tile_dirt_alt.png")
-    save(make_witch(), "witch.png")
-    save(make_pet(), "pet.png")
+    if not RAW.is_dir():
+        print(f"note: {RAW} not present (gitignored, local-only) — generating placeholders for everything")
+
+    tile = from_source(*DUNGEON, "dirt_S.png")
+    save(tile, "tile_dirt.png", source_note="real" if tile else "placeholder") if tile \
+        else save(make_tile((94, 74, 58), seed=1), "tile_dirt.png", source_note="placeholder")
+
+    tile_alt = from_source(*DUNGEON, "dirtTiles_S.png")
+    save(tile_alt, "tile_dirt_alt.png", source_note="real") if tile_alt \
+        else save(make_tile((104, 84, 66), seed=2), "tile_dirt_alt.png", source_note="placeholder")
+
+    # No witch costume in the Kenney pack — variant 0 Idle is the closest
+    # stand-in until real witch art is sourced.
+    witch = from_source(*DUNGEON_CHARS, "Male_0_Idle.png")
+    save(witch, "witch.png", source_note="real (Kenney variant-0 stand-in)") if witch \
+        else save(make_witch(), "witch.png", source_note="placeholder")
+
+    # Always procedural — see module docstring.
+    save(make_pet(), "pet.png", source_note="placeholder (by design)")
