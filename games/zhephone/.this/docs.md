@@ -43,6 +43,10 @@ Not yet defined: exact facing-arc geometry, specific skill-multiplier growth cur
 ### Alliance / clan system
 - Formation, membership, and a declared-rivalry flag are the only channel through which PvP is legal (per the PvE-base + clan-gated-PvP core loop).
 - Private alliance comms exist but are leaky by design (memory.md: a defector can sell/reveal them to a rival) — this is a data-visibility rule enforced server-side (who can read which comm channel), not a client feature.
+- **Membership (decided 2026-07-05):** any player can freely join or leave any clan at any time, opt-in by default — no approval gate, no cooldown, no leader sign-off required to join or quit. Matches the free-will pillar (no forced social state).
+- **Leadership (decided):** a clan's founder — the first player to create it — is its leader by default.
+- **Diplomacy authority (decided):** only the clan leader can declare an alliance or an enemy/rivalry status with another clan. Individual members cannot unilaterally change their clan's external relationships — this is a governance choke point, not a technicality: it means a leader can commit their whole clan to a war or pact the membership didn't sign up for, which is exactly the kind of betrayal-surface the information-asymmetry pillar wants.
+- **Open, not yet decided:** leadership succession. Permadeath means a leader can die mid-season — does diplomacy authority transfer (to a designated second, oldest remaining member, an election), or does the clan lose the ability to declare new alliances/rivalries until something resolves it, or does the clan dissolve? Flagging rather than guessing.
 
 ### Information asymmetry
 - Headcount/position visibility is scoped to line-of-sight/scouting — never a global map. This means the tick server must track per-player visibility sets, not just broadcast full world-state to everyone (also helps the fan-out cost problem above).
