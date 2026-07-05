@@ -24,8 +24,21 @@ Reference spec. `memory.md` is the decision log (why); this is the how. Nothing 
 - **Tick rate: 0.1s (10 ticks/sec), decided.** Networking implication that comes with it: at 10k concurrent entities, a naive full-state broadcast 10x/sec is far too much bandwidth — this makes the line-of-sight/scouting visibility scoping (already decided for the information-asymmetry pillar) load-bearing for performance too, not just design: each client only needs deltas for entities in its visibility set, not the whole world. Delta payloads, not full snapshots, per tick.
 - This loop is the literal implementation of pillar 1 (determinism for everything non-social): given the same intents in the same order, the outcome is 100% reproducible — good for both fairness disputes and for letting players actually calculate odds.
 
-### Combat resolution
-- Must be skill-predominant per the design/legal decision already made — avoid a `swarms`-style `accFactor = 1 + uniform(-acc, +acc)` dice roll as the primary damage determinant. Lean on position, timing, and equipment as the deciding factors instead of a random multiplier. Not yet designed in detail — flagged as the next open mechanics thread.
+### Combat resolution (decided 2026-07-05)
+
+No dice anywhere — no hit chance, no crit chance, no `swarms`-style `1 + uniform(-acc, +acc)` multiplier. Every input to damage is either a fixed known value or a player-controlled timing/positioning choice, so any player can compute the exact outcome of an engagement in advance. This matters doubly: it's the actual mechanism behind "skill-predominant" (design pillar 1 + the legal stance), and in a permadeath game, dice deciding who lives removes the one thing the whole game is supposed to be testing.
+
+```
+damage = baseWeaponDamage × skillMultiplier(attacker) × positionModifier − blockReduction(defender)
+```
+
+- **`skillMultiplier`** — deterministic and visible, derived from tracked usage (e.g. hits landed with a weapon type), not a hidden RNG skill-up roll like classic Tibia. A player can look up their own exact multiplier at any time.
+- **`positionModifier`** — fixed, known bonuses for tactical positioning: e.g. a flat +50% for attacking into a target's rear facing arc. Rewards the tile-based movement/positioning game rather than a stat roll. Exact facing-arc math not yet defined.
+- **`blockReduction(defender)`** — this is where defense becomes a timing skill instead of an evasion-chance stat: a defender who queues a block/parry *intent* in a tick before the attack resolves gets a fixed, known damage reduction. Miss the timing window, take full damage. Reading an opponent's tick-cadence and preempting it is the actual skill test — not a dice roll behind the scenes.
+- **Resource pacing**: attacks cost stamina, regenerating per tick; attacking faster than stamina regenerates reduces output via the deterministic formula above (e.g. a stamina-starved `skillMultiplier` penalty), not a random miss. Discourages mindless spam without introducing luck.
+- HP depletion to 0 triggers permadeath — irreversible, per the core loop. Because every term above is calculable, a player facing lethal damage always could have known it was lethal in advance; the drama is in the tactical choice, not a hidden roll.
+
+Not yet defined: exact facing-arc geometry, specific skill-multiplier growth curve, stamina costs/regen rates, PvE creature stat baselines. This is a first pass on the *shape* of the system (deterministic, timing/position-driven), not final numbers — needs a load-test/playtest pass once the tick server exists to tune the actual constants.
 
 ### Alliance / clan system
 - Formation, membership, and a declared-rivalry flag are the only channel through which PvP is legal (per the PvE-base + clan-gated-PvP core loop).
@@ -101,7 +114,7 @@ games/zhephone/
 
 ## Open questions
 
-- Combat resolution formulas not designed — this is the next concrete mechanics thread.
+- Combat resolution *shape* is decided (deterministic, timing/position-driven — see above); exact numbers (facing-arc geometry, skill-multiplier curve, stamina costs, PvE baselines) still need a playtest pass.
 - Divine-intervention event catalog not designed.
 - Sponsor drop moderation workflow (who approves, what's the SLA) not designed.
 - Payout rail specifics (which processor, international coverage, minimum payout thresholds) not researched.
