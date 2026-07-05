@@ -127,24 +127,46 @@ def make_witch():
 
 
 def make_pet():
-    """Single base shape, meant to be tinted per-instance in Phaser rather
+    """A small floating skull, not an animal — necromancer summons should
+    read as undead/spirit, and the project is literally named `bones`.
+    Single base shape, meant to be tinted per-instance in Phaser rather
     than re-drawn per variant — keeps the asset count flat as summon count
     scales up."""
     img = new_canvas()
     draw = ImageDraw.Draw(img)
     w, h = CANVAS
     base_y = h - 96
-    body_color = (235, 235, 235)
+    bone_color = (232, 224, 206)
+    socket_color = (24, 18, 16)
 
-    draw.ellipse([w / 2 - 34, base_y - 56, w / 2 + 34, base_y + 4], fill=(*body_color, 255))
-    for dx in (-16, 16):
-        draw.polygon(
-            [(w / 2 + dx - 10, base_y - 50), (w / 2 + dx, base_y - 80), (w / 2 + dx + 10, base_y - 50)],
-            fill=(*body_color, 255),
+    cranium_r = 30
+    cranium_cy = base_y - 44
+    draw.ellipse(
+        [w / 2 - cranium_r, cranium_cy - cranium_r, w / 2 + cranium_r, cranium_cy + cranium_r * 0.9],
+        fill=(*bone_color, 255),
+    )
+
+    jaw_w, jaw_h = 26, 16
+    draw.rounded_rectangle(
+        [w / 2 - jaw_w / 2, cranium_cy + cranium_r * 0.4, w / 2 + jaw_w / 2, cranium_cy + cranium_r * 0.4 + jaw_h],
+        radius=6,
+        fill=(*bone_color, 255),
+    )
+
+    for dx in (-13, 13):
+        draw.ellipse(
+            [w / 2 + dx - 8, cranium_cy - 6, w / 2 + dx + 8, cranium_cy + 10],
+            fill=(*socket_color, 255),
         )
-    eye_y = base_y - 30
-    draw.ellipse([w / 2 - 16, eye_y - 4, w / 2 - 8, eye_y + 4], fill=(20, 20, 20, 255))
-    draw.ellipse([w / 2 + 8, eye_y - 4, w / 2 + 16, eye_y + 4], fill=(20, 20, 20, 255))
+
+    draw.polygon(
+        [(w / 2 - 4, cranium_cy + 10), (w / 2 + 4, cranium_cy + 10), (w / 2, cranium_cy + 18)],
+        fill=(*socket_color, 255),
+    )
+
+    for i in range(3):
+        tx = w / 2 - 9 + i * 9
+        draw.line([(tx, cranium_cy + cranium_r * 0.4 + jaw_h), (tx, cranium_cy + cranium_r * 0.4)], fill=(*socket_color, 180), width=1)
 
     return img
 

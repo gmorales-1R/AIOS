@@ -10,6 +10,7 @@ A necromancer/witch summoning game — "a necro spammer's paradise." The player 
 
 - **Pets are basic and scalable, on purpose.** One shared sprite, tinted per-instance for visual variety instead of drawing unique art per pet — cost stays flat as summon count grows. No per-pet update logic beyond a shared idle tween.
 - **Unrestricted summoning is the core fantasy**, not a balance lever — no pet cap should be added later without revisiting this identity first.
+- **Avoid animal features unless explicitly required.** Summons should read as undead/spirit (skulls, wisps, spectral shapes), not creatures — no ears, snouts, paws, tails. The first placeholder pet accidentally read as a cat (round body + triangle ears); corrected to a skull, which also matches the project name.
 
 ## North star
 
