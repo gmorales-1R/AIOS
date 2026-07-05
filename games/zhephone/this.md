@@ -31,3 +31,4 @@ Zhephone is a "permadeath Tibia" crossed with a real-money royale: a persistent 
 | Facet | Load |
 |-------|------|
 | `memory.md` | Required — session history, design decisions, open questions |
+| `docs.md` | Load when working on implementation — tech stack, mechanics logic, file structure, dependencies |
