@@ -7,6 +7,7 @@ Persistent state and accumulated knowledge across sessions. Written because the 
 | Date | Branch | Summary |
 |------|--------|---------|
 | 2026-07-05 | `claude/availability-check-ub31n3` | Initial concept pass: core loop, prize/legal structure, population decay math, cash-out incentive design. No code written yet. |
+| 2026-07-05 (later) | `claude/availability-check-ub31n3` | Designed combat resolution (deterministic, no dice) and clan governance (free membership, founder-leader, leader-only diplomacy, succession rule). Then built `poc-core-loop/` — a playable tech spike proving those two systems actually work: fixed 100ms tick loop resolving queued move/attack intents, the exact damage formula from docs.md (flanking verified via a real overkill hit), clan-gated attacks (ally clicks correctly refused), and a telegraphed NPC attack that a timed block genuinely halves (`hits You for 5 (blocked -50%)` vs. the normal 10 in the log). Verified headlessly by reading actual game state (`window.__poc`) after simulated clicks, not just screenshots. No real art available (same constraint as `bones`) — used tinted three.js capsule primitives instead of sprites. Still client-only; no real authoritative server exists yet, this PoC simulates the tick loop locally as a stand-in. |
 
 ## Core concept
 
