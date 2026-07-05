@@ -84,37 +84,44 @@ def make_tile(base_color, seed):
 
 
 def make_witch():
+    """Scaled to read as ~1.7 tile-heights (tile diamond = 128px), not the
+    ~2.8 tile-heights the unscaled proportions produced originally — a
+    character towering 4 tiles tall was a proportion bug, not a choice."""
     img = new_canvas()
     draw = ImageDraw.Draw(img)
     w, h = CANVAS
     base_y = h - 96
+    scale = 0.6
     robe_color = (58, 42, 92)
     trim_color = (30, 20, 54)
 
+    def dy(v):
+        return base_y - v * scale
+
     draw.polygon(
-        [(w / 2 - 6, base_y - 210), (w / 2 - 46, base_y), (w / 2 + 46, base_y), (w / 2 + 6, base_y - 210)],
+        [(w / 2 - 6 * scale, dy(210)), (w / 2 - 46 * scale, base_y), (w / 2 + 46 * scale, base_y), (w / 2 + 6 * scale, dy(210))],
         fill=(*robe_color, 255),
     )
-    draw.ellipse([w / 2 - 46, base_y - 14, w / 2 + 46, base_y + 14], fill=(*trim_color, 255))
+    draw.ellipse([w / 2 - 46 * scale, base_y - 14 * scale, w / 2 + 46 * scale, base_y + 14 * scale], fill=(*trim_color, 255))
 
-    head_r = 26
-    head_cy = base_y - 232
+    head_r = 26 * scale
+    head_cy = dy(232)
     skin = (222, 184, 158)
     draw.ellipse([w / 2 - head_r, head_cy - head_r, w / 2 + head_r, head_cy + head_r], fill=(*skin, 255))
 
     hat_color = (24, 18, 40)
     draw.polygon(
-        [(w / 2, head_cy - head_r - 90), (w / 2 - 44, head_cy - head_r + 10), (w / 2 + 44, head_cy - head_r + 10)],
+        [(w / 2, head_cy - head_r - 90 * scale), (w / 2 - 44 * scale, head_cy - head_r + 10 * scale), (w / 2 + 44 * scale, head_cy - head_r + 10 * scale)],
         fill=(*hat_color, 255),
     )
     draw.ellipse(
-        [w / 2 - 56, head_cy - head_r - 4, w / 2 + 56, head_cy - head_r + 20],
+        [w / 2 - 56 * scale, head_cy - head_r - 4 * scale, w / 2 + 56 * scale, head_cy - head_r + 20 * scale],
         fill=(*hat_color, 255),
     )
 
-    eye_y = head_cy + 2
-    draw.ellipse([w / 2 - 12, eye_y - 3, w / 2 - 6, eye_y + 3], fill=(20, 10, 10, 255))
-    draw.ellipse([w / 2 + 6, eye_y - 3, w / 2 + 12, eye_y + 3], fill=(20, 10, 10, 255))
+    eye_y = head_cy + 2 * scale
+    draw.ellipse([w / 2 - 12 * scale, eye_y - 3 * scale, w / 2 - 6 * scale, eye_y + 3 * scale], fill=(20, 10, 10, 255))
+    draw.ellipse([w / 2 + 6 * scale, eye_y - 3 * scale, w / 2 + 12 * scale, eye_y + 3 * scale], fill=(20, 10, 10, 255))
 
     return img
 
