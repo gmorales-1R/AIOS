@@ -4,7 +4,7 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 
 ## Ubicación común
 - **Dónde:** en la superficie del planeta menta, al pie del Árbol de los Susurros, junto a Lumi.
-- **Turno:** 4.
+- **Turno:** 5.
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
@@ -28,4 +28,4 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 - **Rol:** curiosea y ayuda.
 - **Ánimo:** emocionado (aún con flan en la nariz).
 - **Objetos:** mochila con cosas variadas y algo pegajosas; galletas de saludo.
-- **Notas:** curioseando; se acerca a una de las pelusas grises de las ramas.
+- **Notas:** notó que una pelusa gris tiembla, como si tuviera frío.

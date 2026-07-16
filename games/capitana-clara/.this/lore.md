@@ -13,6 +13,15 @@ Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar l
 - **El Árbol de los Susurros:** enorme árbol luminoso (más alto que diez naves), el más viejo y bonito del planeta menta. Sus hojas brillaban con mil colores, pero se están **apagando una a una**. A sus pies hay pasto verde menta y el aire huele a menta con caramelo.
 - **Pistas del misterio (turno 3):** (1) **pelusas grises** dormidas sobre las ramas cuyas hojas están apagadas; (2) un **arroyito casi seco** junto a las raíces; (3) **silencio raro**: no hay animales en el planeta.
 
+## Cómo funciona el Árbol
+- El Árbol brillaba porque los **animalitos del planeta cantaban** con él cada noche; con cada canción sus hojas brillaban más fuerte. Sin canciones, el brillo baja.
+
+## Las pelusas grises
+- Llegaron una noche dentro de una **nube gris y fría** que cayó del cielo (origen aún desconocido).
+- Se sientan calladitas en las ramas y **donde se posan, la luz se apaga**.
+- No hacen daño; parecen tener **frío** (tiemblan). Hipótesis de la tripulación: no son malas, solo buscan calor.
+- Efecto secundario: los animalitos se asustaron y se **escondieron**, por eso ya nadie canta.
+
 ## Personajes del mundo (no jugables)
 - **Lumi:** brotecito (pequeño ser-planta) del Árbol de los Susurros. Voz dulce y tímida. Canta para pedir ayuda, pero su voz solo llega a las estrellas. Quiere salvar el brillo del Árbol.
 - **Comandante Bigotes:** gato espacial sabio; da pistas desde su estación. Bosteza mucho. (Aún no ha aparecido en escena.)
