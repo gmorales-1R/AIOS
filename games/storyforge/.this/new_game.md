@@ -1,0 +1,27 @@
+# new_game — from "an idea" to "game on"
+
+The checklist the GM runs the moment a player states a premise. Goal: be playing within one turn, with the framework already loaded underneath.
+
+## Steps
+
+1. **Take the idea as-is.** Whatever the player says ("dwarves mining who find a stone golem") is the fiction. Don't negotiate the wrapper.
+2. **Find the real system hiding inside it** and pick **one disruptive concept** (`learning_design.md`). For the golem: geomechanics of a mine. Prefer real science; make it emerge from the setting.
+3. **Build the ~3-rung ladder** (intuitive → contradiction → real-concept-applied). Write it down before narrating.
+4. **Decide the "turn of the screw."** What early-obvious theory will you let form, and what fact will break it in Act 2? (Anti-shallow: the answer must not be visible from turn 1.)
+5. **Read the players' level** from context / the returning `jugadores.md`, and set scaffolding accordingly.
+6. **Create the partida node:** `partidas/<slug>/this.md`, `.this/{jugadores,lore,narrativa}.md` (from the templates in `turn_engine.md`), `sessions/`. Seed `lore.md` with the concept + ladder; seed `narrativa.md` with rung 1 active.
+7. **Add the partida** to `storyforge/this.md`'s Partidas table.
+8. **Write the premise** with `gm_craft.md` rules: concrete situation, a second layer, no telegraphed answer. Present it, then ask the **first open decision** (a reasoning question, not a menu).
+9. **Play.** Run the turn loop (`turn_engine.md`); update the three files and commit each turn.
+
+## Quick sanity check before the first beat
+
+- One concept, not three? ✅
+- Is the answer non-obvious at turn 1? ✅
+- Does the non-human thing obey real, impersonal rules (no lazy anthropomorphism)? ✅
+- Is there a layer for the adult and a rung for the kid? ✅
+- Chilean Spanish, PG, open decisions? ✅
+
+## Reusing a cast
+
+A returning troupe (e.g. the *Estrella Errante* crew: Clara/Guille/Maida/José) can headline a new space game — copy their character blocks into the new partida's `jugadores.md`. A different setting (dwarves, deep sea) usually wants a fresh cast; that's fine. Recurring players (the real kids) should carry their level notes forward.
