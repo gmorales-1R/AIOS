@@ -4,7 +4,7 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 
 ## Ubicación común
 - **Dónde:** en la superficie del planeta menta, al pie del Árbol de los Susurros, junto a Lumi.
-- **Turno:** 5.
+- **Turno:** 6.
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
@@ -22,7 +22,7 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 - **Rol:** analiza e investiga.
 - **Ánimo:** intrigada; la señal la fascina.
 - **Objetos:** escáner de bolsillo.
-- **Notas:** en tierra, escáner en mano, lista para analizar las pistas del Árbol.
+- **Notas:** con el escáner detectó una estrella apagada cerca y confirmó que las pelusas son pedacitos suyos (misma temperatura fría).
 
 ## José (pasajero)
 - **Rol:** curiosea y ayuda.

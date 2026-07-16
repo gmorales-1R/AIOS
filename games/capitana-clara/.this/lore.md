@@ -17,10 +17,14 @@ Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar l
 - El Árbol brillaba porque los **animalitos del planeta cantaban** con él cada noche; con cada canción sus hojas brillaban más fuerte. Sin canciones, el brillo baja.
 
 ## Las pelusas grises
-- Llegaron una noche dentro de una **nube gris y fría** que cayó del cielo (origen aún desconocido).
+- Llegaron una noche dentro de una **nube gris y fría** que **bajó de una estrella lejana que se apagó**.
+- Son **pedacitos de esa estrella apagada** (misma temperatura fría, confirmado por el escáner de Maida).
 - Se sientan calladitas en las ramas y **donde se posan, la luz se apaga**.
-- No hacen daño; parecen tener **frío** (tiemblan). Hipótesis de la tripulación: no son malas, solo buscan calor.
+- No hacen daño; tienen **frío** porque se quedaron sin su estrella. No son malas, solo buscan calor.
 - Efecto secundario: los animalitos se asustaron y se **escondieron**, por eso ya nadie canta.
+
+## La estrella apagada
+- Estrella que antes brillaba muy fuerte y ahora está **apagada y gris**. Está en el cielo del planeta menta, **alcanzable en la nave**. Por qué se apagó: aún desconocido.
 
 ## Personajes del mundo (no jugables)
 - **Lumi:** brotecito (pequeño ser-planta) del Árbol de los Susurros. Voz dulce y tímida. Canta para pedir ayuda, pero su voz solo llega a las estrellas. Quiere salvar el brillo del Árbol.

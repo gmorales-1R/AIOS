@@ -3,10 +3,10 @@
 Se actualiza **cada turno**. Registro cronológico de la historia + la situación actual + la decisión pendiente.
 
 ## Situación actual
-- **Turno:** 5 — Lumi explica el silencio.
+- **Turno:** 6 — el origen de la nube fría.
 - **Dónde estamos:** al pie del Árbol de los Susurros, con Lumi.
-- **Qué acaba de pasar:** preguntaron a Lumi por el silencio. Explica que antes los animalitos venían de noche a **cantar** con el Árbol (y eso lo hacía brillar), pero una noche cayó una **nube gris y fría** de la que salieron las **pelusas**. Las pelusas se sientan en las ramas y ahí la luz se apaga; los animales se asustaron y se **escondieron**. Lumi cree que las pelusas no son malas: parecen tener **frío**. José nota que una pelusa **tiembla** como si tuviera frío.
-- **Decisión pendiente:** ¿examinar una pelusa de cerca, buscar cómo darles calor, preguntar de dónde vino la nube fría, u otra idea?
+- **Qué acaba de pasar:** preguntaron de dónde vino la nube fría. Lumi señala el cielo: bajó de una **estrella que antes brillaba fuerte y ahora está apagada y gris**. Maida confirma con el escáner que hay una estrella apagada cerca (alcanzable en nave) y que las pelusas tienen **su misma temperatura fría**: son **pedacitos de la estrella apagada** que cayeron. Conclusión del grupo: las pelusas no son malas, solo tienen frío por quedarse sin su estrella.
+- **Decisión pendiente:** ¿darles calor a las pelusas ahora, ir en la nave a la estrella apagada, que Maida investigue por qué se apagó, u otra idea?
 
 ## Bitácora
 | Turno | Qué pasó | Decisión de los jugadores |
@@ -15,4 +15,5 @@ Se actualiza **cada turno**. Registro cronológico de la historia + la situació
 | 1 | Guille pilota hacia el planeta menta. Descubren nubes rosas y un árbol gigante luminoso; la señal es una "vocecita" que sale de él. | Clara decide hablar por radio con la voz. |
 | 2 | Clara contacta por radio. Responde Lumi, un brotecito del Árbol de los Susurros, que pide ayuda: el Árbol pierde sus lucecitas. | Clara ordena bajar a investigar qué apaga las luces. |
 | 3 | Aterrizan y conocen a Lumi en persona. Ven 3 pistas: pelusas grises en las ramas apagadas, un arroyito casi seco, y un silencio raro (sin animales). | Preguntan a Lumi por qué está todo tan callado. |
-| 4 | Lumi cuenta: los animales cantaban con el Árbol y lo hacían brillar; cayó una nube gris fría con las pelusas; estas apagan la luz donde se sientan y los animales se escondieron. Parece que las pelusas solo tienen frío (una tiembla). | (pendiente) |
+| 4 | Lumi cuenta: los animales cantaban con el Árbol y lo hacían brillar; cayó una nube gris fría con las pelusas; estas apagan la luz donde se sientan y los animales se escondieron. Parece que las pelusas solo tienen frío (una tiembla). | Preguntan a Lumi de dónde vino la nube fría. |
+| 5 | Lumi dice que la nube bajó de una estrella lejana que se apagó. Maida confirma: hay una estrella apagada cerca y las pelusas son pedacitos suyos, con frío. Las pelusas no son malas. | (pendiente) |
