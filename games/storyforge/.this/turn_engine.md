@@ -5,11 +5,17 @@ How a game runs, mechanically. Generalized from `la-estrella-dormida`.
 ## The turn loop
 
 Each turn:
+0. **Read `settings.json`** (match config): language + register, rating, players, difficulty, duration, learning. Everything below obeys it.
 1. **Reload state.** Read the active game's `narrativa.md` (situación actual + open threads + ladder rung), `jugadores.md` (crew/players state), `lore.md` (established facts + the disruptive concept). Nothing you narrate may contradict these.
-2. **Narrate one short beat** in Chilean Spanish, PG. Run the `gm_craft.md` anti-shallow checklist. Advance the pacing/ladder when the beat calls for it.
-3. **Ask an open decision** when pertinent — a question that makes the players *reason*, not just pick from a menu. Offer 2–4 example moves plus an always-open "...o lo que se les ocurra." Address the right character by role when useful.
+2. **Narrate one short beat** in the configured language/register and within the configured `rating`. Run the `gm_craft.md` anti-shallow checklist (calibrated to `difficulty`). Advance the pacing/ladder when the beat calls for it, aiming the arc at `duration.ideal_turns`.
+3. **Ask an open decision** when pertinent — a question that makes the players *reason*, not just pick from a menu. Offer 2–4 example moves plus an always-open free option (phrased in the configured language). Address the right character by role when useful.
 4. **Update the three living files** to reflect what happened and leave a clean state for next turn.
 5. **Commit & push** (progress survives the ephemeral container). One commit per turn: `"<partida> · turno N: <resumen corto>"`.
+
+## Config vs. state (per partida)
+
+- **`settings.json`** — match config (language/register, rating, players, difficulty, duration, learning). Set at game start; changes rarely. Read every turn, but not part of the story state.
+- **The three living files** below — the story *state*, rewritten every turn.
 
 ## The three living files (per partida)
 
@@ -31,7 +37,7 @@ Each turn:
 - **Bitácora:** one row per turn (qué pasó | decisión de los jugadores).
 
 ## Starting a game
-Follow `new_game.md`. In short: create `partidas/<slug>/` with `this.md` + `.this/{jugadores,lore,narrativa}.md` + `sessions/`, seed them from the template below, then narrate the premise and the first open decision.
+Follow `new_game.md`. In short: create `partidas/<slug>/` with `settings.json` (copied from `storyforge/settings.default.json` and overridden) + `this.md` + `.this/{jugadores,lore,narrativa}.md` + `sessions/`, seed them from the templates below, then narrate the premise and the first open decision.
 
 ## Resuming a game
 Read the active partida's `narrativa.md` → *situación actual* and continue from the pending decision. The three files are the save state; trust them over memory.
@@ -40,6 +46,9 @@ Read the active partida's `narrativa.md` → *situación actual* and continue fr
 When the arc lands, mark the partida ✅ in its files and this node's `this.md`, and write a recap to `partidas/<slug>/sessions/<date>_<slug>.md` including a short **"qué aprendimos"** (which concept, which rungs the kids actually climbed). Update `storyforge/this.md`'s Partidas table.
 
 ## File templates (copy for a new partida)
+
+**settings.json** — copy `storyforge/settings.default.json` and override (see `settings.md` for the schema). At minimum set `title`, `language`, `players`, and `theme`.
+
 
 **jugadores.md**
 ```

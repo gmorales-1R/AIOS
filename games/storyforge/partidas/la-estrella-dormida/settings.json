@@ -1,0 +1,29 @@
+{
+  "title": "La Capitana Clara y la Estrella Dormida",
+  "language": {
+    "locale": "es-CL",
+    "register": "coloquial",
+    "formality": "tú/ustedes",
+    "slang_level": "alto",
+    "notes": "RETRO: se narró demasiado coloquial/flaite ('po', jerga a cada rato). El registro correcto para esta familia era 'culto' (chileno educado). Corregido en el default del framework."
+  },
+  "rating": "PG",
+  "players": {
+    "count": 1,
+    "ages": [],
+    "names": [],
+    "level": "principiante"
+  },
+  "difficulty": "suave",
+  "duration": {
+    "ideal_turns": 12,
+    "target_time": "una sentada",
+    "pacing": "normal"
+  },
+  "learning": {
+    "enabled": true,
+    "intensity": "baja",
+    "concept": "(débil) las 'pelusas' antropomorfizadas — sin sistema real; ver retro"
+  },
+  "theme": "aventura en el espacio, tripulación en una nave"
+}

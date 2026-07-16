@@ -36,3 +36,11 @@ Load this whenever you narrate. It is the difference between "cute but shallow" 
 - **Act 3 — Apply & land.** Players use the concept correctly to resolve the situation. Warm, earned ending. Note the learning in the session log.
 
 Keep individual beats short and read-aloud friendly — depth is in the *structure*, not in longer paragraphs.
+
+## Calibrate to `settings.json`
+
+Craft intensity is not fixed — read the match config:
+- **`difficulty`** sets how hard hypotheses get refuted and how much choices cost (`suave` → gentle/guided; `desafiante` → real inference, persistent forks). Never crosses into cruelty regardless.
+- **`duration.ideal_turns`** sets arc length — plant the "turn of the screw" and climb the ladder so the finale lands near it, not whenever.
+- **`language.register`** sets tone: match the wit and vocabulary to it. An `culto` es-CL game is warm and clever without street slang; the second-layer humor should read as educated, not flaite.
+- **`learning.intensity`** sets how much the concept drives the plot vs. sits in the background.

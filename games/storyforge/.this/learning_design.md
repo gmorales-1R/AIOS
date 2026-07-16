@@ -38,7 +38,7 @@ Our first game failed here: "xenobiology" was Earth animals with feelings. Guard
 
 ## Scaling to the child
 
-Read the players' level from `jugadores.md` and their answers. Younger/newer → more concrete, one word at a time, more scaffolding. Older/returning → thinner scaffolding, more inference, a harder rung 3. Never below their level (boring) or so far above that reasoning stalls (frustrating). Aim just above.
+Read `settings.json` → `players.ages`/`level` and `learning.intensity` (and the players' answers). Younger/newer → more concrete, one word at a time, more scaffolding. Older/returning → thinner scaffolding, more inference, a harder rung 3. Never below their level (boring) or so far above that reasoning stalls (frustrating). Aim just above. If `learning.enabled` is false, run pure-fun mode: keep the craft, drop the ladder.
 
 ## Starter library (concept ↔ setting)
 

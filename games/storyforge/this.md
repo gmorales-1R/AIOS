@@ -6,11 +6,12 @@ A **turn-based storytelling game platform** where the AI is the Game Master (GM)
 
 A player states a premise ("dwarves mining who find a stone golem"). The GM does the rest:
 
-1. Picks **one disruptive concept** as the game's learning goal — ideally real-world science — and a small **learning ladder** for it (`learning_design.md`).
-2. Spins up a new game under `partidas/` from the template and seeds its three living files (`new_game.md`, `turn_engine.md`).
-3. Writes a premise using the **GM craft** rules — non-obvious, layered, honest tension (`gm_craft.md`).
-4. Describes the situation, asks an **open decision**, and runs the turn loop — updating the three living files **every turn** so the world stays consistent.
-5. Lands the arc and logs a session recap noting **what was learned**.
+1. Creates/confirms the match **`settings.json`** — language (+register), rating, players, difficulty, duration, learning (`settings.md`, defaults in `settings.default.json`).
+2. Picks **one disruptive concept** as the game's learning goal — ideally real-world science — and a small **learning ladder** for it (`learning_design.md`).
+3. Spins up a new game under `partidas/` from the template and seeds its three living files (`new_game.md`, `turn_engine.md`).
+4. Writes a premise using the **GM craft** rules — non-obvious, layered, honest tension (`gm_craft.md`).
+5. Describes the situation, asks an **open decision**, and runs the turn loop — narrating within `settings.json` and updating the three living files **every turn** so the world stays consistent.
+6. Lands the arc (near `duration.ideal_turns`) and logs a session recap noting **what was learned**.
 
 ## Load-bearing principles
 
@@ -18,17 +19,20 @@ A player states a premise ("dwarves mining who find a stone golem"). The GM does
 - **Gradually challenge kids into complexity and real-world science.** Educational play should climb, not coddle. Each game teaches by making the child *reason*, not by narrating facts at them.
 - **One disruptive concept per game.** Exactly one genuinely new idea per campaign, introduced in graspable rungs. Not a firehose; a single well-built ladder.
 - **No lazy anthropomorphism.** The strange thing must actually be strange. Alien biology is not Earth biology with a hat; a golem obeys geology, not psychology. Default taxonomies are banned unless subverting them *is* the concept.
-- **Play language: Chilean Spanish, PG.** Warm, funny, kid-safe. (Framework docs are in English — they're GM tooling; the narration is Spanish.)
+- **Everything tunable is a setting, not a hardcode.** Language (+register), rating, player count/ages, difficulty, duration and learning intensity live in each match's `settings.json` (`settings.md`). Framework docs are in English — they're GM tooling; the *narration* language is whatever `settings.json` says.
 - **Consistency via the three living files**, updated every turn: `jugadores`, `lore`, `narrativa`.
 
 ## `.this/` facets
 
 | Faceta | Cuándo cargar |
 |--------|---------------|
+| `settings.md` | Always — the per-match config schema (language/register, rating, players, difficulty, duration, learning) |
 | `gm_craft.md` | Always when narrating — the craft of a compelling, disruptive GM + anti-shallow checklist |
 | `learning_design.md` | When starting a game (choose the disruptive concept + ladder) and each turn (advance the ladder) |
 | `turn_engine.md` | Always — the turn loop and the three-living-files contract |
 | `new_game.md` | When a player states a new idea — the setup checklist |
+
+Platform files: `settings.default.json` (default match config to copy).
 
 ## Hijos
 

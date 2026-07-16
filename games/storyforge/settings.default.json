@@ -1,0 +1,29 @@
+{
+  "title": "Nueva partida",
+  "language": {
+    "locale": "es-CL",
+    "register": "culto",
+    "formality": "tú/ustedes",
+    "slang_level": "bajo",
+    "notes": "Español de Chile educado (clase media-alta), gramática cuidada y cálida. Chilenismos transversales y suaves con moderación (harto, al tiro, ¿cierto?); evitar 'po', coa, jerga flaite y garabatos. El sabor chileno viene del léxico y la musicalidad culta, no de la jerga."
+  },
+  "rating": "PG",
+  "players": {
+    "count": 1,
+    "ages": [],
+    "names": [],
+    "level": "principiante"
+  },
+  "difficulty": "suave",
+  "duration": {
+    "ideal_turns": 12,
+    "target_time": "una sentada (~20-30 min)",
+    "pacing": "normal"
+  },
+  "learning": {
+    "enabled": true,
+    "intensity": "media",
+    "concept": null
+  },
+  "theme": null
+}

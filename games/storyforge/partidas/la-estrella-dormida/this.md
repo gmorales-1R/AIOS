@@ -15,13 +15,15 @@ El adulto la encontró **superficial, obvia y aburrida**; los niños la disfruta
 - **Concepto disruptivo débil/ausente.** La "xenobiología" fue en realidad animalitos terrestres con sentimientos — antropomorfismo, no ciencia. No enseñó un sistema real.
 - **Solución telegrafiada.** "No son malas, tienen frío" se veía desde la primera pista; ninguna hipótesis fue refutada.
 - **Decisiones sin consecuencia.** Todos los caminos convergían al mismo beat cálido.
+- **Registro equivocado.** Se narró en chileno demasiado coloquial/flaite ("po", jerga); la familia quería un registro **culto/educado**. De ahí que `register` sea ahora un ajuste en `settings.json` (default es-CL `culto`).
 
-Sirve como línea base: la próxima partida debe elegir **un concepto disruptivo real** y construir su escalera de aprendizaje.
+Sirve como línea base: la próxima partida debe elegir **un concepto disruptivo real**, construir su escalera de aprendizaje y respetar el `register` configurado.
 
 ## Archivos
 
 | Archivo | Contenido |
 |---------|-----------|
+| `settings.json` | Config de esta partida (incluye la nota-retro del registro) |
 | `.this/jugadores.md`, `lore.md`, `narrativa.md` | Estado final de la partida (los tres archivos vivos) |
 | `.this/docs.md` | Premisa y guía de esta partida (histórico) |
 | `sessions/` | Recap final |
