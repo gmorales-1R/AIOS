@@ -3,9 +3,9 @@
 Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada personaje.
 
 ## Ubicación común
-- **Dónde:** claro junto al Árbol de los Susurros (planeta menta), alrededor de una fogata. Con Lumi y el Comandante Bigotes.
-- **Turno:** 9.
-- **Misión activa:** ✅ chispitas calentitas y felices + ✅ canción completa. Falta: **llevar las chispitas a la estrella dormida y cantársela** para despertarla.
+- **Dónde:** a bordo de *La Estrella Errante*, junto a la estrella dormida. A bordo: tripulación, Lumi y las chispitas. Bigotes afuera.
+- **Turno:** 10.
+- **Misión activa:** ✅ chispitas a salvo en la nave + ✅ canción completa + ✅ llegaron a la estrella. Falta el paso final: **soltar a las chispitas y cantar la Canción de las Estrellas** para despertar a la estrella.
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
@@ -17,7 +17,7 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 - **Rol:** pilota y traza rutas.
 - **Ánimo:** animado; disfruta pilotando.
 - **Objetos:** mando de navegación.
-- **Notas:** pilotó la nave desde el planeta hasta la estrella dormida.
+- **Notas:** pilotó la nave de vuelta a la estrella dormida con las chispitas a bordo.
 
 ## Maida (científica)
 - **Rol:** analiza e investiga.
@@ -29,4 +29,4 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 - **Rol:** curiosea y ayuda.
 - **Ánimo:** emocionado (aún con flan en la nariz).
 - **Objetos:** mochila con cosas variadas y algo pegajosas; galletas de saludo; un calcetín de lana gigante con pompón.
-- **Notas:** propuso la fogata; reparte marshmallows para todos (incluidos Lumi y Bigotes).
+- **Notas:** en el viaje calentó a las chispitas juntándolas y haciéndolas reír con un chiste malo.
