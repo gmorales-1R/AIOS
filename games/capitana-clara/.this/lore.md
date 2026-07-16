@@ -9,7 +9,8 @@ Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar l
 - **La Estrella Errante:** nave-hogar de la tripulación. Puente de mando con gran ventana redonda. (Los jugadores pueden rebautizarla.)
 
 ## Lugares
-- **Planeta color menta (sin nombre aún):** no aparece en los mapas. De ahí viene una señal suave y misteriosa. Nada más se sabe todavía.
+- **Planeta color menta (sin nombre aún):** no aparece en los mapas. Verde menta brillante, rodeado de **nubes rosas** como algodón de azúcar. En su superficie hay un **árbol gigante que brilla**, del que sale la señal.
+- **El Árbol Brillante:** enorme árbol luminoso en el planeta menta. La misteriosa señal es en realidad **una vocecita** que sale de él (aún no se sabe de quién ni qué quiere).
 
 ## Personajes del mundo (no jugables)
 - **Comandante Bigotes:** gato espacial sabio; da pistas desde su estación. Bosteza mucho. (Aún no ha aparecido en escena.)

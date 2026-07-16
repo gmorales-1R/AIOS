@@ -3,29 +3,29 @@
 Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada personaje.
 
 ## Ubicación común
-- **Dónde:** puente de mando de *La Estrella Errante*.
-- **Turno:** 0 (aún sin empezar).
+- **Dónde:** a bordo de *La Estrella Errante*, aproximándose al planeta menta.
+- **Turno:** 2.
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
-- **Ánimo:** tranquila, atenta.
+- **Ánimo:** decidida y curiosa; quiere ayudar a quien envía la señal.
 - **Objetos:** insignia de capitana, taza de flan espacial.
-- **Notas:** —
+- **Notas:** ordenó poner rumbo al planeta menta.
 
 ## Guille (navegante)
 - **Rol:** pilota y traza rutas.
-- **Ánimo:** relajado, listo para maniobrar.
+- **Ánimo:** animado; disfruta pilotando.
 - **Objetos:** mando de navegación.
-- **Notas:** —
+- **Notas:** llevó la nave hasta la órbita del planeta menta.
 
 ## Maida (científica)
 - **Rol:** analiza e investiga.
-- **Ánimo:** curiosa; la señal le pica el interés.
+- **Ánimo:** intrigada; la señal la fascina.
 - **Objetos:** escáner de bolsillo.
-- **Notas:** —
+- **Notas:** descubrió que la señal es una "vocecita", no una máquina, y sale del árbol gigante.
 
 ## José (pasajero)
 - **Rol:** curiosea y ayuda.
-- **Ánimo:** contento, con la boca llena de flan.
-- **Objetos:** mochila con cosas variadas y algo pegajosas.
-- **Notas:** —
+- **Ánimo:** emocionado (aún con flan en la nariz).
+- **Objetos:** mochila con cosas variadas y algo pegajosas; galletas de saludo.
+- **Notas:** fue el primero en ver el árbol brillante.
