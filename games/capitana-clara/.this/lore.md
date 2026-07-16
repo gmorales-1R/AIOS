@@ -10,11 +10,12 @@ Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar l
 
 ## Lugares
 - **Planeta color menta (sin nombre aún):** no aparece en los mapas. Verde menta brillante, rodeado de **nubes rosas** como algodón de azúcar. En su superficie hay un **árbol gigante que brilla**, del que sale la señal.
-- **El Árbol Brillante:** enorme árbol luminoso en el planeta menta. La misteriosa señal es en realidad **una vocecita** que sale de él (aún no se sabe de quién ni qué quiere).
+- **El Árbol de los Susurros:** enorme árbol luminoso, el más viejo y bonito del planeta menta. Sus hojas brillaban con mil colores, pero se están **apagando una a una**. Motivo aún desconocido.
 
 ## Personajes del mundo (no jugables)
+- **Lumi:** brotecito (pequeño ser-planta) del Árbol de los Susurros. Voz dulce y tímida. Canta para pedir ayuda, pero su voz solo llega a las estrellas. Quiere salvar el brillo del Árbol.
 - **Comandante Bigotes:** gato espacial sabio; da pistas desde su estación. Bosteza mucho. (Aún no ha aparecido en escena.)
 
 ## Reglas del universo
 - Los misterios se resuelven con ingenio y amabilidad, nunca con violencia.
-- Aún por descubrir: qué es la señal del planeta menta.
+- **Misterio activo:** ¿por qué se apagan las hojas del Árbol de los Susurros? (sin resolver)

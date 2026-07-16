@@ -3,8 +3,8 @@
 Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada personaje.
 
 ## Ubicación común
-- **Dónde:** a bordo de *La Estrella Errante*, aproximándose al planeta menta.
-- **Turno:** 2.
+- **Dónde:** a bordo de *La Estrella Errante*, en órbita del planeta menta, hablando por radio con Lumi.
+- **Turno:** 3.
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
