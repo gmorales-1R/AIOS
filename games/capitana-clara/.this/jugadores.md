@@ -3,8 +3,9 @@
 Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada personaje.
 
 ## Ubicación común
-- **Dónde:** en la superficie del planeta menta, al pie del Árbol de los Susurros, junto a Lumi.
-- **Turno:** 6.
+- **Dónde:** en el espacio, junto a la estrella dormida, en la Estación Bigotes. Lumi viaja a bordo.
+- **Turno:** 7.
+- **Misión activa:** despertar a la estrella dormida — (1) devolverle las pelusas/chispitas + (2) cantarle la Canción de las Estrellas.
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
@@ -16,7 +17,7 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 - **Rol:** pilota y traza rutas.
 - **Ánimo:** animado; disfruta pilotando.
 - **Objetos:** mando de navegación.
-- **Notas:** llevó la nave hasta la órbita del planeta menta.
+- **Notas:** pilotó la nave desde el planeta hasta la estrella dormida.
 
 ## Maida (científica)
 - **Rol:** analiza e investiga.

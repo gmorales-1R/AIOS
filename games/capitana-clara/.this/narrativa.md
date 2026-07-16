@@ -3,10 +3,10 @@
 Se actualiza **cada turno**. Registro cronológico de la historia + la situación actual + la decisión pendiente.
 
 ## Situación actual
-- **Turno:** 6 — el origen de la nube fría.
-- **Dónde estamos:** al pie del Árbol de los Susurros, con Lumi.
-- **Qué acaba de pasar:** preguntaron de dónde vino la nube fría. Lumi señala el cielo: bajó de una **estrella que antes brillaba fuerte y ahora está apagada y gris**. Maida confirma con el escáner que hay una estrella apagada cerca (alcanzable en nave) y que las pelusas tienen **su misma temperatura fría**: son **pedacitos de la estrella apagada** que cayeron. Conclusión del grupo: las pelusas no son malas, solo tienen frío por quedarse sin su estrella.
-- **Decisión pendiente:** ¿darles calor a las pelusas ahora, ir en la nave a la estrella apagada, que Maida investigue por qué se apagó, u otra idea?
+- **Turno:** 7 — la estrella dormida y el Comandante Bigotes.
+- **Dónde estamos:** en el espacio, junto a la estrella apagada, en la Estación Bigotes. Lumi vino a bordo.
+- **Qué acaba de pasar:** volaron hasta la estrella apagada. Descubren una estacioncita y conocen al **Comandante Bigotes** (gato espacial guardián). Bigotes explica que la estrella no está apagada, sino **dormida y triste**: un viento espacial le sopló todas sus **chispitas** (que son las pelusas grises) y sin ellas se quedó fría y se durmió. Para despertarla hacen falta **dos cosas**: (1) que las **chispitas/pelusas vuelvan** a la estrella; (2) que alguien le cante la **Canción de las Estrellas** (Bigotes la olvidó).
+- **Decisión pendiente:** ¿averiguar quién recuerda la canción, volver a recoger las pelusas, preguntar más a Bigotes, u otra idea?
 
 ## Bitácora
 | Turno | Qué pasó | Decisión de los jugadores |
@@ -16,4 +16,5 @@ Se actualiza **cada turno**. Registro cronológico de la historia + la situació
 | 2 | Clara contacta por radio. Responde Lumi, un brotecito del Árbol de los Susurros, que pide ayuda: el Árbol pierde sus lucecitas. | Clara ordena bajar a investigar qué apaga las luces. |
 | 3 | Aterrizan y conocen a Lumi en persona. Ven 3 pistas: pelusas grises en las ramas apagadas, un arroyito casi seco, y un silencio raro (sin animales). | Preguntan a Lumi por qué está todo tan callado. |
 | 4 | Lumi cuenta: los animales cantaban con el Árbol y lo hacían brillar; cayó una nube gris fría con las pelusas; estas apagan la luz donde se sientan y los animales se escondieron. Parece que las pelusas solo tienen frío (una tiembla). | Preguntan a Lumi de dónde vino la nube fría. |
-| 5 | Lumi dice que la nube bajó de una estrella lejana que se apagó. Maida confirma: hay una estrella apagada cerca y las pelusas son pedacitos suyos, con frío. Las pelusas no son malas. | (pendiente) |
+| 5 | Lumi dice que la nube bajó de una estrella lejana que se apagó. Maida confirma: hay una estrella apagada cerca y las pelusas son pedacitos suyos, con frío. Las pelusas no son malas. | La tripulación decide ir a investigar la estrella apagada. |
+| 6 | Vuelan a la estrella (Lumi va a bordo). Conocen al Comandante Bigotes. La estrella está dormida y triste porque perdió sus chispitas (=las pelusas). Para despertarla: devolver las chispitas + cantarle la Canción de las Estrellas (Bigotes la olvidó). | (pendiente) |

@@ -23,12 +23,14 @@ Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar l
 - No hacen daño; tienen **frío** porque se quedaron sin su estrella. No son malas, solo buscan calor.
 - Efecto secundario: los animalitos se asustaron y se **escondieron**, por eso ya nadie canta.
 
-## La estrella apagada
-- Estrella que antes brillaba muy fuerte y ahora está **apagada y gris**. Está en el cielo del planeta menta, **alcanzable en la nave**. Por qué se apagó: aún desconocido.
+## La estrella dormida
+- No está apagada, sino **dormida y triste**. Un **viento espacial** le sopló todas sus **chispitas** (= las pelusas grises) y, sin ellas, se quedó fría y se durmió de pena.
+- **Estación Bigotes:** estacioncita redonda junto a la estrella, con timbre; hogar del Comandante Bigotes.
+- **Cómo despertarla (la misión):** (1) devolverle sus **chispitas/pelusas**; (2) cantarle la **Canción de las Estrellas** (la que arrulla y enciende a las estrellas; nadie a bordo la sabe todavía).
 
 ## Personajes del mundo (no jugables)
-- **Lumi:** brotecito (pequeño ser-planta) del Árbol de los Susurros. Voz dulce y tímida. Canta para pedir ayuda, pero su voz solo llega a las estrellas. Quiere salvar el brillo del Árbol.
-- **Comandante Bigotes:** gato espacial sabio; da pistas desde su estación. Bosteza mucho. (Aún no ha aparecido en escena.)
+- **Lumi:** brotecito (pequeño ser-planta) del Árbol de los Susurros. Voz dulce y tímida. Ahora viaja a bordo de la nave (en una macetita con cinturón).
+- **Comandante Bigotes:** gato espacial grandote y viejo, gorrito de capitán, muy dormilón. Guardián de la **Estación Bigotes**, junto a la estrella dormida. Conoce la historia de la estrella, pero **olvidó la Canción de las Estrellas**.
 
 ## Reglas del universo
 - Los misterios se resuelven con ingenio y amabilidad, nunca con violencia.
