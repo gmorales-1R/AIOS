@@ -29,7 +29,7 @@ Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar l
 - **Estación Bigotes:** estacioncita redonda junto a la estrella, con timbre; hogar del Comandante Bigotes.
 - **Cómo despertarla (la misión):** (1) devolverle sus **chispitas/pelusas**; (2) cantarle la **Canción de las Estrellas**.
 - **La Canción de las Estrellas:** no la canta nadie solo; la cantan **todas las chispitas juntas**. Cada pelusa (al estar calentita) aporta un trocito. Letra: *"Luna de miel, chispita de luz, vuelve a casita, brilla tú..."*. Ya suena **completa** (turno 8).
-- **Estado (turno 8):** todas las pelusas están **doradas, calentitas y felices**; el Árbol de los Susurros **volvió a brillar**. Falta llevar las chispitas a la estrella dormida y cantársela allí.
+- **Estado FINAL:** las chispitas volvieron a la estrella y **la estrella despertó y se encendió entera** (turno 10). La estrella agradeció a la tripulación. En el planeta menta, los **animalitos volvieron** y cantan de nuevo con el Árbol, que resplandece. Todo el rincón del cielo quedó feliz y calentito. 🌟
 
 ## Personajes del mundo (no jugables)
 - **Lumi:** brotecito (pequeño ser-planta) del Árbol de los Susurros. Voz dulce y tímida. Ahora viaja a bordo de la nave (en una macetita con cinturón).

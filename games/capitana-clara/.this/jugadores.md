@@ -3,9 +3,9 @@
 Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada personaje.
 
 ## Ubicación común
-- **Dónde:** a bordo de *La Estrella Errante*, junto a la estrella dormida. A bordo: tripulación, Lumi y las chispitas. Bigotes afuera.
-- **Turno:** 10.
-- **Misión activa:** ✅ chispitas a salvo en la nave + ✅ canción completa + ✅ llegaron a la estrella. Falta el paso final: **soltar a las chispitas y cantar la Canción de las Estrellas** para despertar a la estrella.
+- **Dónde:** en el espacio, frente a la estrella ya despierta; a punto de celebrar con chocolate en la Estación Bigotes.
+- **Turno:** 11.
+- **Misión activa:** ✅✅✅ ¡COMPLETADA! La estrella despertó. Aventura "La Estrella Dormida" terminada. Lista para una nueva.
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
