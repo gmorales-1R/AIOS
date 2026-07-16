@@ -22,11 +22,13 @@ Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar l
 - Se sientan calladitas en las ramas y **donde se posan, la luz se apaga**.
 - No hacen daño; tienen **frío** porque se quedaron sin su estrella. No son malas, solo buscan calor.
 - Efecto secundario: los animalitos se asustaron y se **escondieron**, por eso ya nadie canta.
+- **Al calentarlas** (p. ej. con un calcetín de lana): dejan de temblar, se vuelven **doradas** y felices, y **tararean un pedacito de la Canción de las Estrellas**. Cada pelusa guarda un trozo distinto; **juntas cantan la canción completa**.
 
 ## La estrella dormida
 - No está apagada, sino **dormida y triste**. Un **viento espacial** le sopló todas sus **chispitas** (= las pelusas grises) y, sin ellas, se quedó fría y se durmió de pena.
 - **Estación Bigotes:** estacioncita redonda junto a la estrella, con timbre; hogar del Comandante Bigotes.
-- **Cómo despertarla (la misión):** (1) devolverle sus **chispitas/pelusas**; (2) cantarle la **Canción de las Estrellas** (la que arrulla y enciende a las estrellas; nadie a bordo la sabe todavía).
+- **Cómo despertarla (la misión):** (1) devolverle sus **chispitas/pelusas**; (2) cantarle la **Canción de las Estrellas**.
+- **La Canción de las Estrellas:** no la canta nadie solo; la cantan **todas las chispitas juntas**. Cada pelusa (al estar calentita) aporta un trocito. Descubierto en el turno 7.
 
 ## Personajes del mundo (no jugables)
 - **Lumi:** brotecito (pequeño ser-planta) del Árbol de los Susurros. Voz dulce y tímida. Ahora viaja a bordo de la nave (en una macetita con cinturón).

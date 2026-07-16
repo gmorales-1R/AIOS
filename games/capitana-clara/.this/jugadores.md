@@ -3,9 +3,9 @@
 Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada personaje.
 
 ## Ubicación común
-- **Dónde:** en el espacio, junto a la estrella dormida, en la Estación Bigotes. Lumi viaja a bordo.
-- **Turno:** 7.
-- **Misión activa:** despertar a la estrella dormida — (1) devolverle las pelusas/chispitas + (2) cantarle la Canción de las Estrellas.
+- **Dónde:** de vuelta en el planeta menta, al pie del Árbol de los Susurros. Lumi con ellos; Bigotes por radio.
+- **Turno:** 8.
+- **Misión activa:** despertar a la estrella dormida — (1) devolverle las pelusas/chispitas + (2) la Canción de las Estrellas (¡se descubrió que las pelusas calentitas la cantan!).
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
@@ -23,10 +23,10 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 - **Rol:** analiza e investiga.
 - **Ánimo:** intrigada; la señal la fascina.
 - **Objetos:** escáner de bolsillo.
-- **Notas:** con el escáner detectó una estrella apagada cerca y confirmó que las pelusas son pedacitos suyos (misma temperatura fría).
+- **Notas:** dedujo que cada pelusa calentita guarda un trozo de la Canción de las Estrellas y que juntas la cantan completa.
 
 ## José (pasajero)
 - **Rol:** curiosea y ayuda.
 - **Ánimo:** emocionado (aún con flan en la nariz).
-- **Objetos:** mochila con cosas variadas y algo pegajosas; galletas de saludo.
-- **Notas:** notó que una pelusa gris tiembla, como si tuviera frío.
+- **Objetos:** mochila con cosas variadas y algo pegajosas; galletas de saludo; un calcetín de lana gigante con pompón.
+- **Notas:** sacó el calcetín de lana con el que calentaron a la primera pelusa.
