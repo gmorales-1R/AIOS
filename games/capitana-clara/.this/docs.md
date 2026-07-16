@@ -12,6 +12,7 @@ A partir de esa señal, la historia crece según las decisiones. No hay un final
 
 ## Guía de narración
 
+- **Idioma/registro:** español **latino, idealmente chileno**. Usar "ustedes" (no "vosotros"), modismos chilenos suaves y cariñosos ("al tiro", "bacán", "cachar", "po", "harto", "cabros chicos") **sin pasarse**, para que los peques entiendan siempre. Nada de garabatos.
 - **Tono:** cálido, gracioso, con un poquito de magia. Como un cuento antes de dormir, pero entre las estrellas. Apto para peques (PG).
 - **Estructura del turno:**
   1. Describe la situación en pocas frases, viva y clara.

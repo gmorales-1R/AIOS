@@ -10,7 +10,8 @@ Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar l
 
 ## Lugares
 - **Planeta color menta (sin nombre aún):** no aparece en los mapas. Verde menta brillante, rodeado de **nubes rosas** como algodón de azúcar. En su superficie hay un **árbol gigante que brilla**, del que sale la señal.
-- **El Árbol de los Susurros:** enorme árbol luminoso, el más viejo y bonito del planeta menta. Sus hojas brillaban con mil colores, pero se están **apagando una a una**. Motivo aún desconocido.
+- **El Árbol de los Susurros:** enorme árbol luminoso (más alto que diez naves), el más viejo y bonito del planeta menta. Sus hojas brillaban con mil colores, pero se están **apagando una a una**. A sus pies hay pasto verde menta y el aire huele a menta con caramelo.
+- **Pistas del misterio (turno 3):** (1) **pelusas grises** dormidas sobre las ramas cuyas hojas están apagadas; (2) un **arroyito casi seco** junto a las raíces; (3) **silencio raro**: no hay animales en el planeta.
 
 ## Personajes del mundo (no jugables)
 - **Lumi:** brotecito (pequeño ser-planta) del Árbol de los Susurros. Voz dulce y tímida. Canta para pedir ayuda, pero su voz solo llega a las estrellas. Quiere salvar el brillo del Árbol.

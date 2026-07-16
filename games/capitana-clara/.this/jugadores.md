@@ -3,14 +3,14 @@
 Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada personaje.
 
 ## Ubicación común
-- **Dónde:** a bordo de *La Estrella Errante*, en órbita del planeta menta, hablando por radio con Lumi.
-- **Turno:** 3.
+- **Dónde:** en la superficie del planeta menta, al pie del Árbol de los Susurros, junto a Lumi.
+- **Turno:** 4.
 
 ## Capitana Clara
 - **Rol:** capitana; decide el rumbo.
 - **Ánimo:** decidida y curiosa; quiere ayudar a quien envía la señal.
 - **Objetos:** insignia de capitana, taza de flan espacial.
-- **Notas:** ordenó poner rumbo al planeta menta.
+- **Notas:** ordenó aterrizar y bajar a investigar qué apaga las luces del Árbol.
 
 ## Guille (navegante)
 - **Rol:** pilota y traza rutas.
@@ -22,10 +22,10 @@ Se actualiza **cada turno**. Estado, ánimo, objetos y ubicación de cada person
 - **Rol:** analiza e investiga.
 - **Ánimo:** intrigada; la señal la fascina.
 - **Objetos:** escáner de bolsillo.
-- **Notas:** descubrió que la señal es una "vocecita", no una máquina, y sale del árbol gigante.
+- **Notas:** en tierra, escáner en mano, lista para analizar las pistas del Árbol.
 
 ## José (pasajero)
 - **Rol:** curiosea y ayuda.
 - **Ánimo:** emocionado (aún con flan en la nariz).
 - **Objetos:** mochila con cosas variadas y algo pegajosas; galletas de saludo.
-- **Notas:** fue el primero en ver el árbol brillante.
+- **Notas:** curioseando; se acerca a una de las pelusas grises de las ramas.
