@@ -45,7 +45,7 @@ Follow `new_game.md`. In short: create `partidas/<slug>/` with `settings.json` (
 Read the active partida's `narrativa.md` → *situación actual* and continue from the pending decision. The three files are the save state; trust them over memory.
 
 ## Ending a game
-When the arc lands, mark the partida ✅ in its files and this node's `this.md`, and write a recap to `partidas/<slug>/sessions/<date>_<slug>.md` including a short **"qué aprendimos"** (which concept, which rungs the kids actually climbed). Update `storyforge/this.md`'s Partidas table.
+When the arc lands, mark the partida ✅ in its files and this node's `this.md`, and write a recap to `partidas/<slug>/sessions/<date>_<slug>.md` including a short **"qué aprendimos"** (which concept, which rungs the kids actually climbed). Update `storyforge/this.md`'s Partidas table and upsert each real player's row in `storyforge/.this/memory.md` (level, concept just covered, preferences).
 
 ## File templates (copy for a new partida)
 

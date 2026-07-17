@@ -42,6 +42,8 @@ Our first game failed here: "xenobiology" was Earth animals with feelings. Guard
 
 Read `settings.json` → `players.ages`/`level` and `learning.intensity` (and the players' answers). Younger/newer → more concrete, one word at a time, more scaffolding. Older/returning → thinner scaffolding, more inference, a harder rung 3. Never below their level (boring) or so far above that reasoning stalls (frustrating). Aim just above. If `learning.enabled` is false, run pure-fun mode: keep the craft, drop the ladder.
 
+For a returning player, "one concept per game" compounds across their whole play history, not just this match — check `storyforge/.this/memory.md`'s `Conceptos vistos` and pick a concept they haven't had yet, or revisit a domain at a harder rung 3 than last time.
+
 ## Starter library (concept ↔ setting)
 
 Seed ideas — pick or adapt one when a game starts. Always prefer the player's own idea and fit a concept to it.

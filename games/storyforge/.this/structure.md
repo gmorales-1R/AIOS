@@ -34,7 +34,8 @@ The anti-shallow rule (answer not visible from turn 1; `gm_craft.md`) is structu
 If `settings.duration.ideal_turns` ≠ 15, keep the **shape** and scale the middle. Multiply each act by `ideal_turns / 15` and round, but:
 - Acts **V and VI stay 1 turn each** (a climax and a reward are single beats).
 - Act **III keeps the largest share** (it's the heart); give it the rounding slack.
-- Never drop an act to 0 — a very short game (e.g. 6 turns) becomes roughly `[1, 1, 2, 1, 1, 1]`.
+- Never drop an act to 0 — flooring short acts at 1 can overshoot `ideal_turns` after rounding. If it does, trim the surplus from Act III first (it has the slack to give); only pare II/IV next. Never trim I, V, or VI below 1.
+- Example: a 6-turn game scales to `[0.8, 1.2, 2, 1.2, 0.4, 0.4]` → rounds to `[1, 1, 2, 1, 1, 1]` (7, one over). Trim the extra turn from Act III → `[1, 1, 1, 1, 1, 1]`.
 
 Log the planned per-act budget in `narrativa.md` at game start so pacing stays honest.
 

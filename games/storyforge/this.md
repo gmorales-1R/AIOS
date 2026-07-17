@@ -33,6 +33,7 @@ A player states a premise ("dwarves mining who find a stone golem"). The GM does
 | `learning_design.md` | When starting a game (choose the disruptive concept + ladder) and each turn (advance the ladder) |
 | `turn_engine.md` | Always — the turn loop and the three-living-files contract |
 | `new_game.md` | When a player states a new idea — the setup checklist |
+| `memory.md` | When a returning player is present — cross-partida player profiles (level, concepts already covered, preferences), read at game start and written at game end |
 
 Platform files: `settings.default.json` (default match config to copy).
 
