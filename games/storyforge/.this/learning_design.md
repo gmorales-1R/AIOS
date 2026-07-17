@@ -4,7 +4,7 @@ The principle (load-bearing, from the project owner): **interactions with kids, 
 
 ## The rule: one disruptive concept per game
 
-Each game (`partida`) has **exactly one** disruptive concept — a single genuinely-new idea that is the game's learning goal and the source of its non-obvious problems. Not a curriculum dump; one idea, well built.
+Each game (match) has **exactly one** disruptive concept — a single genuinely-new idea that is the game's learning goal and the source of its non-obvious problems. Not a curriculum dump; one idea, well built.
 
 "Disruptive" means it should **break an intuitive assumption** the child (or the crew) starts with. The stone golem isn't a monster with feelings — it's a lesson in how rock, pressure, gas, and ore actually behave. The disruption *is* the education.
 
@@ -16,7 +16,7 @@ Given the player's idea, pick one concept that:
 - is **age-appropriate but slightly above** the child's current intuition — the productive stretch;
 - can be **discovered by reasoning**, not just told.
 
-Record it in the game's `lore.md` (a "Concepto disruptivo" section) — its real mechanics, kid-facing framing, and the vocabulary you'll seed.
+Record it in the game's `lore.md` (a "Disruptive concept" section) — its real mechanics, kid-facing framing, and the vocabulary you'll seed.
 
 ## The learning ladder
 
@@ -28,7 +28,7 @@ Break the concept into **~3 rungs**, intuitive → real, mapped onto the six-act
 
 The **Act IV reveal** is usually the concept's true mechanism clicking into place — the plot twist and the "aha" are the same beat.
 
-Track ladder progress in `narrativa.md` (a "Escalera de aprendizaje" line: which rung is active, what's been delivered).
+Track ladder progress in `narrative.md` (a "Learning ladder" line: which rung is active, what's been delivered).
 
 ## The anti-anthropomorphism rule
 
@@ -42,7 +42,7 @@ Our first game failed here: "xenobiology" was Earth animals with feelings. Guard
 
 Read `settings.json` → `players.ages`/`level` and `learning.intensity` (and the players' answers). Younger/newer → more concrete, one word at a time, more scaffolding. Older/returning → thinner scaffolding, more inference, a harder rung 3. Never below their level (boring) or so far above that reasoning stalls (frustrating). Aim just above. If `learning.enabled` is false, run pure-fun mode: keep the craft, drop the ladder.
 
-For a returning player, "one concept per game" compounds across their whole play history, not just this match — check `storyforge/.this/memory.md`'s `Conceptos vistos` and pick a concept they haven't had yet, or revisit a domain at a harder rung 3 than last time.
+`learning.intensity` and `depth` (`settings.md`) are independent dials: intensity is how much the *concept* drives the plot; depth is how far the *plot and themes* reach. A `high`-intensity, `light`-depth game teaches hard but stays a clean adventure; a `low`-intensity, `existential`-depth game barely leans on the concept but sits with a real question. Most games want both turned up together.
 
 ## Starter library (concept ↔ setting)
 

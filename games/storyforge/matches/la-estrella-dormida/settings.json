@@ -1,0 +1,28 @@
+{
+  "title": "La Capitana Clara y la Estrella Dormida",
+  "language": {
+    "locale": "es-CL",
+    "narrator": "neutral",
+    "notes": "RETRO: the NARRATOR came out too colloquial/street-slang (constant regional filler words) instead of neutral. There were also no character voices distinguished by background. The correct model (neutral narrator + dynamic per-character voices) was folded into the framework after this match."
+  },
+  "rating": "PG",
+  "players": {
+    "count": 1,
+    "ages": [],
+    "names": [],
+    "level": "beginner"
+  },
+  "difficulty": "gentle",
+  "depth": "light",
+  "duration": {
+    "ideal_turns": 12,
+    "target_time": "one sitting",
+    "pacing": "normal"
+  },
+  "learning": {
+    "enabled": true,
+    "intensity": "low",
+    "concept": "(weak) anthropomorphized 'fuzzies' — no real system; see retro"
+  },
+  "theme": "aventura en el espacio, tripulación en una nave"
+}

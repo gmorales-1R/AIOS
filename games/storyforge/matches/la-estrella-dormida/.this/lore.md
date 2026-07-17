@@ -1,6 +1,6 @@
-# lore — el universo
+# lore — the universe
 
-Se actualiza cuando se descubre algo nuevo. Todo lo que se narre debe respetar lo que hay aquí.
+Updated whenever something new is discovered. All narration must respect what's established here. Content below is narrated in this match's language (Chilean Spanish).
 
 ## El mundo
 - **Galaxia de Azúcar:** rincón amable del espacio, con planetas de colores y cometas juguetones. Nada es de verdad peligroso; la gente (y los robots) son amables.

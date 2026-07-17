@@ -1,15 +1,15 @@
-# narrativa — bitácora y situación actual
+# narrative — log and current situation
 
-Se actualiza **cada turno**. Registro cronológico de la historia + la situación actual + la decisión pendiente.
+Updated **every turn**. Chronological story log + current situation + pending decision. Content below is narrated in this match's language (Chilean Spanish); only the field labels are the framework's standard English keys.
 
-## Situación actual
-- **Turno:** 11 — GRAN FINAL. Aventura completada. 🌟
-- **Dónde estamos:** en el espacio, frente a la estrella (ya despierta y brillando). A punto de celebrar con chocolate en la Estación Bigotes.
-- **Qué acaba de pasar:** Clara contó "uno, dos, tres" y **todos cantaron** la Canción de las Estrellas. Las chispitas volaron de vuelta a la estrella, que **despertó y se encendió entera**. La estrella les dio las gracias. En el planeta menta, los animalitos salieron y volvieron a cantar con el Árbol, que resplandece. Lumi felicísimo. **FIN de "La Capitana Clara y la Estrella Dormida".**
-- **Decisión pendiente:** ¿empezar aventura nueva con la misma tripulación, dejarlo por hoy, o ajustar algo para la próxima?
+## Current situation
+- **Turn:** 11 — GRAN FINAL. Aventura completada. 🌟
+- **Where we are:** en el espacio, frente a la estrella (ya despierta y brillando). A punto de celebrar con chocolate en la Estación Bigotes.
+- **What just happened:** Clara contó "uno, dos, tres" y **todos cantaron** la Canción de las Estrellas. Las chispitas volaron de vuelta a la estrella, que **despertó y se encendió entera**. La estrella les dio las gracias. En el planeta menta, los animalitos salieron y volvieron a cantar con el Árbol, que resplandece. Lumi felicísimo. **FIN de "La Capitana Clara y la Estrella Dormida".**
+- **Pending decision:** ¿empezar aventura nueva con la misma tripulación, dejarlo por hoy, o ajustar algo para la próxima?
 
-## Bitácora
-| Turno | Qué pasó | Decisión de los jugadores |
+## Log
+| Turn | What happened | Players' decision |
 |-------|----------|---------------------------|
 | 0 | Se plantea la premisa: llega una señal misteriosa desde un planeta menta desconocido. | La Capitana Clara ordena poner rumbo al planeta. |
 | 1 | Guille pilota hacia el planeta menta. Descubren nubes rosas y un árbol gigante luminoso; la señal es una "vocecita" que sale de él. | Clara decide hablar por radio con la voz. |

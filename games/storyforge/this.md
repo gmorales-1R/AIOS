@@ -6,46 +6,47 @@ A **turn-based storytelling game platform** where the AI is the Game Master (GM)
 
 A player states a premise ("dwarves mining who find a stone golem"). The GM does the rest:
 
-1. Creates/confirms the match **`settings.json`** — locale + neutral narrator, rating, players, difficulty, duration, learning (`settings.md`, defaults in `settings.default.json`). Character voices are per-character, not here.
+1. Creates/confirms the match **`settings.json`** — locale + neutral narrator, rating, players, difficulty, depth, duration, learning (`settings.md`, defaults in `settings.default.json`). Character voices are per-character, not here.
 2. Picks **one disruptive concept** as the game's learning goal — ideally real-world science — and a small **learning ladder** for it (`learning_design.md`).
-3. Spins up a new game under `partidas/` from the template and seeds its three living files (`new_game.md`, `turn_engine.md`).
+3. Spins up a new game under `matches/` from the template and seeds its three living files (`new_game.md`, `turn_engine.md`).
 4. Writes a premise using the **GM craft** rules — non-obvious, layered, honest tension (`gm_craft.md`).
 5. Describes the situation, asks an **open decision**, and runs the turn loop — narrating within `settings.json` and updating the three living files **every turn** so the world stays consistent.
 6. Runs the **six-act arc** (`structure.md`, 15 turns by default), landing the finale on schedule, then logs a session recap noting **what was learned**.
 
 ## Load-bearing principles
 
-- **Two audiences at once.** The surface layer must delight the kids; a second layer (real mechanics, genuine dilemmas, dry wit) must keep an adult engaged. Shallow-but-cute is a failure state — see the honest retro on `partidas/la-estrella-dormida/`.
+- **Two audiences at once.** The surface layer must delight the kids; a second layer (real mechanics, genuine dilemmas, dry wit) must keep an adult engaged. Shallow-but-cute is a failure state — see the honest retro on `matches/la-estrella-dormida/`.
 - **Gradually challenge kids into complexity and real-world science.** Educational play should climb, not coddle. Each game teaches by making the child *reason*, not by narrating facts at them.
 - **One disruptive concept per game.** Exactly one genuinely new idea per campaign, introduced in graspable rungs. Not a firehose; a single well-built ladder.
 - **No lazy anthropomorphism.** The strange thing must actually be strange. Alien biology is not Earth biology with a hat; a golem obeys geology, not psychology. Default taxonomies are banned unless subverting them *is* the concept.
-- **Everything tunable is a setting, not a hardcode.** Locale, narrator voice, rating, player count/ages, difficulty, duration and learning intensity live in each match's `settings.json` (`settings.md`). Framework docs are in English — they're GM tooling; the *narration* language is whatever `settings.json` says.
-- **It's a role-playing game: voice lives on characters.** The narrator stays neutral by default; each character speaks an idiolect drawn from their background (role/class/era/region). Recorded as `Voz` per character, kept consistent across turns.
-- **Consistency via the three living files**, updated every turn: `jugadores`, `lore`, `narrativa`.
+- **Everything tunable is a setting, not a hardcode.** Locale, narrator voice, rating, player count/ages, difficulty, depth, duration and learning intensity live in each match's `settings.json` (`settings.md`).
+- **The framework is English, independent of game language.** Every `.this/` facet, every schema key/enum, every file and directory name in this subtree is English GM tooling. The *narration* — what actually gets said in a running match — is whatever `settings.json` → `language.locale` says, and only that layer varies.
+- **It's a role-playing game: voice lives on characters.** The narrator stays neutral by default; each character speaks an idiolect drawn from their background (role/class/era/region). Recorded as `Voice` per character, kept consistent across turns.
+- **Each game is a blank slate.** No player history, level, or preferences carry over between matches — every match starts fresh from its own `settings.json`.
+- **Consistency via the three living files**, updated every turn: `players`, `lore`, `narrative`.
 
 ## `.this/` facets
 
-| Faceta | Cuándo cargar |
-|--------|---------------|
-| `settings.md` | Always — the per-match config schema (locale + narrator, rating, players, difficulty, duration, learning) |
+| Facet | When to load |
+|-------|---------------|
+| `settings.md` | Always — the per-match config schema (locale + narrator, rating, players, difficulty, depth, duration, learning) |
 | `structure.md` | Always — the default 15-turn, six-act dramatic arc; which act/turn to be in |
 | `gm_craft.md` | Always when narrating — the craft of a compelling, disruptive GM + anti-shallow checklist |
 | `learning_design.md` | When starting a game (choose the disruptive concept + ladder) and each turn (advance the ladder) |
 | `turn_engine.md` | Always — the turn loop and the three-living-files contract |
 | `new_game.md` | When a player states a new idea — the setup checklist |
-| `memory.md` | When a returning player is present — cross-partida player profiles (level, concepts already covered, preferences), read at game start and written at game end |
 
 Platform files: `settings.default.json` (default match config to copy).
 
-## Hijos
+## Children
 
-| Nodo | Propósito |
+| Node | Purpose |
 |------|-----------|
 | `.this/` | The framework (facets above) |
-| `partidas/` | Individual games/campaigns, each a self-contained node with its own three living files |
+| `matches/` | Individual games/campaigns, each a self-contained node with its own three living files |
 
-## Partidas
+## Matches
 
-| Partida | Estado | Concepto disruptivo |
+| Match | Status | Disruptive concept |
 |---------|--------|---------------------|
-| `la-estrella-dormida/` | ✅ Terminada (11 turnos) | (retro: débil/antropomórfico — primer ensayo, ver su nota) |
+| `la-estrella-dormida/` | ✅ Finished (11 turns) | (retro: weak/anthropomorphic — first trial run, see its note) |

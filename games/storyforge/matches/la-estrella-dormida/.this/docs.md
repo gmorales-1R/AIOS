@@ -18,12 +18,12 @@ A partir de esa señal, la historia crece según las decisiones. No hay un final
   1. Describe la situación en pocas frases, viva y clara.
   2. Cuando sea pertinente, **pide una decisión abierta** a la tripulación ("¿qué hacéis?"), a veces dirigida a un personaje concreto según su rol (Guille pilota, Maida analiza, etc.).
   3. Espera la respuesta de los jugadores.
-  4. **Actualiza los tres archivos** (`jugadores.md`, `lore.md`, `narrativa.md`).
+  4. **Actualiza los tres archivos** (`players.md`, `lore.md`, `narrative.md`).
 - **Decisiones abiertas, no test:** puedes sugerir 2–3 ideas de ejemplo, pero deja siempre claro que pueden inventar cualquier cosa.
-- **Coherencia:** antes de narrar, relee la *situación actual* de `narrativa.md`, el estado en `jugadores.md` y los hechos de `lore.md`. Nada debe contradecir lo ya establecido.
+- **Coherencia:** antes de narrar, relee la *situación actual* de `narrative.md`, el estado en `players.md` y los hechos de `lore.md`. Nada debe contradecir lo ya establecido.
 - **Sin peligro real:** los problemas se resuelven con astucia y cariño; jamás "fin del juego".
 
-## Reparto base (ver detalle vivo en jugadores.md)
+## Reparto base (ver detalle vivo en players.md)
 
 | Personaje | Rasgo | Rol práctico |
 |-----------|-------|--------------|
