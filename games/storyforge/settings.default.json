@@ -2,10 +2,8 @@
   "title": "Nueva partida",
   "language": {
     "locale": "es-CL",
-    "register": "culto",
-    "formality": "tú/ustedes",
-    "slang_level": "bajo",
-    "notes": "Español de Chile educado (clase media-alta), gramática cuidada y cálida. Chilenismos transversales y suaves con moderación (harto, al tiro, ¿cierto?); evitar 'po', coa, jerga flaite y garabatos. El sabor chileno viene del léxico y la musicalidad culta, no de la jerga."
+    "narrator": "neutral",
+    "notes": "Narrador en español de Chile neutro y claro (sin acento de clase, sin jerga flaite ni 'po'): describe y pregunta con limpieza para que el color lo pongan los personajes. Las VOCES de los personajes son dinámicas según su origen (rol, clase, época, región) y se anotan en su campo 'Voz'. La paleta de acentos/sociolectos de este mundo sale del locale."
   },
   "rating": "PG",
   "players": {

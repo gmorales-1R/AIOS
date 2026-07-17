@@ -2,10 +2,8 @@
   "title": "La Capitana Clara y la Estrella Dormida",
   "language": {
     "locale": "es-CL",
-    "register": "coloquial",
-    "formality": "tú/ustedes",
-    "slang_level": "alto",
-    "notes": "RETRO: se narró demasiado coloquial/flaite ('po', jerga a cada rato). El registro correcto para esta familia era 'culto' (chileno educado). Corregido en el default del framework."
+    "narrator": "neutral",
+    "notes": "RETRO: el NARRADOR se narró demasiado coloquial/flaite ('po', jerga a cada rato); debía ser neutro. Además no había voces de personajes diferenciadas por origen. El modelo correcto (narrador neutro + voces dinámicas por personaje) se incorporó al framework tras esta partida."
   },
   "rating": "PG",
   "players": {

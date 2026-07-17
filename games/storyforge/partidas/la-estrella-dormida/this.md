@@ -15,9 +15,9 @@ El adulto la encontró **superficial, obvia y aburrida**; los niños la disfruta
 - **Concepto disruptivo débil/ausente.** La "xenobiología" fue en realidad animalitos terrestres con sentimientos — antropomorfismo, no ciencia. No enseñó un sistema real.
 - **Solución telegrafiada.** "No son malas, tienen frío" se veía desde la primera pista; ninguna hipótesis fue refutada.
 - **Decisiones sin consecuencia.** Todos los caminos convergían al mismo beat cálido.
-- **Registro equivocado.** Se narró en chileno demasiado coloquial/flaite ("po", jerga); la familia quería un registro **culto/educado**. De ahí que `register` sea ahora un ajuste en `settings.json` (default es-CL `culto`).
+- **Voz equivocada.** El **narrador** habló en chileno flaite ("po", jerga) en vez de mantenerse neutro, y los personajes no tenían voces propias diferenciadas por origen. De ahí el modelo actual: **narrador neutro** (`language.narrator`) + **voces dinámicas por personaje** (`Voz`, según rol/clase/época/región).
 
-Sirve como línea base: la próxima partida debe elegir **un concepto disruptivo real**, construir su escalera de aprendizaje y respetar el `register` configurado.
+Sirve como línea base: la próxima partida debe elegir **un concepto disruptivo real**, construir su escalera de aprendizaje, mantener el narrador neutro y dar a cada personaje una voz propia por su origen.
 
 ## Archivos
 

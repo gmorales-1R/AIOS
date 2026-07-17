@@ -27,6 +27,7 @@ Load this whenever you narrate. It is the difference between "cute but shallow" 
 - **Diegetic tools, not narration.** Let players *use* the concept (measure it, test it, exploit it), don't lecture it. Maida's scanner should reveal a number that means something, not a moral.
 - **Escalate the ladder.** Start intuitive, end at the real concept. Each act climbs one rung (see `learning_design.md`).
 - **Character as function, with texture.** Each crew member is a lens (Clara decides, Guille acts, Maida analyzes, José disrupts/comic-relief). Use the disruptor to voice the naive theory so the world can correct it.
+- **Voice by background.** This is a role-playing game: every character speaks in an idiolect that reveals *who they are* — role, class, era, region, education, temperament. In an `en-UK` mine, the coal shoveler is broad Cockney ("cor, that ain't no statue, guv…") and the mine-owner is pompous RP ("I must protest — the structural surveys were quite conclusive"). Dialogue should let a listener guess a character's station before they're told. Keep each voice **consistent** across turns (record it as `Voz` in `jugadores.md`/`lore.md`) and **distinct** from the others. The **narrator stays neutral** (`language.narrator`) so the characters carry the color — a narrator doing an accent muddies the scene. Accent and attitude yes; content still obeys `rating`.
 - **Earn the ending.** The finale should require the players to *apply* the concept they learned, not just witness a nice moment.
 
 ## Pacing shape (default)
@@ -42,5 +43,5 @@ Keep individual beats short and read-aloud friendly — depth is in the *structu
 Craft intensity is not fixed — read the match config:
 - **`difficulty`** sets how hard hypotheses get refuted and how much choices cost (`suave` → gentle/guided; `desafiante` → real inference, persistent forks). Never crosses into cruelty regardless.
 - **`duration.ideal_turns`** sets arc length — plant the "turn of the screw" and climb the ladder so the finale lands near it, not whenever.
-- **`language.register`** sets tone: match the wit and vocabulary to it. An `culto` es-CL game is warm and clever without street slang; the second-layer humor should read as educated, not flaite.
+- **`language`** sets the *narrator* voice (default neutral) and the *locale* palette; character voices come from their backgrounds, not from a global register (see "Voice by background").
 - **`learning.intensity`** sets how much the concept drives the plot vs. sits in the background.

@@ -5,28 +5,28 @@ How a game runs, mechanically. Generalized from `la-estrella-dormida`.
 ## The turn loop
 
 Each turn:
-0. **Read `settings.json`** (match config): language + register, rating, players, difficulty, duration, learning. Everything below obeys it.
+0. **Read `settings.json`** (match config): locale + narrator voice, rating, players, difficulty, duration, learning. Everything below obeys it.
 1. **Reload state.** Read the active game's `narrativa.md` (situación actual + open threads + ladder rung), `jugadores.md` (crew/players state), `lore.md` (established facts + the disruptive concept). Nothing you narrate may contradict these.
-2. **Narrate one short beat** in the configured language/register and within the configured `rating`. Run the `gm_craft.md` anti-shallow checklist (calibrated to `difficulty`). Advance the pacing/ladder when the beat calls for it, aiming the arc at `duration.ideal_turns`.
+2. **Narrate one short beat** with a **neutral narrator** (`language.narrator`) in the `locale`, voicing each character in their own **`Voz`** (dynamic, by background — see `gm_craft.md`), all within the configured `rating`. Run the anti-shallow checklist (calibrated to `difficulty`). Advance the pacing/ladder when the beat calls for it, aiming the arc at `duration.ideal_turns`.
 3. **Ask an open decision** when pertinent — a question that makes the players *reason*, not just pick from a menu. Offer 2–4 example moves plus an always-open free option (phrased in the configured language). Address the right character by role when useful.
 4. **Update the three living files** to reflect what happened and leave a clean state for next turn.
 5. **Commit & push** (progress survives the ephemeral container). One commit per turn: `"<partida> · turno N: <resumen corto>"`.
 
 ## Config vs. state (per partida)
 
-- **`settings.json`** — match config (language/register, rating, players, difficulty, duration, learning). Set at game start; changes rarely. Read every turn, but not part of the story state.
+- **`settings.json`** — match config (locale + narrator, rating, players, difficulty, duration, learning). Set at game start; changes rarely. Read every turn, but not part of the story state.
 - **The three living files** below — the story *state*, rewritten every turn.
 
 ## The three living files (per partida)
 
 ### `jugadores.md` — crew & players
 - Who's who: each character (role/lens) + which real player is driving them, if known.
-- Per character: ánimo, objetos, ubicación, last action.
+- Per character: **Voz** (idiolect by background — role/class/era/region/temperament), ánimo, objetos, ubicación, last action.
 - **Player level note** (for `learning_design.md` scaling): how much scaffolding this table of players needs.
 - Common: current location, turn number, active mission.
 
 ### `lore.md` — the world & the concept
-- The world, places, non-player characters, rules of the universe.
+- The world, places, non-player characters (each NPC with a **Voz** — idiolect by background), rules of the universe.
 - **Concepto disruptivo** section: the real mechanism, its kid-facing framing, the vocabulary being introduced, and the learning ladder (rungs).
 - Established facts — anything the fiction has committed to. Append as discovered; never silently contradict.
 
@@ -57,6 +57,7 @@ When the arc lands, mark the partida ✅ in its files and this node's `this.md`,
 - Dónde: … | Turno: 0 | Misión: …
 - Nivel de los jugadores (scaffolding): …
 ## <Personaje> (<rol/lente>)  ·  jugador: <nombre si se sabe>
+- Voz: <idiolecto por origen: rol/clase/época/región/temperamento>
 - Ánimo: … | Objetos: … | Notas: …
 ```
 
@@ -64,6 +65,7 @@ When the arc lands, mark the partida ✅ in its files and this node's `this.md`,
 ```
 # lore — <partida>
 ## Mundo / lugares / personajes
+- <NPC> — Voz: <idiolecto por origen> | …
 …
 ## Concepto disruptivo (meta de aprendizaje)
 - Concepto: … (mecanismo real)
