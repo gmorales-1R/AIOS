@@ -30,11 +30,9 @@ Load this whenever you narrate. It is the difference between "cute but shallow" 
 - **Voice by background.** This is a role-playing game: every character speaks in an idiolect that reveals *who they are* — role, class, era, region, education, temperament. In an `en-UK` mine, the coal shoveler is broad Cockney ("cor, that ain't no statue, guv…") and the mine-owner is pompous RP ("I must protest — the structural surveys were quite conclusive"). Dialogue should let a listener guess a character's station before they're told. Keep each voice **consistent** across turns (record it as `Voz` in `jugadores.md`/`lore.md`) and **distinct** from the others. The **narrator stays neutral** (`language.narrator`) so the characters carry the color — a narrator doing an accent muddies the scene. Accent and attitude yes; content still obeys `rating`.
 - **Earn the ending.** The finale should require the players to *apply* the concept they learned, not just witness a nice moment.
 
-## Pacing shape (default)
+## Pacing shape
 
-- **Act 1 — Hook & the wrong theory.** Present the situation; let the obvious (usually anthropomorphic/intuitive) theory form.
-- **Act 2 — The world pushes back.** Facts accumulate that the wrong theory can't explain. Players test, fail informatively, revise. Introduce the concept's real mechanics rung by rung.
-- **Act 3 — Apply & land.** Players use the concept correctly to resolve the situation. Warm, earned ending. Note the learning in the session log.
+The default arc is a **15-turn, six-act structure** — see `structure.md` for the full beat sheet (Mundo conocido → Irrupción → Prueba y aprendizaje → Vuelco → Batalla final → Vuelta a casa). Always know which act/turn you're in and do that act's job. The concept's learning ladder rides the same curve; the "turn of the screw" is structurally the Act IV reveal.
 
 Keep individual beats short and read-aloud friendly — depth is in the *structure*, not in longer paragraphs.
 

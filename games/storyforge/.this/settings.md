@@ -77,7 +77,7 @@ Difficulty is orthogonal to `rating`: a `desafiante` game can still be `G`. Dang
 
 ## Duration
 
-Land the arc near `duration.ideal_turns`. If players want to keep going past a natural ending, treat it as a new arc (new concept, new ladder) rather than padding. `pacing` tunes how much happens per beat.
+Default `ideal_turns` is **15**, shaped by the six-act structure in `structure.md` (`[2,3,5,3,1,1]`). Land the arc near `ideal_turns`; if `ideal_turns` differs from 15, scale the acts per `structure.md` (keep the shape, Acts V/VI stay 1 turn). If players want to keep going past a natural ending, treat it as a **new arc** (new concept, new ladder) rather than padding. `pacing` tunes how much happens per beat.
 
 ## How the framework uses settings
 

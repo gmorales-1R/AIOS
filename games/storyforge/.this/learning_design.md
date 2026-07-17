@@ -20,11 +20,13 @@ Record it in the game's `lore.md` (a "Concepto disruptivo" section) — its real
 
 ## The learning ladder
 
-Break the concept into **~3 rungs**, intuitive → real, mapped loosely onto the three acts (see `gm_craft.md`):
+Break the concept into **~3 rungs**, intuitive → real, mapped onto the six-act arc (`structure.md`):
 
-1. **Rung 1 — Intuition & the wrong model.** The child meets the phenomenon through a familiar (often anthropomorphic) lens. Let that model form; it's the thing we'll upgrade.
-2. **Rung 2 — The world contradicts the model.** A concrete observation the intuitive model can't explain. The child must revise. Introduce the first real mechanic + one real word.
-3. **Rung 3 — The real concept, applied.** The child uses the actual mechanism to solve the finale. They leave with a working (if simple) mental model.
+1. **Rung 1 — Intuition & the wrong model** (Acts I–II). The child meets the phenomenon through a familiar (often anthropomorphic) lens. Let that model form; it's the thing we'll upgrade.
+2. **Rung 2 — The world contradicts the model** (Act III). The Act III setback proves the intuitive model fails; the build-up then teaches the real mechanics + real vocabulary, one at a time. The "training montage" *is* rung 2.
+3. **Rung 3 — The real concept, applied** (Act V). The child uses the actual mechanism to win the final battle. They leave with a working (if simple) mental model.
+
+The **Act IV reveal** is usually the concept's true mechanism clicking into place — the plot twist and the "aha" are the same beat.
 
 Track ladder progress in `narrativa.md` (a "Escalera de aprendizaje" line: which rung is active, what's been delivered).
 

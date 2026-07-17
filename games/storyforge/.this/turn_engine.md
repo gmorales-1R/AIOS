@@ -7,10 +7,11 @@ How a game runs, mechanically. Generalized from `la-estrella-dormida`.
 Each turn:
 0. **Read `settings.json`** (match config): locale + narrator voice, rating, players, difficulty, duration, learning. Everything below obeys it.
 1. **Reload state.** Read the active game's `narrativa.md` (situación actual + open threads + ladder rung), `jugadores.md` (crew/players state), `lore.md` (established facts + the disruptive concept). Nothing you narrate may contradict these.
-2. **Narrate one short beat** with a **neutral narrator** (`language.narrator`) in the `locale`, voicing each character in their own **`Voz`** (dynamic, by background — see `gm_craft.md`), all within the configured `rating`. Run the anti-shallow checklist (calibrated to `difficulty`). Advance the pacing/ladder when the beat calls for it, aiming the arc at `duration.ideal_turns`.
-3. **Ask an open decision** when pertinent — a question that makes the players *reason*, not just pick from a menu. Offer 2–4 example moves plus an always-open free option (phrased in the configured language). Address the right character by role when useful.
-4. **Update the three living files** to reflect what happened and leave a clean state for next turn.
-5. **Commit & push** (progress survives the ephemeral container). One commit per turn: `"<partida> · turno N: <resumen corto>"`.
+2. **Locate yourself in the arc.** Check `narrativa.md` for the current **acto/turno** (`structure.md`). Do *this act's job*; if the act is about to end, hit its turning point now (don't let the middle sag or the reveal rush).
+3. **Narrate one short beat** with a **neutral narrator** (`language.narrator`) in the `locale`, voicing each character in their own **`Voz`** (dynamic, by background — see `gm_craft.md`), all within the configured `rating`. Run the anti-shallow checklist (calibrated to `difficulty`). Advance the ladder/act when the beat calls for it.
+4. **Ask an open decision** when pertinent — a question that makes the players *reason*, not just pick from a menu. Offer 2–4 example moves plus an always-open free option (phrased in the configured language). Address the right character by role when useful.
+5. **Update the three living files** to reflect what happened (incl. the current acto/turno) and leave a clean state for next turn.
+6. **Commit & push** (progress survives the ephemeral container). One commit per turn: `"<partida> · turno N: <resumen corto>"`.
 
 ## Config vs. state (per partida)
 
@@ -31,7 +32,8 @@ Each turn:
 - Established facts — anything the fiction has committed to. Append as discovered; never silently contradict.
 
 ### `narrativa.md` — the story & the state
-- **Situación actual:** turn, where we are, what just happened, decisión pendiente.
+- **Situación actual:** **acto/turno** (e.g. "Acto III · turno 7/15"), where we are, what just happened, decisión pendiente.
+- **Plan de actos:** the per-act turn budget for this match (from `structure.md`, scaled to `ideal_turns`).
 - **Escalera de aprendizaje:** which rung is active; what's been delivered so far.
 - **Hilos abiertos (open threads):** tracked consequences and setups that should pay off or bite later. This is what makes choices matter — revisit them.
 - **Bitácora:** one row per turn (qué pasó | decisión de los jugadores).
@@ -80,7 +82,9 @@ When the arc lands, mark the partida ✅ in its files and this node's `this.md`,
 ```
 # narrativa — <partida>
 ## Situación actual
-- Turno: 0 | Dónde: … | Qué pasó: … | Decisión pendiente: …
+- Acto: I | Turno: 0/15 | Dónde: … | Qué pasó: … | Decisión pendiente: …
+## Plan de actos (structure.md, ideal_turns=15)
+- I Mundo conocido: t1-2 | II Irrupción: t3-5 | III Prueba y aprendizaje: t6-10 | IV Vuelco: t11-13 | V Batalla final: t14 | VI Vuelta a casa: t15
 ## Escalera de aprendizaje
 - Rung activo: 1 | Entregado: —
 ## Hilos abiertos

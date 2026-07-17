@@ -11,7 +11,7 @@ A player states a premise ("dwarves mining who find a stone golem"). The GM does
 3. Spins up a new game under `partidas/` from the template and seeds its three living files (`new_game.md`, `turn_engine.md`).
 4. Writes a premise using the **GM craft** rules — non-obvious, layered, honest tension (`gm_craft.md`).
 5. Describes the situation, asks an **open decision**, and runs the turn loop — narrating within `settings.json` and updating the three living files **every turn** so the world stays consistent.
-6. Lands the arc (near `duration.ideal_turns`) and logs a session recap noting **what was learned**.
+6. Runs the **six-act arc** (`structure.md`, 15 turns by default), landing the finale on schedule, then logs a session recap noting **what was learned**.
 
 ## Load-bearing principles
 
@@ -28,6 +28,7 @@ A player states a premise ("dwarves mining who find a stone golem"). The GM does
 | Faceta | Cuándo cargar |
 |--------|---------------|
 | `settings.md` | Always — the per-match config schema (locale + narrator, rating, players, difficulty, duration, learning) |
+| `structure.md` | Always — the default 15-turn, six-act dramatic arc; which act/turn to be in |
 | `gm_craft.md` | Always when narrating — the craft of a compelling, disruptive GM + anti-shallow checklist |
 | `learning_design.md` | When starting a game (choose the disruptive concept + ladder) and each turn (advance the ladder) |
 | `turn_engine.md` | Always — the turn loop and the three-living-files contract |
