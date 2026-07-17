@@ -1,6 +1,6 @@
 # settings — per-match configuration
 
-Every game (match) is configured by a **`settings.json`** at its root. It is the single source of truth for language, rating, players, difficulty, depth, duration, and learning intensity. The GM **reads it first, every turn**, and narrates within it. Nothing in the framework should hardcode these — they used to be baked in ("Chilean Spanish, PG"); now they're config. The framework itself (this doc, every `.this/` facet, every schema key and enum value) is always in **English**, independent of what `language.locale` the match is narrated in.
+Every game (match) is configured by a **`settings.json`** at its root. It is the single source of truth for language, rating, players, difficulty, depth, reality check, duration, and learning intensity. The GM **reads it first, every turn**, and narrates within it. Nothing in the framework should hardcode these — they used to be baked in ("Chilean Spanish, PG"); now they're config. The framework itself (this doc, every `.this/` facet, every schema key and enum value) is always in **English**, independent of what `language.locale` the match is narrated in.
 
 Defaults live in `storyforge/settings.default.json`; a new match copies and overrides.
 
@@ -23,6 +23,7 @@ Defaults live in `storyforge/settings.default.json`; a new match copies and over
   },
   "difficulty": "gentle",            // gentle | moderate | challenging — how hard puzzles/hypotheses push back
   "depth": "layered",                // light | layered | existential — how twisted, real, and existential the plot gets
+  "reality_check": 5,                // 1-10 — how fantastical (1) vs scientifically defensible (10) the world's phenomena are
   "duration": {
     "ideal_turns": 15,               // target arc length; land the story near this
     "target_time": "one sitting (~30-45 min)",
@@ -80,6 +81,20 @@ Depth never licenses cruelty or content above `rating` — an `existential` `G`-
 
 Depth is also the dial for `gm_craft.md`'s **layered maturity** technique — lines that read as simple and warm at face value but carry a second, unstated meaning for older players. That technique is what lets `existential` reach real themes without ever breaking the surface story a young child is following.
 
+## Reality check — fantasy vs hard science
+
+A third independent axis, orthogonal to `difficulty` and `depth`: how much the world's phenomena — physical, psychological, evolutionary — must correspond to real, defensible science versus invented fairy-tale logic. Integer **1-10**, default **5**.
+
+| reality_check | What phenomena run on |
+|:---:|---|
+| **1-2** | Mythic/fairy-tale logic. A sleeping star, a whispering tree, a curse — invented rules, not real science. Calibration anchor: `matches/la-estrella-dormida/` sits here. |
+| **3-4** | Fable with a scientific gloss. Invented rules dressed in sciencey-sounding flavor text, not meant to hold up to scrutiny. |
+| **5-6** (default) | Educational sci-fi (Magic-School-Bus territory). Real phenomena, simplified for the learning ladder (`learning_design.md`) but never contradicted — just incomplete. |
+| **7-8** | Grounded speculative science. Real, specific mechanisms explained close to their true complexity; extrapolations are plausible extensions of real science, not proven but not contradicted either. |
+| **9-10** | Rigorous conjecture. Every phenomenon must be defensible under current theory even where unproven or fictional. Speculative is welcome (a hypothetical exotic biochemistry, an unconfirmed cosmological mechanism); impossible is not — **"not proven but fully possible" excludes anything current theory says can't happen**, not just things nobody's confirmed yet. Reverse time travel and other causality-breaking devices are out even at 10. |
+
+`reality_check` is independent of the **no lazy anthropomorphism** rule (`this.md`, `learning_design.md`) — that rule always holds, at every level. It governs whether a non-human system's *mechanism* is human feelings (never allowed, at 1 or at 10) or something with real rules of its own. What `reality_check` changes is whether those rules are **invented-but-internally-consistent** (low end — a magic system still has to obey itself) or **actually real / theoretically defensible** (high end). It also scopes `learning_design.md`'s "prefer real science" guidance: at low `reality_check`, the disruptive concept can be taught through a fantasy metaphor; at high `reality_check`, the concept must be the literal real mechanism, taught precisely.
+
 ## Rating / safety
 
 | rating | What it allows |
@@ -98,5 +113,5 @@ Default `ideal_turns` is **15**, shaped by the six-act structure in `structure.m
 
 - `turn_engine.md`: read `settings.json` at the top of every turn; narrate with a `narrator`-neutral voice, voice each character per their `Voice`, keep beats within `duration.pacing`, aim the arc at `ideal_turns`.
 - `gm_craft.md`: give each character a distinct voice by background; calibrate refutation harshness and consequence weight to `difficulty`; calibrate twist magnitude and thematic reach to `depth`.
-- `learning_design.md`: scale the ladder to `players.ages`/`level` and `learning.intensity`; skip the concept if `learning.enabled` is false (pure-fun mode).
+- `learning_design.md`: scale the ladder to `players.ages`/`level` and `learning.intensity`; skip the concept if `learning.enabled` is false (pure-fun mode); ground the concept's mechanics per `reality_check`.
 - `new_game.md`: create/confirm `settings.json` as step 1.

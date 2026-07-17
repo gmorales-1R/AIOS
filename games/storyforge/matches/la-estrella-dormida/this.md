@@ -17,7 +17,7 @@ The adult found it **shallow, obvious, and boring**; the kids loved it. Failures
 - **Consequence-free decisions.** Every path converged on the same warm beat.
 - **Wrong voice.** The **narrator** spoke in colloquial Chilean street slang instead of staying neutral, and characters had no voices distinguished by background. That's what produced the current model: **neutral narrator** (`language.narrator`) + **dynamic per-character voices** (`Voice`, by role/class/era/region).
 
-Serves as the baseline: the next match should pick **one real disruptive concept**, build its learning ladder, keep the narrator neutral, and give each character their own voice by background.
+Serves as the baseline: the next match should pick **one real disruptive concept**, build its learning ladder, keep the narrator neutral, and give each character their own voice by background. It's also the **`reality_check: 1`** calibration anchor in `settings.md` — the mythic/fairy-tale end of that scale (sleeping stars, whispering trees), as opposed to the scientifically-grounded end at `10`.
 
 ## Files
 

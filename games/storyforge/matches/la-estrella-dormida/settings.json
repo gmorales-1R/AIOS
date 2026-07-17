@@ -14,6 +14,7 @@
   },
   "difficulty": "gentle",
   "depth": "light",
+  "reality_check": 1,
   "duration": {
     "ideal_turns": 12,
     "target_time": "one sitting",

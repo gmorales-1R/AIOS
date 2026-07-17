@@ -11,7 +11,7 @@ Each game (match) has **exactly one** disruptive concept — a single genuinely-
 ### Choosing the concept (at game start)
 
 Given the player's idea, pick one concept that:
-- is **real** where possible (physics, geology, biology, chemistry, math, engineering, ecology) — fiction is the wrapper, the mechanism is real;
+- is **real** where possible (physics, geology, biology, chemistry, math, engineering, ecology) — fiction is the wrapper, the mechanism is real; how literally "real" is set by `reality_check` (`settings.md`) — low end, teach it through a consistent fantasy metaphor; high end, teach the literal mechanism, precisely;
 - **fits the setting** so it emerges naturally from the fiction, not bolted on;
 - is **age-appropriate but slightly above** the child's current intuition — the productive stretch;
 - can be **discovered by reasoning**, not just told.
