@@ -78,6 +78,8 @@ A second, independent axis from `difficulty`. Difficulty is about how hard the *
 
 Depth never licenses cruelty or content above `rating` — an `existential` `G`-rated game earns its weight through honesty and stakes, not through darkness for its own sake. It compounds with `gm_craft.md`'s anti-shallow checklist: `light` still runs the checklist (no telegraphed answers), `existential` just asks more of it.
 
+Depth is also the dial for `gm_craft.md`'s **layered maturity** technique — lines that read as simple and warm at face value but carry a second, unstated meaning for older players. That technique is what lets `existential` reach real themes without ever breaking the surface story a young child is following.
+
 ## Rating / safety
 
 | rating | What it allows |

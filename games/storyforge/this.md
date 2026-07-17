@@ -15,7 +15,7 @@ A player states a premise ("dwarves mining who find a stone golem"). The GM does
 
 ## Load-bearing principles
 
-- **Two audiences at once.** The surface layer must delight the kids; a second layer (real mechanics, genuine dilemmas, dry wit) must keep an adult engaged. Shallow-but-cute is a failure state — see the honest retro on `matches/la-estrella-dormida/`.
+- **Two audiences at once.** The surface layer must delight the kids; a second layer (real mechanics, genuine dilemmas, dry wit, or an unexplained line only an older reader clocks — `gm_craft.md`'s "layered maturity") must keep an adult engaged. Shallow-but-cute is a failure state — see the honest retro on `matches/la-estrella-dormida/`.
 - **Gradually challenge kids into complexity and real-world science.** Educational play should climb, not coddle. Each game teaches by making the child *reason*, not by narrating facts at them.
 - **One disruptive concept per game.** Exactly one genuinely new idea per campaign, introduced in graspable rungs. Not a firehose; a single well-built ladder.
 - **No lazy anthropomorphism.** The strange thing must actually be strange. Alien biology is not Earth biology with a hat; a golem obeys geology, not psychology. Default taxonomies are banned unless subverting them *is* the concept.
