@@ -30,13 +30,14 @@ The **Act IV reveal** is usually the concept's true mechanism clicking into plac
 
 Track ladder progress in `narrative.md` (a "Learning ladder" line: which rung is active, what's been delivered).
 
-## The anti-anthropomorphism rule
+## The anti-anthropomorphism rule (scoped to what the concept claims to be)
 
-Our first game failed here: "xenobiology" was Earth animals with feelings. Guard against it:
+Our first game's actual failure wasn't that its creatures had feelings — it's that they were pitched as **xenobiology** (a claim of real, alien science) and then resolved as Earth animals with feelings and nothing behind it. That's a broken promise, not a ban on personification. Whether personification is a cop-out or the correct genre logic depends on `reality_check` (`settings.md`):
 
-- **Non-human things obey non-human rules.** A golem = geomechanics. An alien ecosystem = its own chemistry/energy source. A cave = fluid dynamics + structural load. Ask "what does this *actually* run on?" before giving it a personality.
-- **Personality is allowed as a hook, not as the explanation.** A friendly narrator-creature can ease kids in, but the *mechanism* behind the mystery must be real and impersonal.
-- **When you catch yourself reaching for a mammal metaphor, stop** and reach for the real system instead. The strangeness is the point.
+- **At low `reality_check` (mythic/fairy-tale, 1-2):** a sleeping star being sad, a tree that whispers — that's the world's real, internally-consistent logic, not laziness. Animism can *be* the concept, as long as it stays consistent (the star is sad for a stated, stable reason, not sad differently every scene).
+- **At mid-to-high `reality_check`:** once a concept is framed as a real system (biology, geology, physics), it must run on that system's actual rules, not on human feelings standing in for them. A golem = geomechanics. An alien ecosystem = its own chemistry/energy source. A cave = fluid dynamics + structural load. Ask "what does this *actually* run on?" before giving it a personality.
+- **The tell, at any level:** did you reach for "it's sad/scared/lonely" *instead of* building the mechanism you promised, or *as* the mechanism you always intended? The first is the failure mode; the second is just world-building appropriate to the match's `reality_check`.
+- **Personality is always allowed as a hook**, even in a hard-science match — a friendly narrator-creature can ease kids in — as long as the mystery's actual mechanism, once revealed, matches the rigor `reality_check` promises.
 
 ## Scaling to the child
 
