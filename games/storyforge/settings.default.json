@@ -1,0 +1,29 @@
+{
+  "title": "New match",
+  "language": {
+    "locale": "en-US",
+    "narrator": "neutral",
+    "notes": "Neutral, clear narrator voice for this locale (no class accent, no regional slang): describe and ask cleanly so the characters carry the color. Character VOICES are dynamic per background (role, class, era, region) and recorded in each character's 'Voice' field. This world's accent/sociolect palette is drawn from the locale."
+  },
+  "rating": "PG",
+  "players": {
+    "count": 1,
+    "ages": [],
+    "names": [],
+    "level": "beginner"
+  },
+  "difficulty": "gentle",
+  "depth": "layered",
+  "reality_check": 5,
+  "duration": {
+    "ideal_turns": 15,
+    "target_time": "one sitting (~30-45 min)",
+    "pacing": "normal"
+  },
+  "learning": {
+    "enabled": true,
+    "intensity": "medium",
+    "concept": null
+  },
+  "theme": null
+}
