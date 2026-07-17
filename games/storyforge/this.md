@@ -51,3 +51,4 @@ Platform files: `settings.default.json` (default match config to copy).
 | Match | Status | Disruptive concept |
 |---------|--------|---------------------|
 | `la-estrella-dormida/` | ✅ Finished (11 turns) | (retro: weak/anthropomorphic — first trial run, see its note) |
+| `self-similar/` | 🟡 In progress (Act I, turn 0/20) | Fractal geometry & iterated function systems (`reality_check: 10`, `depth: existential`) |
