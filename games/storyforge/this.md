@@ -24,6 +24,7 @@ A player states a premise ("dwarves mining who find a stone golem"). The GM does
 - **It's a role-playing game: voice lives on characters.** The narrator stays neutral by default; each character speaks an idiolect drawn from their background (role/class/era/region). Recorded as `Voice` per character, kept consistent across turns.
 - **Each game is a blank slate.** No player history, level, or preferences carry over between matches — every match starts fresh from its own `settings.json`.
 - **Consistency via the three living files**, updated every turn: `players`, `lore`, `narrative`.
+- **Straight to the point.** Every turn's response is plain and economical — state what happened, ask the decision, stop. Some embellishment (a vivid image, a character's line) is fine, but don't pad. Assume the person reading aloud supplies their own ambiance and tone; the text's job is the content, not the performance.
 
 ## `.this/` facets
 
