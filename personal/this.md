@@ -26,5 +26,6 @@ Agents operating here have the owner as their sole focus. When in doubt:
 |------|---------|
 | `calendar/` | Time and scheduling |
 | `ToDo/` | Task and action management |
+| `tinkerbell/` | General thought capture and multi-step reasoning chains |
 
 More nodes will be added as the namespace grows (health, finance, goals, knowledge, etc.).
